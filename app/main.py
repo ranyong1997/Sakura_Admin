@@ -54,11 +54,6 @@ async def read_root():
     return {"Hello": "World"}
 
 
-@app.get("/items/{item_id}")
-async def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, q: q}
-
-
 # 创建用户
 @app.post("/signup", status_code=201)
 async def create_user(user: User):
