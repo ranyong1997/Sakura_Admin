@@ -51,7 +51,7 @@ users = []
 
 @app.get("/")
 async def read_root():
-    return {"Hello": "World"}
+    return {"HelloWorld"}
 
 
 # 创建用户
