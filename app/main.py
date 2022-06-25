@@ -1,8 +1,16 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, requests
 from pydantic import BaseModel
 from typing import List
 from fastapi_jwt_auth import AuthJWT
 from typing import Optional
+from aioredis import create_redis_pool, Redis
+from app.routes.user import usersRouter
+from app.routes.course import courseRouter
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+from config import *
+from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 

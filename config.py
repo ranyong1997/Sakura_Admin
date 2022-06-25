@@ -11,9 +11,9 @@ EVENT = "test"
 SECRET_KEY = "4e95f0a14cc530df519cb8c4d77e8eb029fd40ac56fa16be572c58b5ee0b55af"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-# redishost = '127.0.0.1'  # redis配置
-# redisport = '6379'  # redis端口
-# redisdb = '0'
+redishost = '127.0.0.1'  # redis配置
+redisport = '6379'  # redis端口
+redisdb = '0'
 
 userid = 14
 user_cru = 3
@@ -24,12 +24,12 @@ username = 'Sakura_Admin'  # mysql用户名
 password = 'Sakura_Admin'  # mysql密码
 db = 'sakura_admin'  # mysql数据库
 # 测试服
-# testhost = "120.79.24.202"  # mysql地址
-# testport = 3306  # mysql端口
-# testusername = 'Sakura_Admin'  # mysql用户名
-# testpassword = 'Sakura_Admin'  # mysql密码
-# testdb = 'sakura_admin'  # mysql数据库
-#
-# testredishost = '127.0.0.1'  # redis配置
-# testredisport = '6379'  # redis端口
-# testredisdb = '0'
+testhost = "120.79.24.202"  # mysql地址
+testport = 3306  # mysql端口
+testusername = 'Sakura_Admin'  # mysql用户名
+testpassword = 'Sakura_Admin'  # mysql密码
+testdb = 'sakura_admin'  # mysql数据库
+
+testredishost = '127.0.0.1'  # redis配置
+testredisport = '6379'  # redis端口
+testredisdb = '0'
