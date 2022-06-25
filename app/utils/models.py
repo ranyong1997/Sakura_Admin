@@ -5,7 +5,7 @@
 # @Site    : 
 # @File    : models.py
 # @Software: PyCharm
-# @desc    :
+# @desc    : 数据库设计
 from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Text, DateTime
 from datetime import datetime
 from config import EVENT
@@ -25,10 +25,6 @@ class User(Base):
     username = Column(String(length=32), unique=True, index=True)  # 用户名
     password = Column(String(length=252))  # 密码
     status = Column(Integer, default=0)  # 1.删除,0正常
-    jobnum = Column(Integer, nullable=True)  # 工号
-    studentnum = Column(Integer, nullable=True)  # 学号
-    age = Column(Integer)  # 年龄
-    sex = Column(String(length=8), default="男")  # 性别
     role = Column(Integer)  # 角色
     addtime = Column(DateTime, default=datetime.now())
 
