@@ -13,7 +13,7 @@ COPY ./requirements.txt /code/requirements.txt
 # 更新pip
 RUN pip3 install --upgrade pip
 # 安装依赖
-RUN pip3 install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN pip3 install --no-cache-dir --upgrade -r /code/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 # 将项目拷贝出来
 COPY ./app /code/app
 # 运行
