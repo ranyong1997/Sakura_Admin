@@ -6,11 +6,11 @@
 # @File    : category_dal.py
 # @Software: PyCharm
 # @desc    :
-from typing import List, Optional
+from typing import List
 from fastapi import status
 from fastapi.exceptions import HTTPException
 
-from sqlalchemy import update, insert, func, delete
+from sqlalchemy import func, delete
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import with_loader_criteria
