@@ -15,6 +15,6 @@ RUN pip3 install --upgrade pip
 # 安装依赖
 RUN pip3 install --no-cache-dir --upgrade -r /code/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 # 将项目拷贝出来
-COPY ./app /code/app
+COPY webapi /code/app
 # 运行
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8090"]
