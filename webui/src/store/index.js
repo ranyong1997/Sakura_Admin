@@ -3,30 +3,30 @@
  * @version: 
  * @Author: 冉勇
  * @Date: 2022-07-07 17:46:35
- * @LastEditTime: 2022-07-07 17:50:01
+ * @LastEditTime: 2022-07-08 09:29:39
  */
-import {createStore} from 'vuex';
+import { createStore } from 'vuex';
 
 export default createStore({
-    state:{
-        test:0
+    state: {
+        test: 0
     },
-    mutations:{
-        add(state){
+    mutations: {
+        add(state) {
             state.test++;
         },
-        min(state){
+        min(state) {
             state.test--;
         },
-        set99(state,payload){
+        set99(state, payload) {
             state.test = payload
         }
     },
-    actions:{
-        change(context,payload){
-            setTimeout(()=>{
-                context.commit('set99',payload)
-            },1500)
+    actions: {
+        change(context, payload) {
+            setTimeout(() => {
+                context.commit('set99', payload)
+            }, 1500);
         }
     }
 });
