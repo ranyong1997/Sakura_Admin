@@ -1,6 +1,6 @@
 FROM node:12-buster as buildWeb
 WORKDIR /workspace
-COPY webui webui
+COPY webui1 webui
 
 WORKDIR /workspace/webui
 RUN npm install

@@ -131,15 +131,14 @@ def register_event(app):
     :return:
     """
 
-    @app.on_event('startup')
+    @app.on_event("startup")
     async def startup_event():
         try:
             await register_elasticsearch()
         except Exception as e:
-            print(e)
             traceback.print_exc()
 
-    @app.on_event('shutdown')
+    @app.on_event("shutdown")
     async def shutdown_event():
         try:
             from webapi.utils.elastic import es

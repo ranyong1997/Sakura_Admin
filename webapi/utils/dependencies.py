@@ -16,9 +16,7 @@ from webapi.db.dals.user_dal import UserDAL
 from webapi.setting import settings
 from webapi.utils import security
 
-reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f'/api/admin/login/access_token'
-)
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl='/api/admin/login/access_token')
 
 
 class DALGetter:
@@ -36,7 +34,7 @@ async def get_current_user(
 ) -> models.User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="无法验证凭据",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
@@ -44,8 +42,8 @@ async def get_current_user(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         token_data = schemas.token.TokenPayload(**payload)
-    except (jwt.JWTError, ValidationError):
-        raise credentials_exception
+    except (jwt.JWTError, ValidationError) as e:
+        raise credentials_exception from e
     user = await dal.get(id=token_data.sub)
     if user is None:
         raise credentials_exception

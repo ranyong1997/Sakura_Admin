@@ -9,16 +9,15 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from webapi.db.models.user import User
-from webapi.db.dals.post_dal import Post, PostDAL
-from webapi.db.dals.comment_dal import Comment, CommentDAL
+from webapi.db.dals.post_dal import PostDAL
+from webapi.db.dals.comment_dal import CommentDAL
 from webapi.utils.dependencies import DALGetter, get_current_user
-from webapi.db.schemas.comment import (CommentCreate, CommentInUpdate, CommentCreateAdmin, CommentCreateAnonymous,
-                                       CommentsListOut, CommentsListOutItemPost, CommentsListOutItem)
+from webapi.db.schemas.comment import (CommentCreate, CommentInUpdate, CommentCreateAdmin, CommentsListOut)
 
 router = APIRouter()
 
 
-@router.get('/', tags=['Comment'], dependencies=[Depends(get_current_user)],
+@router.get('/', tags=['评论'], dependencies=[Depends(get_current_user)],
             status_code=status.HTTP_200_OK, response_model=CommentsListOut)
 async def get_comments(
         dal: CommentDAL = Depends(DALGetter(CommentDAL)),
@@ -30,7 +29,7 @@ async def get_comments(
     return result
 
 
-@router.post('/', tags=['Comment'], status_code=status.HTTP_201_CREATED)
+@router.post('/', tags=['评论'], status_code=status.HTTP_201_CREATED)
 async def create_comment(
         user: User = Depends(get_current_user),
         comment_dal: CommentDAL = Depends(DALGetter(CommentDAL)),
@@ -51,7 +50,7 @@ async def create_comment(
     return JSONResponse(status_code=status.HTTP_201_CREATED, content={'detail': 'OK'})
 
 
-@router.put('/{comment_id}', tags=['Comment'], dependencies=[Depends(get_current_user)],
+@router.put('/{comment_id}', tags=['评论'], dependencies=[Depends(get_current_user)],
             status_code=status.HTTP_200_OK)
 async def update_comment(
         dal: CommentDAL = Depends(DALGetter(CommentDAL)), *,
@@ -64,7 +63,7 @@ async def update_comment(
     return db_obj
 
 
-@router.delete('/{comment_id}', tags=['Comment'], dependencies=[Depends(get_current_user)],
+@router.delete('/{comment_id}', tags=['评论'], dependencies=[Depends(get_current_user)],
                status_code=status.HTTP_200_OK)
 async def delete_comment(
         dal: CommentDAL = Depends(DALGetter(CommentDAL)), *,

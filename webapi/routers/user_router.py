@@ -19,19 +19,19 @@ from webapi.utils import security
 router = APIRouter()
 
 
-@router.post('/login/access_token/', tags=['User'],
+@router.post('/login/access_token/', tags=['用户'],
              response_model=Token, status_code=status.HTTP_201_CREATED)
 async def login_access_token(
-        dal: UserDAL = Depends(DALGetter(UserDAL)),
-        form_data: OAuth2PasswordRequestForm = Depends()
+        dal: UserDAL = Depends(DALGetter(UserDAL)),  # 获取用户数据访问层
+        form_data: OAuth2PasswordRequestForm = Depends()  # OAuth2PasswordRequestForm表单数据
 ):
     user = await dal.authenticate(
-        username=form_data.username,
-        password=form_data.password
+        username=form_data.username,  # 用户名
+        password=form_data.password  # 密码
     )
     if not user:
         raise HTTPException(
-            status_code=400, detail="错误的邮箱帐号或密码"
+            status_code=400, detail="错误的帐号或密码"
         )
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {
@@ -42,13 +42,13 @@ async def login_access_token(
     }
 
 
-@router.get('/login/getinfo/', tags=['User'])
+@router.get('/login/getinfo/', tags=['用户'])
 async def login_getinfo(
         current_user: User = Depends(get_current_user)
 ):
     data = {
-        'username': current_user.username,
-        'nickname': current_user.nickname,
-        'roles': ['admin']
+        '用户名': current_user.username,
+        '昵称': current_user.nickname,
+        '角色': ['admin']
     }
     return JSONResponse(content=data, status_code=status.HTTP_200_OK)

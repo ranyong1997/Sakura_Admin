@@ -7,13 +7,13 @@
 # @Software: PyCharm
 # @desc    :
 import traceback
-from typing import List, Optional
+from typing import List
 
-from sqlalchemy import update, func, delete, and_, desc
+from sqlalchemy import func, delete, desc
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload, joinedload, with_loader_criteria
-from webapi.db.models import Post, Category, Comment, post_category
+from sqlalchemy.orm import selectinload, with_loader_criteria
+from webapi.db.models import Post, Category, Comment
 from webapi.db.schemas.post import PostIn, PostInUpdate
 from webapi.utils.elastic import es_update_doc, es_delete_doc, es_create_doc
 

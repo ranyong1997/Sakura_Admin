@@ -16,7 +16,7 @@ from webapi.db.schemas.category import CategoryCreate, CategoryOut, CategoryAllO
 router = APIRouter()
 
 
-@router.get('/', tags=['Category'], dependencies=[Depends(get_current_user)], response_model=CategoryAllOut,
+@router.get('/', tags=['类别'], dependencies=[Depends(get_current_user)], response_model=CategoryAllOut,
             status_code=status.HTTP_200_OK)
 async def get_all_categories(dal: CategoryDAL = Depends(DALGetter(CategoryDAL)), unlimit: bool = True, page: int = 1,
                              limit: int = 10, *, name: str = None):
@@ -29,7 +29,7 @@ async def get_all_categories(dal: CategoryDAL = Depends(DALGetter(CategoryDAL)),
 
 
 # 游客查看类别的文章数，只显示已发布的文章
-@router.get('/published/', tags=['Category'], response_model=CategoryAllOut, status_code=status.HTTP_200_OK)
+@router.get('/published/', tags=['类别'], response_model=CategoryAllOut, status_code=status.HTTP_200_OK)
 async def get_all_categories(dal: CategoryDAL = Depends(DALGetter(CategoryDAL)),
                              *, name: str = None):
     total = await dal.count(name=name, is_published=True)
@@ -37,7 +37,7 @@ async def get_all_categories(dal: CategoryDAL = Depends(DALGetter(CategoryDAL)),
     return {'total': total, 'items': result}
 
 
-@router.post('/', tags=['Category'], dependencies=[Depends(get_current_user)], response_model=CategoryAllOut,
+@router.post('/', tags=['类别'], dependencies=[Depends(get_current_user)], response_model=CategoryAllOut,
              status_code=status.HTTP_201_CREATED)
 async def create_category(category_schema: CategoryCreate, dal: CategoryDAL = Depends(DALGetter(CategoryDAL))):
     exist = await dal.get_by_name(category_schema.name)
@@ -46,12 +46,12 @@ async def create_category(category_schema: CategoryCreate, dal: CategoryDAL = De
     return await dal.create(category_schema)
 
 
-@router.get('/selection/', tags=['Category'], response_model=CategorySelectionOut, status_code=status.HTTP_200_OK)
+@router.get('/selection/', tags=['类别'], response_model=CategorySelectionOut, status_code=status.HTTP_200_OK)
 async def get_selection_category(dal: CategoryDAL = Depends(DALGetter(CategoryDAL))):
     return await dal.get_selection()
 
 
-@router.put('/{category_id}', tags=['Category'], dependencies=[Depends(get_current_user)], response_model=CategoryOut,
+@router.put('/{category_id}', tags=['类别'], dependencies=[Depends(get_current_user)], response_model=CategoryOut,
             status_code=status.HTTP_200_OK)
 async def update_category(category_id: int, category_schema: CategoryUpdate,
                           dal: CategoryDAL = Depends(DALGetter(CategoryDAL))):
@@ -62,7 +62,7 @@ async def update_category(category_id: int, category_schema: CategoryUpdate,
     return db_obj
 
 
-@router.delete('/{category_id}/', tags=['Category'], dependencies=[Depends(get_current_user), ],
+@router.delete('/{category_id}/', tags=['类别'], dependencies=[Depends(get_current_user), ],
                status_code=status.HTTP_200_OK)
 async def delete_category(
         category_id: int,

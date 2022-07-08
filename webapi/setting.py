@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     # 默认管理员账号密码等信息
     ADMIN_USERNAME = dotenv_config.get('ADMIN_USERNAME', 'admin')  # 管理员账号
     ADMIN_PASSWORD = dotenv_config.get('ADMIN_PASSWORD', '123456')  # 密码
-    ADMIN_NICKNAME = dotenv_config.get('ADMIN_NICKNAME', 'admin')  # 管理员昵称
+    ADMIN_NICKNAME = dotenv_config.get('ADMIN_NICKNAME', 'RanY-管理员')  # 管理员昵称
     ADMIN_EMAIL = dotenv_config.get('ADMIN_EMAIL', 'admin@example.com')  # 管理员邮箱
 
     # 数据库账号密码
@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URI: str = f'mysql+aiomysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
     # Elasticsearch
-    ELASTIC_HOST = dotenv_config.get('ELASTIC_HOST', '192.168.1.197')  # Elasticsearch地址
+    ELASTIC_HOST = dotenv_config.get('ELASTIC_HOST', '192.168.1.196')  # Elasticsearch地址
     ELASTIC_PORT = dotenv_config.get('ELASTIC_PORT', 9200)  # Elasticsearch端口
 
     # 12 Hours
