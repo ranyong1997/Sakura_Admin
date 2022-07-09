@@ -1,8 +1,15 @@
+<!--
+ * @Descripttion: 
+ * @version: 
+ * @Author: 冉勇
+ * @Date: 2022-07-09 08:33:10
+ * @LastEditTime: 2022-07-09 10:13:28
+-->
 <template>
   <ElDialog
     :before-close="close"
     :model-value="versionVisible"
-    title="版本日志（Admin Frame 版权所有）"
+    title="版本日志（Sakura_Admin_Admin版权所有）"
     width="900px"
   >
     <ul class="v-log-content">

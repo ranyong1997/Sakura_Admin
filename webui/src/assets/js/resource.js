@@ -3,13 +3,13 @@
 export default [
     //资源信息
     {
-        resourceName: '首页',
+        resourceName: '测试总览',
         resourceUrl: "/homePage",
         resourceIcon: 'fa fa-tachometer',
         children: []
     },
     {
-        resourceName: "功能",
+        resourceName: "工作空间",
         resourceUrl: "/gongneng",
         resourceIcon: 'fa fa-wrench',
         children: [
@@ -38,16 +38,6 @@ export default [
                 resourceUrl: "/qrcode",
                 children: []
             },
-            // {
-            //     resourceName: "无线滚动",
-            //     resourceUrl: "/infiniteScroll",
-            //     children: []
-            // },
-            // {
-            //     resourceName: "地图",
-            //     resourceUrl: "/map",
-            //     children: []
-            // },
             {
                 resourceName: "监测电脑信息",
                 resourceUrl: "/computerMonitor",
@@ -56,7 +46,7 @@ export default [
         ]
     },
     {
-        resourceName: "模板",
+        resourceName: "测试准备",
         resourceUrl: "/content",
         resourceIcon: "fa fa-file-text",
         children: [
@@ -78,15 +68,10 @@ export default [
         ]
     },
     {
-        resourceName: "编辑器",
+        resourceName: "测试分工",
         resourceUrl: "/editor",
         resourceIcon: "fa fa-bold",
         children: [
-            // {
-            //     resourceName: "markdown",
-            //     resourceUrl: "/markdown",
-            //     children: []
-            // },
             {
                 resourceName: "富文本编辑器",
                 resourceUrl: "/textEditor",
@@ -95,7 +80,7 @@ export default [
         ]
     },
     {
-        resourceName: "返回结果",
+        resourceName: "测试环境",
         resourceUrl: "/result",
         resourceIcon: "fa fa-random",
         children: [
@@ -116,7 +101,7 @@ export default [
         ]
     },
     {
-        resourceName: "异常界面",
+        resourceName: "测试执行",
         resourceUrl: "/error",
         resourceIcon: "fa fa-exclamation-triangle",
         children: [{
@@ -147,13 +132,13 @@ export default [
         ]
     },
     {
-        resourceName: "工作流程",
+        resourceName: "缺陷跟踪",
         resourceUrl: "/workflow",
         resourceIcon: 'fa fa-crosshairs',
         children: []
     },
     {
-        resourceName: "消息管理",
+        resourceName: "综合事务",
         resourceUrl: "/messageManagement",
         resourceIcon: "fa fa-comment",
         children: [
@@ -165,7 +150,7 @@ export default [
         ]
     },
     {
-        resourceName: "权限管理",
+        resourceName: "测试分析",
         resourceUrl: "/setting",
         resourceIcon: "fa fa-cog",
         children: [
@@ -187,10 +172,9 @@ export default [
         ]
     },
     {
-        resourceName: "新手引导",
+        resourceName: "项目总结",
         resourceUrl: "/noviceGuide",
         resourceIcon: 'fa fa-question-circle-o',
         children: []
-    },
-  
+    }, 
 ]

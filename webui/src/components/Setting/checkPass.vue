@@ -11,7 +11,7 @@
       :model="ruleForm"
       :rules="rules"
       class="demo-ruleForm"
-      label-width="100px"
+      label-width="auto"
       status-icon
     >
       <ElFormItem label="原密码" prop="oldPassword">

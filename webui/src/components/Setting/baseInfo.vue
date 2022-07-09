@@ -1,17 +1,6 @@
 <template>
-  <ElDrawer
-    :before-close="close"
-    :model-value="baseVisible"
-    title="基本信息"
-    size="800px"
-    @open="getInit"
-  >
-    <ElForm
-      ref="baseInfoRef"
-      :model="baseInfo"
-      :rules="baseInfoRules"
-      label-width="114px"
-    >
+  <ElDrawer :before-close="close" :model-value="baseVisible" title="基本信息" size="800px" @open="getInit">
+    <ElForm ref="baseInfoRef" :model="baseInfo" :rules="baseInfoRules" label-width="114px">
       <ElRow>
         <ElCol :span="10">
           <ElFormItem label="姓名：">
@@ -39,7 +28,7 @@
           </ElFormItem>
         </ElCol>
       </ElRow>
-      <ElRow>
+      <!-- <ElRow>
         <ElCol :span="10">
           <ElFormItem label="出生日期：">
             <ElDatePicker
@@ -49,7 +38,7 @@
             ></ElDatePicker>
           </ElFormItem>
         </ElCol>
-      </ElRow>
+      </ElRow> -->
       <ElRow>
         <ElCol :span="10">
           <ElFormItem label="账号状态：">
@@ -61,36 +50,23 @@
         </ElCol>
         <ElCol :span="10">
           <ElFormItem label="权限分配：" prop="jurisdiction">
-            <ElSelect
-              v-model="baseInfo.jurisdiction"
-              multiple
-              placeholder="请选择"
-            >
-              <ElOption
-                v-for="item in roleList"
-                :key="item.roleId"
-                :label="item.marks"
-                :value="item.roleId"
-              ></ElOption>
+            <ElSelect v-model="baseInfo.jurisdiction" multiple placeholder="请选择">
+              <ElOption v-for="item in roleList" :key="item.roleId" :label="item.marks" :value="item.roleId"></ElOption>
             </ElSelect>
           </ElFormItem>
         </ElCol>
       </ElRow>
-      <ElRow>
+      <!-- <ElRow>
         <ElCol :span="20">
           <ElFormItem label="家庭住址：">
             <ElInput v-model="baseInfo.address"></ElInput>
           </ElFormItem>
         </ElCol>
-      </ElRow>
+      </ElRow> -->
       <ElRow>
         <ElCol :span="20">
           <ElFormItem label="个人说明：">
-            <ElInput
-              v-model="baseInfo.marks"
-              :autosize="{ minRows: 4, maxRows: 6 }"
-              type="textarea"
-            ></ElInput>
+            <ElInput v-model="baseInfo.marks" :autosize="{ minRows: 4, maxRows: 6 }" type="textarea"></ElInput>
           </ElFormItem>
         </ElCol>
       </ElRow>
@@ -99,9 +75,7 @@
           <div class="baseInfo_footer">
             <ElFormItem>
               <ElButton size="default" @click="close">取消</ElButton>
-              <ElButton size="default" type="primary" @click="saveBaseInfo"
-                >确定</ElButton
-              >
+              <ElButton size="default" type="primary" @click="saveBaseInfo">确定</ElButton>
             </ElFormItem>
           </div>
         </ElCol>

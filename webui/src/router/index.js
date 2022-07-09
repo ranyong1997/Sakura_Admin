@@ -238,14 +238,12 @@ router.beforeEach((to, from, next) => {
     next('/404')
   }
   if (user) {
-    // console.log(user, '-=????')
     if (to.path === '/' || to.path === '/login') {
       next()
     } else {
       next()
     }
   } else {
-    // console.log('bushi')
     if (whiteList.includes(to.path)) {
       console.log('-=whiteList?')
       //如果是白名单无须token则直接进入

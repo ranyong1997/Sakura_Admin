@@ -43,7 +43,6 @@ import {
 import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router'
 import { useStore } from 'vuex'
 import { ElMessage } from 'element-plus'
-// import { transitionLocal } from '../../locales/i18n'
 export default defineComponent({
   name: 'Tags',
   setup() {

@@ -1,25 +1,13 @@
 <template>
   <div class="homePage">
     <ElRow :gutter="10">
-      <ElCol
-        v-for="(item, index) in dataList"
-        :key="index"
-        :xs="24"
-        :sm="24"
-        :md="6"
-        :lg="6"
-        :xl="6"
-      >
-        <ElCard
-          class="box-card m-t8"
-          shadow="always"
-          :body-style="{ padding: '35px 20px' }"
-        >
+      <ElCol v-for="(item, index) in dataList" :key="index" :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
+        <ElCard class="box-card m-t8" shadow="always" :body-style="{ padding: '35px 20px' }">
           <template #header>
             <div class="card-header">
               <span class="card-header-title">{{ item.title }}</span>
               <ElTag :type="item.type" effect="dark" size="small">{{
-                item.labelTitle
+                  item.labelTitle
               }}</ElTag>
             </div>
           </template>
@@ -29,18 +17,14 @@
     </ElRow>
     <ElRow :gutter="10">
       <ElCol :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-        <ElCard
-          class="box-card m-t8"
-          shadow="always"
-          :body-style="{ padding: '0' }"
-        >
+        <ElCard class="box-card m-t8" shadow="always" :body-style="{ padding: '0' }">
           <template #header>
             <div class="card-header">
               <span class="card-header-title">各时间段流量监控</span>
             </div>
           </template>
           <div class="text item">
-            <!-- <div id="visitChart" class="home_charts"></div> -->
+            <div id="visitChart" class="home_charts"></div>
           </div>
         </ElCard>
       </ElCol>
@@ -54,7 +38,7 @@
             </div>
           </template>
           <div class="text item">
-            <!-- <div id="originChart" class="home_charts"></div> -->
+            <div id="originChart" class="home_charts"></div>
           </div>
         </ElCard>
       </ElCol>
@@ -66,7 +50,7 @@
             </div>
           </template>
           <div class="text item">
-            <!-- <div id="activeChart" class="home_charts"></div> -->
+            <div id="activeChart" class="home_charts"></div>
           </div>
         </ElCard>
       </ElCol>
@@ -78,7 +62,7 @@
             </div>
           </template>
           <div class="text item">
-            <!-- <div id="genderChart" class="home_charts"></div> -->
+            <div id="genderChart" class="home_charts"></div>
           </div>
         </ElCard>
       </ElCol>
@@ -87,56 +71,85 @@
 </template>
 <script>
 import {
-  inject,
   onMounted,
   defineComponent,
   reactive,
   toRefs,
   onUnmounted
 } from 'vue'
+// 引入 echarts 核心模块，核心模块提供了 echarts 使用必须要的接口。
+import * as echarts from 'echarts/core';
+// 引入柱状图图表，图表后缀都为 Chart
+import { BarChart } from 'echarts/charts';
+import {
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  DatasetComponent,
+  TransformComponent,
+  LegendComponent
+} from 'echarts/components';
+// 标签自动布局，全局过渡动画等特性
+import { LabelLayout, UniversalTransition } from 'echarts/features';
+// 引入 Canvas 渲染器，注意引入 CanvasRenderer 或者 SVGRenderer 是必须的一步
+import { CanvasRenderer } from 'echarts/renderers';
+import { PieChart, LineChart } from 'echarts/charts';
+
+// 注册必须的组件
+echarts.use([
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  DatasetComponent,
+  TransformComponent,
+  BarChart,
+  LabelLayout,
+  UniversalTransition,
+  CanvasRenderer,
+  LegendComponent,
+  PieChart,
+  LineChart,
+]);
 export default defineComponent({
   name: 'HomePage',
   setup() {
-    // let echarts = inject("echarts"); //引入echarts
     const state = reactive({
       dataList: [
         {
-          title: '待办任务',
-          total: '300,000',
+          title: '接口总数',
+          total: '334',
           labelTitle: '总数',
           type: 'danger'
         },
         {
-          title: '用户数量',
-          total: '335,084',
+          title: '通过接口数/未通过接口数',
+          total: '51/74',
           labelTitle: '总数',
           type: ''
         },
         {
-          title: '访问量',
-          total: '88,846,565',
+          title: '未测试接口数',
+          total: '209',
           labelTitle: '总数',
           type: 'success'
         },
         {
-          title: '图鉴',
-          total: '120',
-          labelTitle: '总数',
+          title: '接口未完成用例包(执行率)',
+          total: '24%(113/362)',
+          labelTitle: '百分比',
           type: 'warning'
         }
       ]
     })
 
     onMounted(() => {
-      // window.onresize = function () {
-      //   //页面尺寸变化 自适应大小
-      //   chartsInit();
-      // };
-      //   chartsInit();
+      window.onresize = function () {
+        //页面尺寸变化 自适应大小
+        chartsInit();
+      };
+      chartsInit();
     })
-
-    onUnmounted(() => {})
-
+    onUnmounted(() => { })
     const chartsInit = () => {
       //图标初始化
       loadVisitChart()
@@ -151,7 +164,7 @@ export default defineComponent({
       for (let index = 1; index <= 24; index++) {
         labelware.push(`${index}:00`)
         if (index % 2 === 0) {
-          dataware.push(index * 104)
+          dataware.push(index * 200)
         } else {
           dataware.push(index * 26)
         }
@@ -172,9 +185,7 @@ export default defineComponent({
           }
         ]
       }
-      document
-        .getElementById('visitChart')
-        .setAttribute('_echarts_instance_', '')
+      document.getElementById('visitChart').setAttribute('_echarts_instance_', '')
       myChart.setOption(option)
     }
 
@@ -224,9 +235,7 @@ export default defineComponent({
           }
         ]
       }
-      document
-        .getElementById('originChart')
-        .setAttribute('_echarts_instance_', '')
+      document.getElementById('originChart').setAttribute('_echarts_instance_', '')
       myChart.setOption(option)
     }
 
@@ -244,7 +253,7 @@ export default defineComponent({
         },
         series: [
           {
-            data: [120, 200, 150, 80, 70, 110, 130],
+            data: [300, 200, 150, 80, 70, 110, 130],
             type: 'bar',
             showBackground: true,
             backgroundStyle: {
@@ -253,11 +262,10 @@ export default defineComponent({
           }
         ]
       }
-      document
-        .getElementById('activeChart')
-        .setAttribute('_echarts_instance_', '')
+      document.getElementById('activeChart').setAttribute('_echarts_instance_', '')
       myChart.setOption(option)
     }
+
 
     const loadGenderChart = () => {
       //用户性别统计
@@ -297,11 +305,11 @@ export default defineComponent({
           }
         ]
       }
-      document
-        .getElementById('genderChart')
-        .setAttribute('_echarts_instance_', '')
+      document.getElementById('genderChart').setAttribute('_echarts_instance_', '')
       myChart.setOption(option)
     }
+
+
 
     return {
       ...toRefs(state)
@@ -314,13 +322,16 @@ export default defineComponent({
   .home_charts {
     height: 380px;
   }
+
   .card-header {
     display: flex;
     justify-content: space-between;
+
     .card-header-title {
       font-size: 15px;
     }
   }
+
   .card-h-total {
     font-size: 28px;
   }

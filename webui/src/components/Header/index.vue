@@ -46,7 +46,6 @@
       <div class="user-avatar">
         <!-- <img src="../../assets/image/LG.png" /> -->
         <img :src="'data:image/svg+xml;utf8,' + generateFromString" />
-        <!-- <ElAvatar icon="el-icon-user-solid"> </ElAvatar> -->
       </div>
     </div>
     <CheckPass v-model:passVisible="passVisible"></CheckPass>
