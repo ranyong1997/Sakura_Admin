@@ -72,7 +72,7 @@ export default defineComponent({
           let formdata = new FormData()
           formdata.append('username', "admin")
           formdata.append('password', "123456")
-          axios.post('/api/admin/login/access_token/', formdata)
+          axios.post('http://127.0.0.1:8001/api/admin/login/access_token/', formdata)
             .then(function (response) {
               proxy._public.debounce(() => {
                 myFun.setAccessToken(state.param.username, 2000)
