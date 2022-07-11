@@ -144,7 +144,6 @@ export default defineComponent({
       text-align: center;
     }
   }
-
   .other-content {
     display: flex;
     justify-content: space-between;
