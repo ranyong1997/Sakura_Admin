@@ -34,6 +34,7 @@ import {
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import myFun from '../utils/myFun.js'
+import axios from '.././utils/axios'
 export default defineComponent({
   setup() {
     const store = useStore() //vuex仓库
@@ -68,18 +69,23 @@ export default defineComponent({
       //登陆
       loginRef.value.validate((valid) => {
         if (valid) {
-          setTimeout(() => {
-            state.loading = false
-          }, 1000)
-          proxy._public.debounce(() => {
-            myFun.setAccessToken(state.param.username, 2000)
-            router.push({ path: '/homePage' })
-            state.loading = false
-          }, 300)
+          let formdata = new FormData()
+          formdata.append('username', "admin")
+          formdata.append('password', "123456")
+          axios.post('/api/admin/login/access_token/', formdata)
+            .then(function (response) {
+              proxy._public.debounce(() => {
+                myFun.setAccessToken(state.param.username, 2000)
+                router.push({ path: '/homePage' })
+                state.loading = false
+              }, 300)
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
         }
       })
     }
-
     return {
       ...toRefs(state),
       loginRef,
@@ -95,7 +101,7 @@ export default defineComponent({
   width: 100%;
   height: 100vh;
   background-size: cover;
-  background-image: url('../assets/image/n-y.jpg');
+  background-image: url('image/n-y.jpg');
 
   .login-body {
     box-shadow: 0px 0px 10px 0px #646464;

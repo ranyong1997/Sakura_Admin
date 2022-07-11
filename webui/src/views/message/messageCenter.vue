@@ -3,21 +3,12 @@
     <ElContainer class="defult-h">
       <ElAside width="200px">
         <ul class="category_body">
-          <li
-            v-for="item in categoryList"
-            :key="item.id"
-            :class="
-              storageCategory && storageCategory.id === item.id
-                ? 'category_list category_list_click'
-                : 'category_list'
-            "
-            @click="changeCategory(item)"
-          >
-            <ElBadge
-              :value="item.unread"
-              :type="item.type ? item.type : 'danger'"
-              >{{ item.name }}</ElBadge
-            >
+          <li v-for="item in categoryList" :key="item.id" :class="
+            storageCategory && storageCategory.id === item.id
+              ? 'category_list category_list_click'
+              : 'category_list'
+          " @click="changeCategory(item)">
+            <ElBadge :value="item.unread" :type="item.type ? item.type : 'danger'">{{ item.name }}</ElBadge>
           </li>
         </ul>
       </ElAside>
@@ -145,6 +136,7 @@ export default defineComponent({
     height: 100%;
     padding: 12px 0;
     box-sizing: border-box;
+
     .category_list {
       padding: 15px 25px 15px 5px;
       font-size: 16px;
@@ -152,21 +144,26 @@ export default defineComponent({
       font-weight: 600;
       text-align: center;
     }
+
     .category_list_click {
       color: rgb(64, 158, 255);
     }
+
     .category_list :hover {
       color: rgb(64, 158, 255);
     }
   }
+
   .el-aside,
   .el-header {
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     border: 1px solid #dcdfe6;
   }
+
   .el-aside {
     border-radius: 10px;
   }
+
   .el-header {
     height: 50px;
     line-height: 50px;
@@ -175,19 +172,24 @@ export default defineComponent({
     display: flex;
     align-items: center;
   }
+
   .fa-refresh {
     padding-left: 12px;
     cursor: pointer;
   }
+
   .fa-refresh:hover {
     color: rgb(64, 158, 255);
   }
+
   .el-header,
   .el-main {
     margin-left: 10px;
   }
+
   .el-main {
     margin-top: 10px;
+
     .message_body {
       .message_list {
         border: 1px solid #dedede;
@@ -198,9 +200,11 @@ export default defineComponent({
         background: #fff;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
         border-radius: 4px;
+
         .message_b_nav {
           display: flex;
           align-items: center;
+
           .message_b_n_t {
             font-size: 15px;
             font-weight: 600;
@@ -209,12 +213,14 @@ export default defineComponent({
             white-space: nowrap;
             text-overflow: ellipsis;
           }
+
           .message_b_n_d {
             padding-left: 12px;
             font-size: 15px;
             color: #999;
           }
         }
+
         .message_b_content {
           padding: 12px 12px 0 12px;
           line-height: 24px;
@@ -226,6 +232,7 @@ export default defineComponent({
           -webkit-box-orient: vertical;
         }
       }
+
       .message_list:first-child {
         margin-top: 0px;
       }

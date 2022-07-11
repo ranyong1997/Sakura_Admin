@@ -3,7 +3,7 @@
  * @version: 
  * @Author: 冉勇
  * @Date: 2022-07-07 17:17:22
- * @LastEditTime: 2022-07-08 16:14:32
+ * @LastEditTime: 2022-07-11 15:53:04
  */
 import { defineConfig } from 'vite' // 引入vite
 import vue from '@vitejs/plugin-vue'  // 导入vue插件
@@ -39,10 +39,10 @@ export default defineConfig({
   },
   // 反向代理
   proxy: {
-    '/api': {
-      target: 'http://localhost:3000',
+    '/api/': {
+      target: 'http://127.0.0.1:8001/api/',
       changeOrigin: true,
-      rewrite: (path) => path.replace(/^\/api/, '')
+      // rewrite: (path) => path.replace(/^\/api/, ''),
     }
   }
 })

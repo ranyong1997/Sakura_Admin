@@ -2,6 +2,7 @@
   <div id="diagramContainer">
     <div id="item_left" class="item">前端</div>
     <div id="item_right" class="item" style="left: 400px; top: 150px">后端</div>
+    <div id="item_right" class="item" style="left: 400px; top: 300px">后端</div>
   </div>
 </template>
 <script>

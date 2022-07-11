@@ -7,7 +7,7 @@
   >
     <div class="zan-sidebar-nav">
       <img alt src="../../assets/image/LG.png" />
-      <h1 v-if="!collapse">Sakura_Admin</h1>
+      <h1 v-if="!collapse">波塞冬</h1>
     </div>
     <ElMenu
       :default-active="onRoutes"
