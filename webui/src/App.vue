@@ -3,7 +3,7 @@
  * @version: 
  * @Author: 冉勇
  * @Date: 2022-07-09 08:33:10
- * @LastEditTime: 2022-07-14 15:07:39
+ * @LastEditTime: 2022-07-14 15:11:16
 -->
 <template>
   <ElConfigProvider :locale="locale">

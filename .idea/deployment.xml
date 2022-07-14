@@ -2,17 +2,10 @@
 <project version="4">
   <component name="PublishConfigData" autoUpload="Always" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="root@192.168.1.196:22">
+      <paths name="虚拟机">
         <serverdata>
           <mappings>
-            <mapping deploy="/usr/local/python3_pro" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="root@192.168.1.197:10086 password">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/python3_project" local="$PROJECT_DIR$" web="" />
+            <mapping deploy="/python3_pro" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
