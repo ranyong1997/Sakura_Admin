@@ -3,7 +3,7 @@
  * @version: 
  * @Author: 冉勇
  * @Date: 2022-07-09 08:33:10
- * @LastEditTime: 2022-07-14 14:58:04
+ * @LastEditTime: 2022-07-14 15:07:39
 -->
 <template>
   <ElConfigProvider :locale="locale">
@@ -45,5 +45,3 @@ export default defineComponent({
   line-height: 40px !important;
 }
 </style>
-
-<!--  -->
