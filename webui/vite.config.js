@@ -10,7 +10,7 @@ import vue from '@vitejs/plugin-vue'  // 导入vue插件
 import path from 'path' // 路径
 export default defineConfig({
   plugins: [vue()],
-  
+
   // 配置dev服务
   server: {
     host: '0.0.0.0',

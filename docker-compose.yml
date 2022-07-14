@@ -11,16 +11,15 @@ services:
       - elasticsearch
 
   mysql:
-    image: "mariadb:10.6.9-focal"
+    image: "mariadb:10.6.8-focal"
     environment:
       - MYSQL_ROOT_HOST=%
-      - MYSQL_ROOT_PASSWORD=SakuraAdmin
-      - MYSQL_DATABASE=SakuraAdmin
-      - MYSQL_PASSWORD=SakuraAdmin
+      - MYSQL_ROOT_PASSWORD=Sakura_Admin
+      - MYSQL_DATABASE=sakura_admin
+      - MYSQL_PASSWORD=Sakura_Admin
     ports:
       - 13306:3306
-    command:
-      [ 'mysql','--character-set-server=utf8mb4','--collation-server=utf8mb4_unicode_ci' ]
+
 
   elasticsearch:
     build:

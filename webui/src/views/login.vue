@@ -34,7 +34,7 @@ import {
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import myFun from '../utils/myFun.js'
-import axios from '.././utils/axios'
+import { login } from '../utils/nav.js' // 引入封装axios
 export default defineComponent({
   setup() {
     const store = useStore() //vuex仓库
@@ -42,11 +42,12 @@ export default defineComponent({
     const loginRef = ref(null) //登录ref
     const registerRef = ref(null) //注册ref
     const router = useRouter() //路由
+    const param = ref({
+      username: 'admin',
+      password: '123456'
+    })
     const state = reactive({
-      param: {
-        username: 'admin',
-        password: '123456'
-      }, //登录账号
+      param, //登录账号
       loginRules: {
         //登陆验证
         username: [
@@ -69,15 +70,16 @@ export default defineComponent({
       //登陆
       loginRef.value.validate((valid) => {
         if (valid) {
-          let formdata = new FormData()
-          formdata.append('username', "admin")
-          formdata.append('password', "123456")
-          axios.post('http://127.0.0.1:8001/api/admin/login/access_token/', formdata)
+          const data = { 'username': state.param.username, 'password': state.param.password }
+          console.log("this", data)
+          login(data).then(res => {
+            console.log("error:", res)
+          })
             .then(function (response) {
               proxy._public.debounce(() => {
                 myFun.setAccessToken(state.param.username, 2000)
                 router.push({ path: '/homePage' })
-                state.loading = false
+                state.loading = true
               }, 300)
             })
             .catch(function (error) {
@@ -144,9 +146,13 @@ export default defineComponent({
       text-align: center;
     }
   }
+
   .other-content {
     display: flex;
     justify-content: space-between;
   }
 }
 </style>
+
+
+

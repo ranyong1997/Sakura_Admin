@@ -50,7 +50,7 @@ export default defineComponent({
   setup() {
     const state = reactive({
       readOnly: false, //只读
-      content: '<h1><strong>欢迎来到Admin-Frame-Vue3</strong></h1>'
+      content: '<h1><strong>欢迎来到波塞冬</strong></h1>'
     })
 
     const editorId = `w-e-${Math.random().toString().slice(-5)}` //【注意】编辑器 id ，要全局唯一
@@ -71,14 +71,14 @@ export default defineComponent({
   
 
  
-    //   // form-data fieldName ，默认值 'wangeditor-uploaded-image'
-    //   fieldName: 'your-custom-name',
+      // form-data fieldName ，默认值 'wangeditor-uploaded-image'
+      fieldName: 'your-custom-name',
 
-    //   // 单个文件的最大体积限制，默认为 2M
-    //   maxFileSize: 1 * 1024 * 1024, // 1M
+      // 单个文件的最大体积限制，默认为 2M
+      maxFileSize: 1 * 1024 * 1024, // 1M
 
-    //   // 最多可上传几个文件，默认为 100
-    //   maxNumberOfFiles: 10,
+      // 最多可上传几个文件，默认为 100
+      maxNumberOfFiles: 10,
 
     //   // 选择文件时的类型限制，默认为 ['image/*'] 。如不想限制，则设置为 []
       allowedFileTypes: ['image/*'],

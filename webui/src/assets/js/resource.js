@@ -9,7 +9,13 @@ export default [
         children: []
     },
     {
-        resourceName: "工作空间",
+        resourceName: '工作空间',
+        resourceUrl: "/work",
+        resourceIcon: 'fa fa-wrench',
+        children: []
+    },
+    {
+        resourceName: "工作空间copy",
         resourceUrl: "/gongneng",
         resourceIcon: 'fa fa-wrench',
         children: [
@@ -21,6 +27,11 @@ export default [
             {
                 resourceName: "添加水印",
                 resourceUrl: "/wartermark",
+                children: []
+            },
+            {
+                resourceName: "pinia",
+                resourceUrl: "/shop",
                 children: []
             },
             {
@@ -176,5 +187,5 @@ export default [
         resourceUrl: "/noviceGuide",
         resourceIcon: 'fa fa-question-circle-o',
         children: []
-    }, 
+    },
 ]

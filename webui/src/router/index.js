@@ -25,7 +25,6 @@ const routes = [
     meta: {
       title: '基础'
     },
-    // redirect: '/homePage',
     component: () => import('../views/main.vue'),
     children: [
       {
@@ -35,6 +34,13 @@ const routes = [
         },
         component: () => import('../views/homePage.vue')
       },
+      {
+        path: '/work',
+        meta: {
+          title: '工作空间'
+        },
+        component: () => import('../views/work/workpage.vue')
+      },
       // 功能
       {
         path: '/dialogDrag',
@@ -42,6 +48,13 @@ const routes = [
           title: '可拖拽弹框'
         },
         component: () => import('../views/content/dialogDrag.vue')
+      },
+      {
+        path: '/shop',
+        meta: {
+          title: '购物'
+        },
+        component: () => import('../views/Shop.vue')
       },
       {
         path: '/wartermark',
@@ -71,13 +84,6 @@ const routes = [
         },
         component: () => import('../views/content/qrcode.vue')
       },
-      // {
-      //   path: '/map',
-      //   meta: {
-      //     title: '地图'
-      //   },
-      //   component: () => import('../views/content/map.vue')
-      // },
       {
         path: '/computerMonitor',
         meta: {
@@ -245,11 +251,11 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     if (whiteList.includes(to.path)) {
-      console.log('-=whiteList?')
+      console.log('是白名单')
       //如果是白名单无须token则直接进入
       next()
     } else {
-      console.log('-=!!!!!!!!!!!!!!!!!whiteList???')
+      console.log('非白名单')
       next('/login')
       ElMessage.error('无登陆凭证,无法访问,请先登陆!')
     }

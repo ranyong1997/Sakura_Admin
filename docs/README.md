@@ -54,7 +54,6 @@
 ---
 *前端*
 * 框架：Vue
-* 博客界面：BootstrapVue
 * 管理界面：ElementUI
 ---
 ### 基本要求
@@ -92,8 +91,6 @@
 1: cd fastapi-vue-blog/webui
 2: npm install
 3: npm run dev
-4: http://localhost:8080        # 进入前端页面
-4: http://localhost:8080/admin  # 进入管理员页面
 ```
 ## 部署与发布
 * 前提：安装好Docker和docker-compose

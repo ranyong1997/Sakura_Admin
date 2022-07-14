@@ -3,10 +3,12 @@
  * @version: 
  * @Author: 冉勇
  * @Date: 2022-07-08 16:14:04
- * @LastEditTime: 2022-07-08 16:14:45
+ * @LastEditTime: 2022-07-13 10:55:10
  */
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'   // 引入pinia
 import ElementPlus from 'element-plus'
+import store from './store/index.js'
 import 'element-plus/dist/index.css'
 import './assets/css/font-awesome.min.css' //font 样式
 import animated from 'animate.css' //动画库
@@ -20,7 +22,6 @@ import '@wangeditor/editor/dist/css/style.css' // 富文本编辑器样式
 
 import App from './App.vue'
 import router from './router'
-import store from './store'
 
 const app = createApp(App)
 
@@ -33,6 +34,7 @@ for (let iconName in ELIcons) {
   app.component(iconName, ELIcons[iconName])
 }
 app.use(dialogDrag) // 引入拖拽指令
+app.use(createPinia()) // 引入pinia
 app.use(copy) // 引入复制指令
 app.use(animated) // 引入动画库
 app.use(ElementPlus)  // 引入element-plus

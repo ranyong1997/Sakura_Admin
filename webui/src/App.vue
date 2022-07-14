@@ -3,7 +3,7 @@
  * @version: 
  * @Author: 冉勇
  * @Date: 2022-07-09 08:33:10
- * @LastEditTime: 2022-07-11 16:37:03
+ * @LastEditTime: 2022-07-14 14:58:04
 -->
 <template>
   <ElConfigProvider :locale="locale">
@@ -46,3 +46,4 @@ export default defineComponent({
 }
 </style>
 
+<!--  -->

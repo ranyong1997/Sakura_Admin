@@ -1,7 +1,19 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @Author: 冉勇
+ * @Date: 2022-07-08 16:14:04
+ * @LastEditTime: 2022-07-12 16:40:58
+ */
 import { createStore } from 'vuex'
+import { createPinia } from "pinia";
 import modules from './modules'
 
+// 创建store实例
+const store = createPinia();
+
 export default createStore({
+  store,
   state: {
     tagsList: [], //tag标签存储
     collapse: false, //侧边栏展开关闭
