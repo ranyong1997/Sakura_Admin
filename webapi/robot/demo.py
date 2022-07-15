@@ -12,7 +12,6 @@ import time
 import hmac
 import hashlib
 import base64
-from urllib import parse
 from datetime import datetime
 
 
@@ -79,43 +78,43 @@ class FeiShuRobot:
         except Exception as e:
             print("发送飞书失败:", e)
 
-    # def send_img(path, bot):
-    #     """发送图片信息"""
-    #     url = f"https://open.feishu.cn/open-apis/bot/v2/hook/{bot}"
-    #     headers = {"Content-Type": "text/plain"}
-    #     data = {"msg_type": "image", "content": {"image_key": upload_image(path)}}
-    #     r = requests.post(url, headers=headers, json=data)
-    #     return r.text
+    def send_md(self):
+        """发送普通信息"""
+        try:
+            url = f"https://open.feishu.cn/open-apis/bot/v2/hook/{self.robot_id}"
+            headers = {"Content-Type": "text/plain"}
+            timestamp, sign = self.get_sign()
+            data = {"msg_type": "interactive", "card": {"config": {"wide_screen_mode": True}},
+                    "header": {"title": {"tag": "plain_text", "content": "注意咯！！注意咯！！！"}, "template": "red"},
+                    "elements": [{"tag": "div", "text": {"content": self, "tag": "lark_md"}}]}
+            r = requests.post(url, headers=headers, json=data)
+            print("发送飞书成功")
+            return r.text
+        except Exception as e:
+            print("发送飞书失败:", e)
 
-    def send_markdown(text, bot):
-        """发送富文本消息"""
+    def send_img(self, path, bot):
+        """发送图片信息"""
         url = f"https://open.feishu.cn/open-apis/bot/v2/hook/{bot}"
         headers = {"Content-Type": "text/plain"}
-        data = {
-            "msg_type": "interactive",
-            "card": {
-                "config": {
-                    "wide_screen_mode": True
-                }
-            },
-            "header": {
-                "title": {
-                    "tag": "plain_text",
-                    "content": "注意咯！！注意咯！！！"
-                },
-                "template": "red"
-            },
-            "elements": [{"tag": "div",
-                          "text": {"content": text,
-                                   "tag": "lark_md"}}]
-        }
+        data = {"msg_type": "image", "content": {"image_key": self.upload_image(path)}}
         r = requests.post(url, headers=headers, json=data)
         return r.text
 
-    def send_card(self, bot):
+    def send_markdown(self, text):
+        """发送富文本消息"""
+        url = "https://open.feishu.cn/open-apis/bot/v2/hook/fce32975-4d2f-49ab-b7a0-72921b173bb9"
+        headers = {"Content-Type": "text/plain"}
+        data = {"msg_type": "interactive", "card": {"config": {"wide_screen_mode": True}},
+                "header": {"title": {"tag": "plain_text", "content": "注意咯！！注意咯！！！"}, "template": "red"},
+                "elements": [{"tag": "div", "text": {"content": text, "tag": "lark_md"}}]}
+        r = requests.post(url, headers=headers, json=data)
+        return r.text
+
+    def send_card(self):
         """发送卡片信息"""
         try:
-            url = f"https://open.feishu.cn/open-apis/bot/v2/hook/{bot}"
+            url = "https://open.feishu.cn/open-apis/bot/v2/hook/fce32975-4d2f-49ab-b7a0-72921b173bb9"
             headers = {"Content-Type": "text/plain"}
             data = {"msg_type": "interactive", "card": self}
             r = requests.post(url, headers=headers, json=data)
@@ -124,17 +123,8 @@ class FeiShuRobot:
             print("发送飞书失败:", e)
 
 
-def feishu_test():
-    # https://open.feishu.cn/open-apis/bot/v2/hook/2221b915-1672-4db1-96a5-185eb8cd2f8d
-    robot_id = '2221b915-1672-4db1-96a5-185eb8cd2f8d'
-    secret = 'L6NDA58EBD0URW5uQ5Bwch'
-    feishu = FeiShuRobot(robot_id, secret)
-    now = datetime.now()
-    # if now.second % 10 == 0:
-    feishu.send_text('哎，行行好！')
-    feishu.send_text('哎，行，行，好！')
-
-
 if __name__ == '__main__':
-    while True:
-        feishu_test()
+    robot_id = 'fce32975-4d2f-49ab-b7a0-72921b173bb9'
+    secret = f'https://open.feishu.cn/open-apis/bot/v2/hook/{robot_id}'
+    feishu = FeiShuRobot(robot_id, secret)
+    feishu.send_text("你好")

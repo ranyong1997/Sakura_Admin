@@ -5,10 +5,9 @@ import logging
 import time
 import urllib3
 import datetime
-
-from common.setting import ConfigHandler
-from utils.readFilesUtils.yamlControl import GetYamlData
-from utils.otherUtils.allureDate.allure_report_data import CaseCount
+from webapi.common.setting import ConfigHandler
+from webapi.utils.readFilesUtils.yamlControl import GetYamlData
+from webapi.utils.otherUtils.allureDate.allure_report_data import CaseCount
 
 urllib3.disable_warnings()
 
@@ -32,6 +31,7 @@ def is_not_null_and_blank_str(content):
 
 class FeiShuTalkChatBot(object):
     """飞书机器人通知"""
+
     def __init__(self):
 
         self.timeStamp = str(round(time.time() * 1000))
@@ -88,12 +88,13 @@ class FeiShuTalkChatBot(object):
                                 {
                                     "tag": "a",
                                     "text": "测试报告",
-                                    "href": "https://192.168.xx.72:8080/job/helper_test_adverte/allure/#"
+                                    "href": "www.baidu.com"
                                 },
                                 {
                                     "tag": "at",
-                                    "user_id": "ou_18eac85d35a26f989317ad4f02e8bbbb"
-                                    # "text":"陈锐男"
+                                    # 冉勇申请添加你为联系人，点击链接处理 https://www.feishu.cn/invitation/page/add_contact/?token=bf5t2841-24c2-4e1d-a29f-d153ab0437ed
+                                    "user_id": "bf5t2841-24c2-4e1d-a29f-d153ab0437ed",
+                                    "text": "冉勇"
                                 }
                             ],
                             [
@@ -160,7 +161,6 @@ class FeiShuTalkChatBot(object):
                                     "text": "{test}".format(test=datetime.datetime.now().strftime('%Y-%m-%d'))
                                 }
                             ],
-
                             [
                                 {
                                     "tag": "img",
@@ -172,7 +172,7 @@ class FeiShuTalkChatBot(object):
                         ]
                     }
                 }
-            }
+            },
         }
         try:
             post_data = json.dumps(rich_text)

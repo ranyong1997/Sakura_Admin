@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Time   : 2022/3/28 15:44
-# @Author : 余少琪
-
 import json
 from webapi.common.setting import ConfigHandler
 from webapi.utils.readFilesUtils.get_all_files_path import get_all_files

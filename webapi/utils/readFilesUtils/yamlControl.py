@@ -5,7 +5,7 @@
 
 import os
 import yaml.scanner
-from utils.readFilesUtils.regularControl import regular
+from webapi.utils.readFilesUtils.regularControl import regular
 
 
 class GetYamlData:

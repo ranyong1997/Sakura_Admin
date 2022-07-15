@@ -1,16 +1,9 @@
-"""
-Desc : 自定义函数调用
-# @Time : 2022/4/2 9:32 上午
-# @Author : liuYunWin
-"""
-import json
 import re
 import datetime
-from utils.otherUtils.jsonpath import jsonpath
+from webapi.utils.otherUtils.jsonpath import jsonpath
 from faker import Faker
-import random
-from utils.logUtils.logControl import ERROR
-from utils.cacheUtils.cacheControl import Cache
+from webapi.utils.logUtils.logControl import ERROR
+from webapi.utils.cacheUtils.cacheControl import Cache
 
 
 class Context:
@@ -81,8 +74,8 @@ class Context:
 
     @classmethod
     def host(cls) -> str:
-        from utils.readFilesUtils.yamlControl import GetYamlData
-        from common.setting import ConfigHandler
+        from webapi.utils.readFilesUtils.yamlControl import GetYamlData
+        from webapi.common.setting import ConfigHandler
 
         # 从配置文件conf.yaml 文件中获取到域名，然后使用正则替换
         host = GetYamlData(ConfigHandler.config_path) \
@@ -92,8 +85,8 @@ class Context:
     @classmethod
     def app_host(cls) -> str:
         """获取app的host"""
-        from utils.readFilesUtils.yamlControl import GetYamlData
-        from common.setting import ConfigHandler
+        from webapi.utils.readFilesUtils.yamlControl import GetYamlData
+        from webapi.common.setting import ConfigHandler
 
         # 从配置文件conf.yaml 文件中获取到域名，然后使用正则替换
         host = GetYamlData(ConfigHandler.config_path) \

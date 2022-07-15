@@ -1,11 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# @Time   : 2022/3/28 15:28
-# @Author : 余少琪
-
 import os
 from typing import Any
-from common.setting import ConfigHandler
+from webapi.common.setting import ConfigHandler
 
 
 class Cache:
