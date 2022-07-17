@@ -35,6 +35,7 @@ export default [
                 children: []
             },
             {
+                resourceName: "数据统计",
                 resourceUrl: "/statistic",
                 children: []
             },
