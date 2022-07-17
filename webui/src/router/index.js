@@ -18,7 +18,7 @@ const routes = [
     meta: {
       title: '登录'
     },
-    component: () => import('../views/login.vue')
+    component: () => import('views/login.vue')
   },
   {
     path: '/main',
@@ -32,14 +32,42 @@ const routes = [
         meta: {
           title: '首页'
         },
-        component: () => import('../views/homePage.vue')
+        component: () => import('views/homePage.vue')
       },
       {
         path: '/work',
         meta: {
           title: '工作空间'
         },
-        component: () => import('../views/work/workpage.vue')
+        component: () => import('views/work/workpage.vue')
+      },
+      {
+        path: '/testcase',
+        meta: {
+          title: '接口用例'
+        },
+        component: () => import('views/apiTest/testcase.vue')
+      },
+      {
+        path: '/record',
+        meta: {
+          title: '用例录制'
+        },
+        component: () => import('views/apiTest/record.vue')
+      },
+      {
+        path: '/testplan',
+        meta: {
+          title: '测试计划'
+        },
+        component: () => import('views/apiTest/testplan.vue')
+      },
+      {
+        path: '/statistic',
+        meta: {
+          title: '数据统计'
+        },
+        component: () => import('views/apiTest/statistic.vue')
       },
       // 功能
       {

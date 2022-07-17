@@ -15,6 +15,32 @@ export default [
         children: []
     },
     {
+        resourceName: '接口测试',
+        resourceUrl: "/apiTest",
+        resourceIcon: 'fa fa-wrench',
+        children: [
+            {
+                resourceName: "接口用例",
+                resourceUrl: "/testcase",
+                children: []
+            },
+            {
+                resourceName: "用例录制",
+                resourceUrl: "/record",
+                children: []
+            },
+            {
+                resourceName: "测试计划",
+                resourceUrl: "/testplan",
+                children: []
+            },
+            {
+                resourceUrl: "/statistic",
+                children: []
+            },
+        ]
+    },
+    {
         resourceName: "工作空间copy",
         resourceUrl: "/gongneng",
         resourceIcon: 'fa fa-wrench',

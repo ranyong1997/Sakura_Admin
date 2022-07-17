@@ -223,7 +223,6 @@ export default defineComponent({
                 {
                     value: '测试人员A',
                     label: '测试人员A',
-
                 },
                 {
                     value: '测试人员B',
@@ -415,9 +414,9 @@ export default defineComponent({
 }
 
 .box-card {
-    width: 399px;
+    width: auto;
     border-radius: 10px;
-
+    margin-left: 10px;
 }
 
 .car-col1 {
