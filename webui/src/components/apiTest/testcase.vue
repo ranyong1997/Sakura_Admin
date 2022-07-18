@@ -3,7 +3,7 @@
  * @version: 
  * @Author: 冉勇
  * @Date: 2022-07-18 08:54:59
- * @LastEditTime: 2022-07-18 16:58:56
+ * @LastEditTime: 2022-07-18 20:46:59
 -->
 <template>
     <div class="common-layout">
@@ -48,10 +48,24 @@
                     <el-button type="info" :icon="Refresh" @click="reset(ruleFormRef)">重置</el-button>
                 </el-row>
                 <el-row>
-                    <el-button type="primary" :icon="Plus">添加用例</el-button>
+                    <el-dropdown>
+                        <el-button type="primary" :icon="Plus">添加用例
+                            <el-icon>
+                                <arrow-down />
+                            </el-icon>
+                        </el-button>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item @click="commoncase">普通用例</el-dropdown-item>
+                                <el-dropdown-item>录制用例</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
                 </el-row>
                 <div class="add-table">
+
                     <ElTable height="calc(100vh - 320px)" style="width: 100%">
+
                         <ElTableColumn prop="name" label="名称"></ElTableColumn>
                         <ElTableColumn prop="request-protocol" label="请求协议"></ElTableColumn>
                         <ElTableColumn prop="priority" label="优先级"></ElTableColumn>
@@ -65,9 +79,10 @@
                                         {{ scope.row.enabled === '0' ? '启用' : '禁用' }}
                                     </ElButton>
                                     <ElButton type="text">执行</ElButton>
-                                </ElSpace>
+                                </ElSpace>New Added use case functionality
                             </template>
                         </ElTableColumn>
+
                     </ElTable>
                     <el-pagination v-model:currentPage="currentPage2" v-model:page-size="pageSize2"
                         :page-sizes="[5, 10, 50, 100]" :small="small" :disabled="disabled" :background="background"
@@ -81,12 +96,14 @@
 <script lang="ts" setup>
 import { ref, watch, reactive } from 'vue'
 import { ElTree, ElLoading, FormInstance, FormRules } from 'element-plus'
-import { Search, Plus, Refresh } from '@element-plus/icons-vue'
+import { Search, Plus, Refresh, ArrowDown } from '@element-plus/icons-vue'
 const formSize = ref('default')
 const ruleFormRef = ref<FormInstance>()
+// 表单规则初始化
 const ruleForm = reactive({
     casename: '',
 })
+// 表单验证规则
 const rules = reactive<FormRules>({
     casename: [
         { required: true, message: '请输入用例名称', trigger: 'blur' },
@@ -127,7 +144,10 @@ interface Tree {
     label: string
     children?: Tree[]
 }
+const commoncase = () => {
+    console.log(`普通用例`)
 
+}
 const value = ref('')
 const currentPage2 = ref(5)
 const pageSize2 = ref(100)
