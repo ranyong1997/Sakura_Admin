@@ -69,6 +69,9 @@ const routes = [
         },
         component: () => import('views/apiTest/statistic.vue')
       },
+
+
+      // 后续移除
       // 功能
       {
         path: '/dialogDrag',
