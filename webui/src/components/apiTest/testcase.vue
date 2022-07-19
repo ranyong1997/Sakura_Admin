@@ -3,7 +3,7 @@
  * @version: 
  * @Author: 冉勇
  * @Date: 2022-07-18 08:54:59
- * @LastEditTime: 2022-07-19 15:43:19
+ * @LastEditTime: 2022-07-19 18:02:00
 -->
 <template>
     <div class="common-layout">
@@ -71,7 +71,7 @@
                             <el-col :span="12">
                                 <span class="title">用例信息</span>
                                 <div class="flex-button">
-                                    <el-button type="primary" :icon="Document">提交</el-button>
+                                    <el-button type="primary" :icon="Document" @click="sub">提交</el-button>
                                     <el-button type="primary" :icon="Cpu">测试</el-button>
                                 </div>
                             </el-col>
@@ -93,7 +93,7 @@
                                 </el-col>
                                 <el-col :span="8">
                                     <el-form-item label="优先级：" prop="priority">
-                                        <el-select v-model="value" placeholder="请选择用例优先级" clearable>
+                                        <el-select v-model="ruleForm.priority" placeholder="请选择用例优先级" clearable>
                                             <el-option v-for="item in priority" :key="item.value" :label="item.label"
                                                 :value="item.value" />
                                         </el-select>
@@ -101,7 +101,7 @@
                                 </el-col>
                                 <el-col :span="8">
                                     <el-form-item label="用例状态：" prop="state">
-                                        <el-select v-model="value" placeholder="请选择用例当前状态" clearable>
+                                        <el-select v-model="ruleForm.state" placeholder="请选择用例当前状态" clearable>
                                             <el-option v-for="item in state" :key="item.value" :label="item.label"
                                                 :value="item.value" />
                                         </el-select>
@@ -111,7 +111,7 @@
                             <el-row :gutter="20">
                                 <el-col :span="8">
                                     <el-form-item label="请求类型：" prop="method">
-                                        <el-select v-model="value" placeholder="请选择请求类型" clearable>
+                                        <el-select v-model="ruleForm.method" placeholder="请选择请求类型" clearable>
                                             <el-option v-for="item in method" :key="item.value" :label="item.label"
                                                 :value="item.value" />
                                         </el-select>
@@ -119,31 +119,26 @@
                                 </el-col>
                                 <el-col :span="8">
                                     <el-form-item label="用例标签：">
-                                        <el-tag v-for="tag in dynamicTags" :key="tag" class="mx-1" closable
+                                        <el-tag v-for="tag in ruleForm.casetags" :key="tag" closable
                                             :disable-transitions="false" @close="handleClose(tag)">
                                             {{ tag }}
                                         </el-tag>
-                                        <el-input v-if="inputVisible" ref="InputRef" v-model="inputValue"
-                                            class="ml-1 w-20" size="small" @keyup.enter="handleInputConfirm"
-                                            @blur="handleInputConfirm" />
-                                        <el-button v-else class="button-new-tag ml-1" size="small" @click="showInput">
+                                        <el-input v-if="inputVisible" ref="InputRef" v-model="inputValue" size="small"
+                                            @keyup.enter="handleInputConfirm" @blur="handleInputConfirm" />
+                                        <el-button v-else size="small" @click="showInput">
                                             + 添加新标签页
                                         </el-button>
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="8">
                                     <el-form-item label="用例类型：" prop="casetype">
-                                        <el-select v-model="value" placeholder="请选择用例类型" clearable>
+                                        <el-select v-model="ruleForm.casetype" placeholder="请选择用例类型" clearable>
                                             <el-option v-for="item in casetype" :key="item.value" :label="item.label"
                                                 :value="item.value" />
                                         </el-select>
                                     </el-form-item>
                                 </el-col>
                             </el-row>
-                            <!-- <el-form-item>
-                                <el-button type="primary" @click="submitForm(ruleFormRef)">Submit</el-button>
-                                <el-button @click="resetForm(ruleFormRef)">Reset</el-button>
-                            </el-form-item> -->
                         </el-form>
                     </el-drawer>
                     <!-- 分割线 -->
@@ -193,18 +188,18 @@ const ruleFormRef = ref<FormInstance>()
 // 表单规则初始化
 const ruleForm = reactive({
     casename: '',
-
+    priority: '',
+    state: '',
+    method: '',
+    casetype: '',
+    casetags: []
 })
-// 临时
 const inputValue = ref('')
-const dynamicTags = ref([])
 const inputVisible = ref(false)
 const InputRef = ref<InstanceType<typeof ElInput>>()
-
-const handleClose = (tag: string) => {
-    dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1)
+const handleClose = (casetags: string) => {
+    ruleForm.casetags.splice(ruleForm.casetags.indexOf(casetags), 1)
 }
-
 const showInput = () => {
     inputVisible.value = true
     nextTick(() => {
@@ -213,46 +208,10 @@ const showInput = () => {
 }
 const handleInputConfirm = () => {
     if (inputValue.value) {
-        dynamicTags.value.push(inputValue.value)
+        ruleForm.casetags.push(inputValue.value)
     }
     inputVisible.value = false
     inputValue.value = ''
-}
-const checkAge = (rule: any, value: any, callback: any) => {
-    if (!value) {
-        return callback(new Error('请输入用例名称'))
-    }
-}
-const validatePass = (rule: any, value: any, callback: any) => {
-    if (value === '') {
-        callback(new Error('请输入用例名称'))
-    } else {
-        if (ruleForm.checkPass !== '') {
-            if (!ruleFormRef.value) return
-            ruleFormRef.value.validateField('checkPass', () => null)
-        }
-        callback()
-    }
-}
-const validatePass2 = (rule: any, value: any, callback: any) => {
-    if (value === '') {
-        callback(new Error('请输入用例状态'))
-    }
-}
-const submitForm = (formEl: FormInstance | undefined) => {
-    if (!formEl) return
-    formEl.validate((valid) => {
-        if (valid) {
-            console.log('submit!')
-        } else {
-            console.log('error submit!')
-            return false
-        }
-    })
-}
-const resetForm = (formEl: FormInstance | undefined) => {
-    if (!formEl) return
-    formEl.resetFields()
 }
 // 表单验证规则
 const rules = reactive<FormRules>({
@@ -275,7 +234,7 @@ const rules = reactive<FormRules>({
 // 查询逻辑
 const search = async (formEl: FormInstance | undefined) => {
     if (!formEl) return
-    await formEl.validate((valid, fields) => {
+    await formEl.validate((valid) => {
         if (valid) {
             const loading = ElLoading.service({
                 lock: true,
@@ -343,6 +302,15 @@ const method = [
         label: 'HTTP',
     },
 ]
+const sub = (valid) => {
+    if (valid) {
+        console.log(ruleForm)
+    } else {
+        console.log('error submit!')
+        return false
+    }
+}
+
 // 用例状态下拉框
 const state = [
     {
