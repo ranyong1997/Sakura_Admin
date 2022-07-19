@@ -3,7 +3,7 @@
  * @version: 
  * @Author: 冉勇
  * @Date: 2022-07-18 08:54:59
- * @LastEditTime: 2022-07-18 20:46:59
+ * @LastEditTime: 2022-07-19 10:22:45
 -->
 <template>
     <div class="common-layout">
@@ -49,18 +49,37 @@
                 </el-row>
                 <el-row>
                     <el-dropdown>
-                        <el-button type="primary" :icon="Plus">添加用例
-                            <el-icon>
-                                <arrow-down />
-                            </el-icon>
-                        </el-button>
-                        <template #dropdown>
-                            <el-dropdown-menu>
-                                <el-dropdown-item @click="commoncase">普通用例</el-dropdown-item>
-                                <el-dropdown-item>录制用例</el-dropdown-item>
-                            </el-dropdown-menu>
-                        </template>
+                        <el-dropdown>
+                            <el-button type="primary" :icon="Plus">添加用例
+                                <el-icon>
+                                    <arrow-down />
+                                </el-icon>
+                            </el-button>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item :icon="Plus" @click="commoncase = true">普通用例
+                                    </el-dropdown-item>
+                                    <el-dropdown-item :icon="Plus" @click="recordcase = true">录制用例
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
                     </el-dropdown>
+                    <!-- 抽屉 -->
+                    <el-drawer v-model="commoncase" title="添加用例" direction="rtl" size="64%">
+                        <el-table :data="gridData">
+                            <el-table-column property="date" label="Date" width="150" />
+                            <el-table-column property="name" label="Name" width="200" />
+                            <el-table-column property="address" label="Address" />
+                        </el-table>
+                    </el-drawer>
+                    <el-drawer v-model="recordcase" title="录制用例" direction="rtl" size="64%">
+                        <el-table :data="gridData">
+                            <el-table-column property="date" label="Date" width="150" />
+                            <el-table-column property="name" label="Name" width="200" />
+                            <el-table-column property="address" label="Address" />
+                        </el-table>
+                    </el-drawer>
                 </el-row>
                 <div class="add-table">
 
@@ -144,10 +163,32 @@ interface Tree {
     label: string
     children?: Tree[]
 }
-const commoncase = () => {
-    console.log(`普通用例`)
-
-}
+// 抽屉开关
+const commoncase = ref(false)
+const recordcase = ref(false)
+// 抽屉数据
+const gridData = [
+    {
+        date: '2016-05-02',
+        name: 'Peter Parker',
+        address: 'Queens, New York City',
+    },
+    {
+        date: '2016-05-04',
+        name: 'Peter Parker',
+        address: 'Queens, New York City',
+    },
+    {
+        date: '2016-05-01',
+        name: 'Peter Parker',
+        address: 'Queens, New York City',
+    },
+    {
+        date: '2016-05-03',
+        name: 'Peter Parker',
+        address: 'Queens, New York City',
+    },
+]
 const value = ref('')
 const currentPage2 = ref(5)
 const pageSize2 = ref(100)
@@ -184,16 +225,13 @@ const options = [
 ]
 const filterText = ref('')
 const treeRef = ref<InstanceType<typeof ElTree>>()
-
 const defaultProps = {
     children: 'children',
     label: 'label',
 }
-
 watch(filterText, (val) => {
     treeRef.value!.filter(val)
 })
-
 const filterNode = (value: string, data: Tree) => {
     if (!value) return true
     return data.label.includes(value)
