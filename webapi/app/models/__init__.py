@@ -39,7 +39,7 @@ create_database()
 # 异步engine
 async_engine = create_async_engine(Config.ASYNC_SQLALCHEMY_URL, pool_recycle=1500)
 
-async_engine = sessionmaker(async_engine, class_=AsyncSession)
+async_session = sessionmaker(async_engine, class_=AsyncSession)
 
 # 创建对象的基类
 Base = declarative_base()
