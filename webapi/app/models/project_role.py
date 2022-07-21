@@ -17,7 +17,7 @@ class ProjectRoleEnum:
     @staticmethod
     def name(role):
         if role == 1:
-            return "管理员"
+            return "组长"
         elif role == 2:
             return "组员"
         return None
