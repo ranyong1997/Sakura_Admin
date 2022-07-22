@@ -44,7 +44,7 @@ class EnvironmentDao(Mapper):
                     session.add(env)
         except Exception as e:
             EnvironmentDao.log.error(f"新增环境:{data.name}失败,{e}")
-            raise Exception(f"添加失败:{str(e)}") from e
+            raise Exception(f"添加失败:{str(e)}")
 
     @classmethod
     async def list_env(cls, page, size, name=None, exactly=False):
@@ -66,4 +66,4 @@ class EnvironmentDao(Mapper):
                 return data.scalars().all(), total
         except Exception as e:
             cls.log.error(f"获取环境列表失败,{str(e)}")
-            raise Exception(f"获取环数据失败:{str(e)}") from e
+            raise Exception(f"获取环数据失败:{str(e)}")
