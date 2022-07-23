@@ -206,3 +206,16 @@ def format_record(record: dict) -> str:
         format_string += "\n<level>{extra[payload]}</level>"
     format_string += "{exception}\n"
     return format_string
+
+
+def make_filter(name):
+    """
+    过滤操作,当日志要选择对应的日志文件的时候,通过filter进行筛选
+    :param name:
+    :return:
+    """
+
+    def filter_(record):
+        return record["extra"].get("name") == name
+
+    return filter_
