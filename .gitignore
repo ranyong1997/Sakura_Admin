@@ -14,3 +14,6 @@ venv
 webapi/utils/__pycache__/dependencies.cpython-37.pyc
 webapi/routers/__pycache__/__init__.cpython-39.pyc
 webapi/routers/__pycache__/hr_router.cpython-39.pyc
+.idea/Sakura_admin.iml
+.idea/Sakura_admin.iml
+.idea/misc.xml
