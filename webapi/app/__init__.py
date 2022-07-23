@@ -148,3 +148,38 @@ async def global_execution_handler(request: Request, exc: Exception):
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content=dict(code=110, msg="未知错误:" + str(exc))
     )
+
+
+# 添加全局error
+sakura.add_middleware(
+    ServerErrorMiddleware,
+    handler=global_execution_handler,
+)
+
+# 添加跨域
+sakura.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+
+class InterceptHandler(logging.Handler):
+    """拦截处理程序"""
+
+    def emit(self, record: logging.LogRecord):
+        try:
+            level = logger.level(record.levelname).name
+        except ValueError:
+            level = record.levelno
+
+        frame, depth = logging.currentframe(), 2
+        while frame.f_code.co_filename == logging.__file__:
+            frame = frame.f_back
+            depth += 1
+
+        logger.opt(depth=depth, exception=record.exc_info).log(
+            level, record.getMessage()
+        )
