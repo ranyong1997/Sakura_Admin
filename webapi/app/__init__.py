@@ -122,6 +122,29 @@ async def unexpected_exception_error(request: Request, exc: PermissionException)
 
 @sakura.exception_handler(AuthException)
 async def unexpected_exception_error(request: Request, exc: AuthException):
-    return JSONResponse({
+    """
+    意外异常错误
+    :param request:
+    :param exc:
+    :return:
+    """
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=jsonable_encoder({
+            "code": 401,
+            "msg": str(exc.detail)
+        })
+    )
 
-    })
+
+async def global_execution_handler(request: Request, exc: Exception):
+    """
+    全局执行处理程序
+    :param request:
+    :param exc:
+    :return:
+    """
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content=dict(code=110, msg="未知错误:" + str(exc))
+    )
