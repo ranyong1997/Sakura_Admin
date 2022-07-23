@@ -219,3 +219,38 @@ def make_filter(name):
         return record["extra"].get("name") == name
 
     return filter_
+
+
+def init_log():
+    """
+    初始化日志
+    :return:
+    """
+    loggers = {
+        logging.getLogger(name)
+        for name in logging.root.manager.loggerDict
+        if name.startswith("uvicorn.")  # 以【uvicorn.】开始
+    }
+    for uvicorn_logger in loggers:
+        uvicorn_logger.handlers = []
+    # 这里啊错做事为了改变uvicorn默认的logger,采用loguru的logger
+    intercept_handler = InterceptHandler()
+    logging.getLogger("uvicorn").handlers = [intercept_handler]
+    # 为sakura添加一个info log的文件,主要记录debug和info级别的日志
+    sakura_info = os.path.join(Config.LOG_DIR, f"{Config.SAKURA_INFO}.log")
+    # 为sakura添加一个error log的文件,主要记录warning和error级别的日志
+    sakura_error = os.path.join(Config.LOG_DIR, f"{Config.SAKURA_ERROR}.log")
+    logger.add(sakura_info, enqueue=True, rotation="10 MB", level="DEBUG", filter=make_filter(Config.SAKURA_INFO))
+    logger.add(sakura_error, enqueue=True, rotation="10 MB", level="WARNING", filter=make_filter(Config.SAKURA_ERROR))
+
+    # 配置loguru的日志句柄,sink代表输出目标
+    logger.configure(
+        handlers=[
+            {"sink": sys.stdout, "level": logging.DEBUG, "format": format_record},
+            {"sink": sakura_info, "level": logging.INFO, "format": INFO_FORMAT,
+             "filter": make_filter(Config.SAKURA_INFO)},
+            {"sink": sakura_error, "level": logging.WARNING, "format": ERROR_FORMAT,
+             "filter": make_filter(Config.SAKURA_ERROR)}
+        ]
+    )
+    return logger
