@@ -99,3 +99,6 @@ class ConnectionManager:
                 await SakuraNotificationDao.insert_record(notice)
         except Exception as e:
             ConnectionManager.logger.error(f"发送消息失败,{e}")
+
+
+ws_manage = ConnectionManager()
