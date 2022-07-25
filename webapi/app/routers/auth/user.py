@@ -73,7 +73,7 @@ async def login_with_github(code: str):
 
 
 @router.post("/update")
-async def update_user_info(user_info: UserForm, user=Depends(Permission(Config.MEMBER))):
+async def update_user_info(user_info: UserUpdateForm, user=Depends(Permission(Config.MEMBER))):
     try:
         if user['role'] != Config.ADMIN:
             if user['id'] != user_info.id:
