@@ -67,6 +67,13 @@ class DatabaseHelper(object):
         return data
 
     @staticmethod
+    async def test_connection(ss):
+        if ss is None:
+            raise Exception("暂不支持的数据库类型")
+        async with ss() as session:
+            await session.execute("select 1")
+
+    @staticmethod
     def get_jdbc_url(sql_type: int, host: str, port: int, username: str, password: str, database: str):
         if sql_type == DatabaseEnum.MYSQL:
             # mysql模式
