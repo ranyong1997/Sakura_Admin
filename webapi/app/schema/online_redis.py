@@ -10,7 +10,7 @@ from pydantic import BaseModel, validator
 from webapi.app.schema.base import SakuraModel
 
 
-class OlineRedisForm(BaseModel):
+class OnlineRedisForm(BaseModel):
     id: int = None
     command: str
 
