@@ -75,6 +75,7 @@ class BaseConfig(BaseSettings):
 
     SERVER_REPORT = "http://localhost:8000/#/record/report/"
 
+    OSS_URL = "http://oss.sakura.fun"
     # 七牛云链接地址，如果采用七牛oss，需要自行替换
     QINIU_URL = "xxxxxxxxxxxx"
     RELATION = "sakura_relation"
