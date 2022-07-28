@@ -5,7 +5,7 @@
 # @Site    : 
 # @File    : __init__.py.py
 # @Software: PyCharm
-# @desc    :
+# @desc    : 路由映射
 from webapi.app.routers.config.environment import router
 from webapi.app.routers.config.gconfig import router
 from webapi.app.routers.config.dbconfig import router
