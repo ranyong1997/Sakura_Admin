@@ -74,6 +74,7 @@ async def delete_oss_file(filepath: str, user_info=Depends(Permission(Config.MEM
             raise Exception("文件不存在或已被删除")
         await SakuraOssDao.delete_by_id(session, user_info['id'], record, log=True)
         client = OssClient.get_oss_client()
+        await client.delete_file(filepath)
         return SakuraResponse.success()
     except Exception as e:
         return SakuraResponse.failed(f"删除失败:{e}")
