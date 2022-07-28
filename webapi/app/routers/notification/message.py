@@ -24,7 +24,7 @@ router = APIRouter(prefix="/notification")
 async def list_msg(msg_status: int, msg_type: int, user_info=Depends(Permission())):
     try:
         data = await SakuraNotificationDao.list_message(msg_type=msg_type, msg_status=msg_status,
-                                                        reversed=user_info['id'])
+                                                        receiver=user_info['id'])
         return SakuraResponse.success(data)
     except Exception as e:
         return SakuraResponse.failed(str(e))
