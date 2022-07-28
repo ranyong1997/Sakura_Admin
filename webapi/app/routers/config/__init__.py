@@ -6,4 +6,9 @@
 # @File    : __init__.py.py
 # @Software: PyCharm
 # @desc    :
-from webapi.app.routers.config.environment import
+from webapi.app.routers.config.environment import router
+from webapi.app.routers.config.gconfig import router
+from webapi.app.routers.config.dbconfig import router
+from webapi.app.routers.config.redis_config import router
+from webapi.app.routers.config.system import router
+from webapi.app.routers.config.address import router
