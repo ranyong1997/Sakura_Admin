@@ -36,8 +36,9 @@ from webapi.config import Config
 
 
 class Mapper(object):
-    log = None
-    model = None
+    # 防止自己的定义的dao如果要用log对象就不行了，所以弄成了__log__
+    __log__ = None
+    __model__ = None
 
     @classmethod
     @RedisHelper.cache("dao")
@@ -54,7 +55,7 @@ class Mapper(object):
                 result = await session.execute(sql)
                 return result.scalars().all()
         except Exception as e:
-            cls.log.error(f"获取{cls.model}列表失败,error:{e}")
+            cls.__log__.error(f"获取{cls.__model__}列表失败,error:{e}")
             raise Exception("获取数据失败")
 
     @classmethod
@@ -72,14 +73,14 @@ class Mapper(object):
                 sql = cls.query_wrapper(**kwargs)
                 return await DatabaseHelper.pagination(page, size, session, sql)
         except Exception as e:
-            cls.log.error(f"获取{cls.model}列表失败,error:{e}")
+            cls.__log__.error(f"获取{cls.__model__}列表失败,error:{e}")
             raise Exception("获取数据失败")
 
     @classmethod
     def query_wrapper(cls, condition=None, **kwargs):
         conditions = condition or list()
-        if getattr(cls.model, "deleted_at", None):
-            conditions.append(getattr(cls.model, "deleted_at") == 0)
+        if getattr(cls.__model__, "deleted_at", None):
+            conditions.append(getattr(cls.__model__, "deleted_at") == 0)
         _sort = kwargs.get("_sort")
         if _sort is not None:
             # 需要去掉desc,不然会影响之前sql执行
@@ -89,8 +90,9 @@ class Mapper(object):
             like = isinstance(v, str) and (v.startswith("%") or v.endswith("%"))
             if like and len(v) == 2:
                 continue
-            DatabaseHelper.where(v, getattr(cls.model, k).like(v) if like else getattr(cls.model, k) == v, conditions)
-        sql = select(cls.model).where(*conditions)
+            DatabaseHelper.where(v, getattr(cls.__model__, k).like(v) if like else getattr(cls.__model__, k) == v,
+                                 conditions)
+        sql = select(cls.__model__).where(*conditions)
         if _sort and isinstance(_sort, tuple):
             for d in _sort:
                 sql = getattr(sql, "order_by")(d)
@@ -109,7 +111,7 @@ class Mapper(object):
                 result = await session.execute(sql)
                 return result.scalars().first()
         except Exception as e:
-            cls.log.error(f"查询{cls.model}失败,error:{e}")
+            cls.__log__.error(f"查询{cls.__model__}失败,error:{e}")
             raise Exception("查询记录失败")
 
     @classmethod
@@ -138,7 +140,7 @@ class Mapper(object):
                                    key=model.id))
             return model
         except Exception as e:
-            cls.log.error(f"添加{cls.model}记录失败, error: {e}")
+            cls.__log__.error(f"添加{cls.__model__}记录失败, error: {e}")
             raise Exception("添加记录失败")
 
     @classmethod
@@ -147,11 +149,11 @@ class Mapper(object):
         try:
             async with async_session() as session:
                 async with session.begin():
-                    sql = update(cls.model).where(*condition).values(**kwargs, updated_at=datetime.now(),
-                                                                     update_user=user)
+                    sql = update(cls.__model__).where(*condition).values(**kwargs, updated_at=datetime.now(),
+                                                                         update_user=user)
                     await session.execute(sql)
         except Exception as e:
-            cls.log.error(f"更新数据失败:{e}")
+            cls.__log__.error(f"更新数据失败:{e}")
             raise Exception("更新数据失败")
 
     @classmethod
@@ -175,7 +177,7 @@ class Mapper(object):
                             cls.insert_log(session, user, OperationType.UPDATE, now, old, model.id, changed=changed))
                 return now
         except Exception as e:
-            cls.log.error(f"更新{cls.model}记录失败,error:{e}")
+            cls.__log__.error(f"更新{cls.__model__}记录失败,error:{e}")
             raise Exception(f"更新数据失败")
 
     @classmethod
@@ -216,7 +218,7 @@ class Mapper(object):
             async with session.begin():
                 return await cls._inner_delete(session, user, value, log, key, exists)
         except Exception as e:
-            cls.log.exception(f"删除{cls.model.__name__}记录失败: \n{e}")
+            cls.__log__.exception(f"删除{cls.__model__.__name__}记录失败: \n{e}")
             raise Exception("删除失败")
 
     @classmethod
@@ -236,7 +238,7 @@ class Mapper(object):
                     await asyncio.create_task(
                         cls.insert_log(session, user, OperationType.DELETE, original, key=id_))
         except Exception as e:
-            cls.log.exception(f"删除{cls.model}记录失败,error:{e}")
+            cls.__log__.exception(f"删除{cls.__model__}记录失败,error:{e}")
             raise Exception("删除记录失败")
 
     @classmethod
@@ -272,24 +274,19 @@ class Mapper(object):
         fields = getattr(now, Config.FIELD, None)
         # 根据要展示的字段数量(__show__)获取title数据
         fields_number = getattr(now, Config.SHOW_FIELD, 1)
-        if fields:
-            # 必须要展示至少一个字符
-            fields = [f.name for f in fields[:fields_number]]
-        else:
-            fields = ['id']
-        if not changed:
-            if mode == OperationType.INSERT:
-                changed_fields = await cls.get_fields(now)
-            else:
-                changed_fields = []
-        else:
+        fields = [f.name for f in fields[:fields_number]] if fields else ['id']
+        if changed:
             changed_fields = changed
+        elif mode == OperationType.INSERT:
+            changed_fields = await cls.get_fields(now)
+        else:
+            changed_fields = []
         detail_fields = [c for c in changed_fields if
                          c not in fields] if mode != OperationType.UPDATE else changed_fields
         result = []
         title = []
         for f in detail_fields:
-            item = await cls.get_fields_alias(session, getattr(now, Config.RELATION, None), f, now, old)
+            item = await cls.get_field_alias(session, getattr(now, Config.RELATION, None), f, now, old)
             result.append(item)
         for d in fields:
             item = await cls.get_field_alias(session, getattr(now, Config.RELATION, None), d, now, old)
@@ -300,12 +297,7 @@ class Mapper(object):
     async def get_id_list(cls, ids):
         if ids == "":
             return []
-        if isinstance(ids, int):
-            # 说明是多个id
-            id_list = [ids]
-        else:
-            id_list = list(map(int, ids.split(",")))
-        return id_list
+        return [ids] if isinstance(ids, int) else list(map(int, ids.split(",")))
 
     @classmethod
     async def fetch_id_with_name(cls, session, id_field, name_field, old_id, new_id):
@@ -332,13 +324,9 @@ class Mapper(object):
         id_list = old_list + new_list
         data = await session.execute(select(cls_).where(getattr(cls_, id_field.name).in_(id_list)))
         old_ans, new_ans = [], []
-        mp = dict()
-        for d in data.scalars():
-            mp[getattr(d, id_field, None)] = getattr(d, name_field, None)
-        for t in old_list:
-            old_ans.append(mp.get(t, t))
-        for i in new_list:
-            new_ans.append(mp.get(i, i))
+        mp = {getattr(d, id_field, None): getattr(d, name_field, None) for d in data.scalars()}
+        old_ans.extend(mp.get(t, t) for t in old_list)
+        new_ans.extend(mp.get(i, i) for i in new_list)
         return ",".join(map(str, new_ans)), ",".join(map(str, old_ans))
 
     @classmethod
@@ -395,10 +383,8 @@ class Mapper(object):
         ans = []
         fields = getattr(model, Config.FIELD, None)
         fields = [x.name for x in fields] if fields else list()
-        for c in model.__table__.columns:
-            if c.name in Config.IGNORE_FIELDS or (fields and c.name not in fields):
-                continue
-            ans.append(c.name)
+        ans.extend(c.name for c in model.__table__.columns if
+                   c.name not in Config.IGNORE_FIELDS and (not fields or c.name in fields))
         return ans
 
     @classmethod
@@ -419,17 +405,14 @@ class Mapper(object):
                         raise Exception("记录不存在")
                     session.delete(original)
         except Exception as e:
-            cls.log.error(f"逻辑删除{cls.model}记录失败,error:{e}")
-            raise Exception("删除记录失败")
+            cls.__log__.error(f"逻辑删除{cls.__model__}记录失败,error:{e}")
+            raise Exception("删除记录失败") from e
 
 
 class ModelWrapper:
     def __init__(self, model, log=None):
         self.__module__ = model
-        if log is None:
-            self.__log__ = Log(f"{model.__name__}Dao")
-        else:
-            self.__log__ = log
+        self.__log__ = Log(f"{model.__name__}Dao") if log is None else log
 
     def __call__(self, cls):
         setattr(cls, "__model__", self.__module__)
@@ -475,14 +458,11 @@ async def create_table():
 init_relation(ProjectRole, SakuraRelationField(ProjectRole.user_id, (User.id, User.name)),
               SakuraRelationField(ProjectRole.project_id, (Project.id, Project.name)),
               SakuraRelationField(ProjectRole.project_role, ProjectRoleEnum.name))
-
 init_relation(SakuraRedis, SakuraRelationField(SakuraRedis.env, (Environment.id, Environment.name)))
-
 init_relation(SakuraTestPlan, SakuraRelationField(SakuraTestPlan.env, (Environment.id, Environment.name)),
               SakuraRelationField(SakuraTestPlan.project_id, (Project.id, Project.name)),
               SakuraRelationField(SakuraTestPlan.msg_type, SakuraTestPlan.get_msg_type),
               SakuraRelationField(SakuraTestPlan.receiver, (User.id, User.name)))
-
 init_relation(TestCase)
 init_relation(TestCaseAsserts, SakuraRelationField(TestCaseAsserts.case_id, (TestCase.id, TestCase.name)))
 init_relation(SakuraGateway, SakuraRelationField(SakuraGateway.env, (Environment.id, Environment.name)))
