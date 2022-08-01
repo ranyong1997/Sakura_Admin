@@ -12,7 +12,7 @@ from webapi.app.excpetions.ParamsException import ParamsError
 from webapi.app.schema.base import SakuraModel
 from webapi.app.schema.constructor import ConstructorForm
 from webapi.app.schema.request import RequestInfo
-from webapi.app.schema.testcase_data import SakuraTestcaseDateForm
+from webapi.app.schema.testcase_data import SakuraTestcaseDataForm
 from webapi.app.schema.testcase_out_parameters import SakuraTestCaseOutParametersForm
 
 
@@ -56,7 +56,7 @@ class TestCaseAssertsForm(BaseModel):
 class TestCaseInfo(BaseModel):
     case: TestCaseForm = None
     asserts: List[TestCaseAssertsForm] = []
-    data: List[SakuraTestcaseDateForm] = []
+    data: List[SakuraTestcaseDataForm] = []
     constructor: List[ConstructorForm] = []
     out_parameters: List[SakuraTestCaseOutParametersForm] = []
 
