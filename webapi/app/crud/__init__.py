@@ -31,6 +31,7 @@ from webapi.app.models.test_case import TestCase
 from webapi.app.models.test_plan import SakuraTestPlan
 from webapi.app.models.testcase_asserts import TestCaseAsserts
 from webapi.app.models.user import User
+from webapi.app.utils.logger import Log
 from webapi.config import Config
 
 
@@ -420,6 +421,20 @@ class Mapper(object):
         except Exception as e:
             cls.log.error(f"逻辑删除{cls.model}记录失败,error:{e}")
             raise Exception("删除记录失败")
+
+
+class ModelWrapper:
+    def __init__(self, model, log=None):
+        self.__module__ = model
+        if log is None:
+            self.__log__ = Log(f"{model.__name__}Dao")
+        else:
+            self.__log__ = log
+
+    def __call__(self, cls):
+        setattr(cls, "__model__", self.__module__)
+        setattr(cls, "__log__", self.__log__)
+        return cls
 
 
 def get_dao_path():
