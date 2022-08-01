@@ -10,7 +10,7 @@ from pydantic import BaseModel, validator
 from webapi.app.schema.base import SakuraModel
 
 
-class SakuraTestcaseDateForm(BaseModel):
+class SakuraTestcaseDataForm(BaseModel):
     id: int = None
     case_id: int = None
     name: str
