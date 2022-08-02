@@ -98,7 +98,8 @@ class TestCaseAssertsDao(Mapper):
                     result = await session.execute(sql)
                     data = result.scalars().first()
                     if data is None:
-                        raise Exception("编辑用例断言失败")
+                        raise Exception("断言信息不存在,请检查")
+                    DatabaseHelper.delete_model(data, user_id)
         except Exception as e:
-            cls.__log__.error(f"编辑用例断言失败:{e}")
-            raise Exception(f"编辑用例断言失败:{e}") from e
+            cls.__log__.error(f"删除用例断言失败:{e}")
+            raise Exception(f"删除用例断言失败:{e}") from e
