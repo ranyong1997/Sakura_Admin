@@ -35,6 +35,12 @@ class TestCaseAssertsDao(Mapper):
 
     @staticmethod
     async def insert_test_case_asserts(form: TestCaseAssertsForm, user_id: int):
+        """
+        新增用例断言
+        :param form:
+        :param user_id:
+        :return:
+        """
         try:
             ans = None
             async with async_session() as session:
@@ -73,11 +79,26 @@ class TestCaseAssertsDao(Mapper):
                     result = await session.execute(sql)
                     data = result.scalars().first()
                     if data is None:
-                        raise Exception(f"断言信息不存在,请检查")
+                        raise Exception("断言信息不存在,请检查")
                     DatabaseHelper.updata_model(data, form, user_id)
                     await session.flush()
                     session.expunge(data)
                     return data
+        except Exception as e:
+            cls.__log__.error(f"更新用例断言失败:{e}")
+            raise Exception(f"更新用例断言失败:{e}") from e
+
+    @classmethod
+    async def delete_test_case_asserts(cls, id: int, user_id: int) -> None:
+        try:
+            async with async_session() as session:
+                async with session.begin():
+                    sql = select(TestCaseAsserts).where(TestCaseAsserts.id == id,
+                                                        TestCaseAsserts.deleted_at == 0)
+                    result = await session.execute(sql)
+                    data = result.scalars().first()
+                    if data is None:
+                        raise Exception("编辑用例断言失败")
         except Exception as e:
             cls.__log__.error(f"编辑用例断言失败:{e}")
             raise Exception(f"编辑用例断言失败:{e}") from e
