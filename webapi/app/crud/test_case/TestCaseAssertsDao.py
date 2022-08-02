@@ -42,7 +42,6 @@ class TestCaseAssertsDao(Mapper):
         :return:
         """
         try:
-            ans = None
             async with async_session() as session:
                 async with session.begin():
                     sql = select(TestCaseAsserts).where(TestCaseAsserts.case_id == form.case_id,
@@ -58,7 +57,7 @@ class TestCaseAssertsDao(Mapper):
                     await session.refresh(new_assert)
                     session.expunge(new_assert)
                     return new_assert
-            return ans
+            return None
         except Exception as e:
             TestCaseAssertsDao.__log__.error(f"新增用例断言失败:{e}")
             raise Exception(f"新增用例断言失败:{e}") from e
