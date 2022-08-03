@@ -5,7 +5,7 @@
 # @Site    : 
 # @File    : TestCaseDirectory.py
 # @Software: PyCharm
-# @desc    : 测试用例目录
+# @desc    : 测试用例目录(dao)逻辑
 import time
 from collections import defaultdict
 from datetime import datetime
