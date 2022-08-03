@@ -10,7 +10,7 @@ from sqlalchemy import Column, String, INT, UniqueConstraint
 from webapi.app.models.basic import SakuraBase
 
 
-class SakuraTestCaseParameters(SakuraBase):
+class SakuraTestCaseOutParameters(SakuraBase):
     """
     sakura用例参数数据，与用例bind
     """
