@@ -9,9 +9,9 @@
 from enum import IntEnum
 
 
-class Constructor(IntEnum):
+class ConstructorType(IntEnum):
     testcase = 0
-    sql = 0
+    sql = 1
     redis = 2
     py_script = 3
     http = 4
