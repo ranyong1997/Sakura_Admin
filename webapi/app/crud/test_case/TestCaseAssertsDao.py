@@ -33,6 +33,23 @@ class TestCaseAssertsDao(Mapper):
             cls.__log__.error(f"获取用例断言失败:{str(e)}")
             raise Exception(f"获取用例断言失败:{str(e)}") from e
 
+    @classmethod
+    async def async_list_test_case_asserts(cls, case_id: int):
+        """
+        异步获取测试用例断言
+        :param case_id:
+        :return:
+        """
+        try:
+            async with async_session() as session:
+                sql = select(TestCaseAsserts).where(TestCaseAsserts.case_id == case_id,
+                                                    TestCaseAsserts.deleted_at == 0).order_by(TestCaseAsserts.name)
+                case_list = await session.execute(sql)
+                return case_list.scalars().all()
+        except Exception as e:
+            cls.__log__.error(f"获取用例断言失败:{str(e)}")
+            raise Exception(f"获取用例断言失败:{str(e)}") from e
+
     @staticmethod
     async def insert_test_case_asserts(form: TestCaseAssertsForm, user_id: int):
         """
