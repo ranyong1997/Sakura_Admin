@@ -37,4 +37,4 @@ class TestcaseConstructor(ConstructorAbstract):
             params[constructor.value] = result
         except Exception as e:
             raise Exception(
-                f"{path}->{constructor.name} 第{index + 1}个{ConstructorAbstract.get_name(constructor)}执行失败:{str(e)}") from e
+                f"{path}->{constructor.name}第{index + 1}个{ConstructorAbstract.get_name(constructor)}执行失败:{str(e)}") from e
