@@ -31,6 +31,19 @@ class GConfigDao(Mapper):
                     if data is not None:
                         raise Exception(f"变量,{data.key}已存在")
                     config = GConfig(**form.dict(), user=user_id)
-                    select.add(config)
+                    session.add(config)
+        except Exception as e:
+            cls.log.error(f"新增变量:{data.key}失败,{str(e)}")
+            raise Exception(f"新增变量:{data.key}失败,{str(e)}") from e
+
+    @staticmethod
+    @RedisHelper.cache("dao", 1800, True)
+    async def async_get_gconfig_by_key(key: str, env: int) -> GConfig:
+        try:
+            filter = [GConfig.key == key, GConfig.deleted_at == 0, GConfig.enable == True, GConfig.env == env]
+            async with async_session() as session:
+                sql = select(GConfig).where(*filter)
+                result = await session.execute(sql)
+                return result.scalars().first()
         except Exception as e:
             raise Exception(f"查询全局变量失败:{str(e)}") from e
