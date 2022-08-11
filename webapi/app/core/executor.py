@@ -618,6 +618,16 @@ class Executor(object, Exception):
                 return False, f"预期结果:{exp} 文本不包含于 实际结果:{act}【✔️】"
             temp = json.dumps(act, ensure_ascii=False)
             if exp in temp:
-                return True,f"预期结果:{exp} 文本包含于 实际结果:{act}【❌】"
+                return True, f"预期结果:{exp} 文本包含于 实际结果:{act}【❌】"
             return False, f"预期结果:{exp} 文本不包含于 实际结果:{act}【✔️】"
-        return False,"不支持的断言的方式💔"
+        return False, "不支持的断言的方式💔"
+
+    def get_el_expression(self, string: str):
+        """
+        获取字符串中的el表达式
+        :param string:
+        :return:
+        """
+        if string is None:
+            return []
+        return re.findall(Executor.pattern, string)
