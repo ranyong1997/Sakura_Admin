@@ -74,7 +74,7 @@ class Executor(object, Exception):
 
     @staticmethod
     def get_constructor_type(c: Constructor):
-        if c.type == ConstructorType.testcase
+        if c.type == ConstructorType.testcase:
             return TestcaseConstructor
         if c.type == ConstructorType.sql:
             return SqlConstructor
@@ -112,9 +112,9 @@ class Executor(object, Exception):
         if key_type == GConfigParserEnum.string:
             return StringGConfigParser.parse
         if key_type == GConfigParserEnum.json:
-            return StringGConfigParser.parse
+            return JSONGConfigParser.parse
         if key_type == GConfigParserEnum.yaml:
-            return StringGConfigParser.parse
+            return YamlGConfigParser.parse
         raise Executor(f"全局变量类型:{key_type}不合法,请检查!")
 
     async def parse_field(self, data, field, name, env):
@@ -153,7 +153,7 @@ class Executor(object, Exception):
         variables = self.get_el_expression(field_origin)
         for v in variables:
             key = v.split(".")
-            if not params.get(key[0])
+            if not params.get(key[0]):
                 continue
             result = params
             for branch in key:
@@ -361,7 +361,7 @@ class Executor(object, Exception):
             out_dict = self.extract_out_parameters(response_info, out_parameters)
 
             # 步骤12: 替换主变量
-            req_params.update(out_dict)
+            req_params |= out_dict
 
             # 步骤13: 写入response
             req_params["response"] = res.get("response", "")
@@ -446,14 +446,14 @@ class Executor(object, Exception):
             executor = Executor()
             result, err = await executor.run(env, case_id, params_pool, request_param, path)
             finished_at = datetime.now()
-            cost = "{}s".format((finished_at - start_at).seconds)
+            cost = f"{(finished_at - start_at).seconds}s"
             if err is not None:
                 status = 2
             else:
-                stat = 0 if result.get("status") else 1
+                status = 0 if result.get("status") else 1
             # 若status 不为0,代表case执行失败,走重试逻辑
             if status != 0 and i < retry_times:
-                await  asyncio.sleep(60 * retry_times)
+                await asyncio.sleep(60 * retry_times)
                 times += 1
                 continue
             asserts = result.get("asserts")
@@ -484,7 +484,7 @@ class Executor(object, Exception):
             await asyncio.gather(
                 *(Executor.run_with_test_data(env, data, report_id, case_id, params_pool,
                                               Executor.get_dict(x.json_data), path, x.name, x.id,
-                                              retry_minutes=retry_minutes)) for x in test_data)
+                                              retry_minutes=retry_minutes) for x in test_data))
 
     @case_log
     def replace_body(self, req_params, body, body_type):
@@ -755,3 +755,83 @@ class Executor(object, Exception):
         except Exception as e:
             Executor.log.exception(f"执行测试计划:【{plan.name}】失败:{str(e)}")
             Executor.log.error(f"执行测试计划:【{plan.name}】失败:{str(e)}")
+
+    @staticmethod
+    async def run_multiple(executor: int, env: int, case_list: List[int], mode=0, plan_id: int = None, ordered=False,
+                           report_dict: dict = None, retry_minutes: int = 0):
+        """
+        批量执行用例
+        :param executor:
+        :param env:
+        :param case_list:
+        :param mode:
+        :param plan_id:
+        :param ordered:
+        :param report_dict:
+        :param retry_minutes:
+        :return:
+        """
+        try:
+            current_env = await EnvironmentDao.query_env(env)
+            if executor != 0:
+                # 说明不是系统执行
+                user = await UserDao.query_user(executor)
+                name = user.name if user is not None else "未知"
+            else:
+                name = 'CPU'
+            st = time.perf_counter()
+            # 步骤1: 新增测试报告数据
+            report_id = await TestReportDao.start(executor, env, mode, plan_id=plan_id)
+            # 步骤2: 开始执行用例
+            result_data = defaultdict(list)
+            # 步骤3: 将报告改为 running状态
+            await TestReportDao.update(report_id, 1)
+            # 步骤4: 执行用例并搜集数据
+            if not ordered:
+                await asyncio.gather(
+                    *(Executor.run_single(env, result_data, report_id, c, retry_minutes=retry_minutes) for c in
+                      case_list))
+            else:
+                # 顺序执行
+                for c in case_list:
+                    await Executor.run_single(env, result_data, report_id, c, retry_minutes=retry_minutes)
+            ok, fail, skip, error = 0, 0, 0, 0
+            for status in result_data.values():
+                for s in status:
+                    if s == 0:
+                        ok += 1
+                    elif s == 1:
+                        fail += 1
+                    elif s == 2:
+                        error += 1
+                    else:
+                        skip += 1
+            cost = time.perf_counter() - st
+            cost = "%.2f" % cost
+            # 步骤5: 回写数据到报告
+            report = await TestReportDao.end(report_id, ok, fail, error, skip, 3, cost)
+            if report_dict is not None:
+                report_dict[env] = {
+                    "report_url": f"{Config.SERVER_REPORT}{report_id}",
+                    "start_time": report.start_at.strftime("%Y-%m-%d %H:%M:%S"),
+                    "end_time": report.finished_at.strftime("%Y-%m-%d %H:%M:%S"),
+                    "success": ok,
+                    "failed": fail,
+                    "total": ok + fail + error + skip,
+                    "error": error,
+                    "skip": skip,
+                    "executor": name,
+                    "cost": cost,
+                    "plan_result": "通过" if ok + fail + error + skip > 0 and fail + error == 0 else "未通过",
+                    "env": current_env.name
+                }
+            return report_id
+        except Exception as e:
+            raise Executor(f"批量执行用例失败:{str(e)}") from e
+
+
+if __name__ == '__main__':
+    a = Executor()
+    temp = json.dumps({"a": {"b": [{"c": 1, "d": 2}]}})
+    ans = a.parse_variable(temp, "${a.b.#name.c}", {"name": 0})
+    print(ans)
