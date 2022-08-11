@@ -510,3 +510,37 @@ class Executor(object, Exception):
         except Exception as e:
             self.append(f"替换请求body失败:{str(e)}")
         return body
+
+    @staticmethod
+    def get_time():
+        return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    @case_log
+    def my_assert(self, asserts: List, json_format: bool) -> [str, bool]:
+        """
+        断言验证
+        :param asserts:
+        :param json_format:
+        :return:
+        """
+        result = {}
+        ok = True
+        if len(asserts) == 0:
+            self.append("未设置断言,用例结束")
+            return json.dumps(result, ensure_ascii=False), ok
+        for item in asserts:
+            try:
+                # 解析预期/实际结果
+                expected = self.translate(item.expected)
+                # 判断请求地址返回是否是json格式,如果不是则进行loads操作
+                actually = self.translate(item.actually)
+                status, err = self.ops(item.assert_type, expected, actually)
+                result[item.id] = {'status': status, 'msg': err}
+            except Exception as e:
+                if ok is True:
+                    ok = False
+                self.append(f"预期结果:{item.expected}\n 实际结果:{item.actually}\n")
+                result[item.id] = {'status': False, 'msg': f"断言取值失败,请检查断言语句:{str(e)}"}
+        return json.dumps(result, ensure_ascii=False), ok
+
+
