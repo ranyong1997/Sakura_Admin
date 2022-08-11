@@ -688,3 +688,38 @@ class Executor(object, Exception):
         if string == "${response}":
             return result
         return json.dumps(result, ensure_ascii=False)
+
+    @staticmethod
+    async def notice(env: list, plan: SakuraTestPlan, project: Project, report_dict: dict, users: list):
+        """
+        消息通知方法
+        :param env:
+        :param plan:
+        :param project:
+        :param report_dict:
+        :param users:
+        :return:
+        """
+        for e in env:
+            msg_types = plan.msg_type.split(",")
+            if msg_types and users:
+                for m in msg_types:
+                    if int(m) == NoticeType.EMAIL:
+                        render_html = Email.render_html(plan_name=plan.name, **report_dict[e])
+                        Email.send_msg(
+                            f"【{report_dict[e].get('env')}】测试计划【{plan.name}】执行完毕({report_dict[e].get('plan_result')})",
+                            render_html, None, *[r.get("email") for r in users])
+                    if int(m) == NoticeType.DINGDING:
+                        report_dict[e]['result_color'] = '#67C23A' if report_dict[e]['plan_result'] == '通过' \
+                            else '#E6A23C'
+                        # 批量获取用户手机号
+                        users = [r.get('phone') for r in users]
+                        report_dict[e]['notification_user'] = "".join(map(lambda x: f"@{x}", users))
+                        render_markdown = DingTalk.render_markdown(**report_dict[e], plan_name=plan.name)
+                        if not project.dingtalk_url:
+                            Executor.log.debug("项目未配置钉钉通知机器人")
+                            continue
+                        ding = DingTalk(project.dingtalk_url)
+                        await ding.send_msg("Sakura测试报告", render_markdown, None, users)
+
+
