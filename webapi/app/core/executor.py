@@ -628,6 +628,4 @@ class Executor(object, Exception):
         :param string:
         :return:
         """
-        if string is None:
-            return []
-        return re.findall(Executor.pattern, string)
+        return [] if string is None else re.findall(Executor.pattern, string)
