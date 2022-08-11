@@ -722,4 +722,36 @@ class Executor(object, Exception):
                         ding = DingTalk(project.dingtalk_url)
                         await ding.send_msg("Sakura测试报告", render_markdown, None, users)
 
-
+    @staticmethod
+    @lock("test_plan")
+    async def run_test_plan(plan_id: int, executor: int = 0):
+        """
+        通过测试计划id执行测试计划
+        :param plan_id:
+        :param executor:
+        :return:
+        """
+        plan = await SakuraTestPlanDao.query_test_plan(plan_id)
+        if plan is None:
+            Executor.log.debug(f"测试计划：【{plan_id}】不存在")
+            return
+        try:
+            # 设置为running
+            await SakuraTestPlanDao.update_test_plan_state(plan_id, 1)
+            project, _ = await ProjectDao.query_project(plan.project_id)
+            env = list(map(int, plan.case_list.split(",")))
+            case_list = list(map(int, plan.case_list.split(",")))
+            receiver = list(map(int, plan.receiver.split(",") if plan.receiver else []))
+            # 聚合报告dict
+            report_dict = {}
+            await asyncio.gather(
+                *(Executor.run_multiple(executor, int(e), case_list, mode=1, retry_minutes=plan.retry_minutes,
+                                        plan_id=plan.id, order=plan.ordered, report_dict=report_dict) for e in env))
+            await SakuraTestPlanDao.update_test_plan_state(plan.id, 0)
+            users = await UserDao.list_user_touch(*receiver)
+            await Executor.notice(env, plan, project, report_dict, users)
+            if executor != 0:
+                await ws_manage.notify(executor, title="测试计划执行完毕", content="请前往测试报告页面查看细节")
+        except Exception as e:
+            Executor.log.exception(f"执行测试计划:【{plan.name}】失败:{str(e)}")
+            Executor.log.error(f"执行测试计划:【{plan.name}】失败:{str(e)}")
