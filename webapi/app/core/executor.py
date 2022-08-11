@@ -652,3 +652,39 @@ class Executor(object, Exception):
                 return branch
             return params.get(data)
         return branch
+
+    @case_log
+    def parse_variable(self, response_info, string: str, params=None):
+        """
+        解析返回response中的变量
+        :param response_info:
+        :param string:
+        :param params:
+        :return:
+        """
+        exp = self.get_el_expression(string)
+        if len(exp) == 0:
+            return string
+        data = exp[0]
+        el_list = data.split(".")
+        result = response_info
+        try:
+            for branch in el_list:
+                branch = self.replace_branch(branch, params)
+                if isinstance(result, str):
+                    # 说明需要反序列化
+                    try:
+                        result = json.loads(result)
+                    except Exception as e:
+                        self.append(f"反序列化失败,result:{result}\n Error:{str(e)}")
+                        break
+                if isinstance(branch, int) or branch.isdigit():
+                    # 说明路径里面是数组
+                    result = result[int(branch)]
+                else:
+                    result = result.get(branch)
+        except Exception as e:
+            return Executor(f"获取变量失败:{str(e)}")
+        if string == "${response}":
+            return result
+        return json.dumps(result, ensure_ascii=False)
