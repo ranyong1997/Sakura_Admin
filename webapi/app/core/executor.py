@@ -629,3 +629,26 @@ class Executor(object, Exception):
         :return:
         """
         return [] if string is None else re.findall(Executor.pattern, string)
+
+    @case_log
+    def translate(self, data):
+        """
+        反序列化为Py对象
+        :param data:
+        :return:
+        """
+        return json.loads(data)
+
+    def replace_branch(self, branch: str, params: dict):
+        if not params:
+            return branch
+        if branch.startswith("#"):
+            # 说明branch也是个子变量
+            data = branch[1:]
+            if len(data) == 0:
+                return branch
+            dist = params.get(data)
+            if dist is None:
+                return branch
+            return params.get(data)
+        return branch
