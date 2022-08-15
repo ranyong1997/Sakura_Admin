@@ -221,7 +221,7 @@ def make_filter(name):
     return filter_
 
 
-def init_log():
+def init_logging():
     """
     初始化日志
     :return:
