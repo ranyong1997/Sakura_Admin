@@ -19,7 +19,7 @@ class SakuraTestcaseDirectory(SakuraBase):
     __tablename__ = 'sakura_testcase_directory'
     # 联合索引,防止同一层次出现同名目录
     __table_args__ = (
-        UniqueConstraint('project_id', 'name', 'parent', 'deleted_at')
+        UniqueConstraint('project_id', 'name', 'parent', 'deleted_at'),
     )
     id = Column(INT, primary_key=True)
     project_id = Column(INT, index=True)

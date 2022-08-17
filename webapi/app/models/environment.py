@@ -17,7 +17,7 @@ class Environment(SakuraBase):
     remarks = Column(String(200))
 
     __table_args__ = (
-        UniqueConstraint('name', 'deleted_at')
+        UniqueConstraint('name', 'deleted_at'),
     )
     __fields__ = [name]
     __tag__ = "环境"

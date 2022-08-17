@@ -13,7 +13,7 @@ from webapi.app.models.basic import SakuraBase
 class Constructor(SakuraBase):
     __tablename__ = "sakura_constructor"
     __table_args__ = (
-        UniqueConstraint('case_id', 'suffix', 'name', 'deleted_at')
+        UniqueConstraint('case_id', 'suffix', 'name', 'deleted_at'),
     )
     type = Column(INT, default=0, comment="0: 测试用例 1: 数据库 2: redis 3: py脚本 4: 其他")
     name = Column(String(64), comment="数据初始化")

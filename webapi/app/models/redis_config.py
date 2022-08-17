@@ -12,7 +12,7 @@ from webapi.app.models.basic import SakuraBase
 
 class SakuraRedis(SakuraBase):
     __tablename__ = "sakura_redis_info"
-    __table_args__ = (UniqueConstraint('env', 'name', 'deleted_at'))
+    __table_args__ = (UniqueConstraint('env', 'name', 'deleted_at'),)
     env = Column(INT, nullable=False)  # 对应环境
     name = Column(String(25), nullable=False)  # redis名称
     addr = Column(String(128), nullable=False)  # redis连接地址

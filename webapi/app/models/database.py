@@ -13,7 +13,7 @@ from webapi.app.models.basic import SakuraBase
 class SakuraDatabase(SakuraBase):
     __tablename__ = "sakura_database_info"
     __table_args__ = (
-        UniqueConstraint('env', 'name', 'deleted_at')
+        UniqueConstraint('env', 'name', 'deleted_at'),
     )
     env = Column(INT, nullable=False)  # 对应环境id
     name = Column(String(24), nullable=False)  # 数据库对应名称

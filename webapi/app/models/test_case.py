@@ -9,7 +9,7 @@
 from typing import List
 from sqlalchemy import Column, String, INT, TEXT, SMALLINT, UniqueConstraint
 from webapi.app.models.basic import SakuraBase
-from webapi.app.models.out_parameters import SakuraTestCaseParameters
+from webapi.app.models.out_parameters import SakuraTestCaseOutParameters
 
 
 class TestCase(SakuraBase):
@@ -27,9 +27,9 @@ class TestCase(SakuraBase):
     status = Column(INT, comment="用例状态: 1: 调试中 2: 暂时关闭 3: 正常运作")
     priority = Column(String(3), comment="用例优先级: P0-P3")
     case_type = Column(SMALLINT, comment="0: 普通用例 1: 前置用例 2: 数据工厂")
-    out_parameters: List[SakuraTestCaseParameters] = None
+    out_parameters: List[SakuraTestCaseOutParameters] = None
     # 调整联合唯一索引
-    __table_args__ = (UniqueConstraint('directory_id', 'name', 'deleted_at'))
+    __table_args__ = (UniqueConstraint('directory_id', 'name', 'deleted_at'),)
     __tag__ = "测试用例"
     __fields__ = (
         name, request_type, url, request_method, request_headers, body, body_type, directory_id, tag, status, body,

@@ -15,7 +15,7 @@ class SakuraTestCaseOutParameters(SakuraBase):
     sakura用例参数数据，与用例bind
     """
     __tablename__ = "sakura_out_parameters"
-    __table_args__ = (UniqueConstraint('case_id', 'name', 'deleted_at'))
+    __table_args__ = (UniqueConstraint('case_id', 'name', 'deleted_at'),)
     # 用例id
     case_id = Column(INT, nullable=False)
     # 参数名

@@ -19,7 +19,7 @@ class GConfig(SakuraBase):
     # 是否可用
     enable = Column(Boolean, default=True)
     __table_args__ = (
-        UniqueConstraint('env', 'key', 'deleted_at')
+        UniqueConstraint('env', 'key', 'deleted_at'),
     )
     __fields__ = (env, key)
     __tag__ = "全局变量"

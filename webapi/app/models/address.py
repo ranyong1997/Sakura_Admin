@@ -12,7 +12,7 @@ from webapi.app.models.basic import SakuraBase
 
 class SakuraGateway(SakuraBase):
     __tablename__ = 'sakura_gateway'
-    __table_args__ = (UniqueConstraint('env', 'name', 'deleted_at'))
+    __table_args__ = (UniqueConstraint('env', 'name', 'deleted_at'),)
     env = Column(INT, comment='对应环境')
     name = Column(String(32), comment='网关名称')
     gateway = Column(String(128), comment='网关地址')

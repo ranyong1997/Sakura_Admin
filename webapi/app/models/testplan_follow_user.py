@@ -16,7 +16,7 @@ class SakuraTestPlanFollowUserRel(SakuraBase):
     """
     __tablename__ = "sakura_testplan_follow_user_rel"
     __table_args__ = (
-        UniqueConstraint("user_id", "plan_id", "deleted_at")
+        UniqueConstraint("user_id", "plan_id", "deleted_at"),
     )
     user_id = Column(INT, nullable=False)
     plan_id = Column(INT, nullable=False)

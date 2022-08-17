@@ -19,7 +19,7 @@ class SakuraTestCaseData(SakuraBase):
     json_data = Column(TEXT, nullable=False)
 
     __table_args__ = (
-        UniqueConstraint('env', 'case_id', 'name', 'deleted_at')
+        UniqueConstraint('env', 'case_id', 'name', 'deleted_at'),
     )
     __tablename__ = 'sakura_testcase_data'
     __filelds__ = [name]
