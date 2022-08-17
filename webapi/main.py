@@ -139,7 +139,7 @@ def init_scheduler():
 
 
 @sakura.on_event("startup")
-async def init_datebase():
+async def init_database():
     """
     初始化数据库,建表
     :return:
