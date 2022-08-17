@@ -304,7 +304,7 @@ class RedisHelper(object):
 
                 return wrapper
 
-        return decorator()
+        return decorator
 
     @staticmethod
     def up_cache(*key: str, key_and_suffix: Tuple = None):
