@@ -12,4 +12,11 @@ from fastapi import FastAPI
 from loguru import logger
 
 from webapi.config import Config
-from webapi.s
+from webapi.sakura_proxy import start_proxy
+
+mock = FastAPI()
+if Config.MOCK_ON:
+    asyncio.run(start_proxy(logger))
+
+if __name__ == '__main__':
+    uvicorn.run("proxy:mock", host="0.0.0.0", port=Config.PROXY_PORT, reload=False, forwarded_allow_ips="*", workers=1)
