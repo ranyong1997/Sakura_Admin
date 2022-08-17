@@ -28,7 +28,7 @@ class SakuraTestPlan(SakuraBase):
     # cron表达式
     cron = Column(String(24), nullable=False)
     # 用例列表
-    case_list = Column(TEXT, null=False)
+    case_list = Column(TEXT, nullable=False)
     # 并行/串行(是否顺序执行)
     ordered = Column(Boolean, default=False)
     # 通过率低于这个数会自动发通知
@@ -41,8 +41,7 @@ class SakuraTestPlan(SakuraBase):
     retry_minutes = Column(SMALLINT, nullable=False, default=0)
     # 测试计划是否在执行中
     state = Column(SMALLINT, default=0, comment="0: 未开始 1: 运行中")
-
-    __tag_args__ = (UniqueConstraint('project_id', 'name', 'deleted_at'))
+    __tag_args__ = (UniqueConstraint('project_id', 'name', 'deleted_at'),)
     __tablename__ = "sakura_test_plan"
     __fields__ = (name, project_id, env, priority)
     __tag__ = "测试计划"

@@ -16,7 +16,7 @@ class GConfigForm(BaseModel):
     value: str
     env: str = None
     key_type: int
-    enable = bool
+    enable: bool
 
     @validator("key", "value", "key_type", "enable")
     def name_not_empty(cls, v):

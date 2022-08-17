@@ -10,10 +10,10 @@ from pydantic import validator, BaseModel
 from webapi.app.schema.base import SakuraModel
 
 
-class DataBaseForm(BaseModel):
+class DatabaseForm(BaseModel):
     id: int = None
     name: str
-    host = str
+    host: str
     port: int = None
     username: str
     password: str
