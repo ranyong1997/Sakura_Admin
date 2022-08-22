@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2022/7/20 09:25
 # @Author  : 冉勇
-# @Site    : 
+# @Site    :
 # @File    : config.py
 # @Software: PyCharm
 # @desc    : 基础配置类
 import os
 from typing import List
-
 from pydantic import BaseSettings
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -17,9 +16,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 class BaseConfig(BaseSettings):
     LOG_DIR = os.path.join(ROOT, 'logs')
     LOG_NAME = os.path.join(LOG_DIR, 'sakura.log')
-    SERVER_ROOT = int
-    HEARTBASE: int = 48
-
+    SERVER_PORT: int
+    HEARTBEAT: int = 48
     # mock_server
     MOCK_ON: bool  # mock开关
     PROXY_ON: bool  # mock代理
@@ -41,7 +39,7 @@ class BaseConfig(BaseSettings):
     # sqlalchemy_server
     SQLALCHEMY_DATABASE_URI: str = ''
     # 异步URI
-    ASYNC_SQLALCHEMY_URL: str = ''
+    ASYNC_SQLALCHEMY_URI: str = ''
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # 权限 [0:普通用户、1:组长、2:管理员]
@@ -75,9 +73,9 @@ class BaseConfig(BaseSettings):
 
     SERVER_REPORT = "http://localhost:8000/#/record/report/"
 
-    OSS_URL = "http://oss.sakura.fun"
+    OSS_URL = "http://oss.pity.fun"
     # 七牛云链接地址，如果采用七牛oss，需要自行替换
-    QINIU_URL = "xxxxxxxxxxxx"
+    QINIU_URL = "https://static.pity.fun"
     RELATION = "sakura_relation"
     ALIAS = "__alias__"
     TABLE_TAG = "__tag__"
@@ -108,8 +106,8 @@ class ProConfig(BaseConfig):
 
 # 获取sakura环境变量
 SAKURA_ENV = os.environ.get("sakura_env", "dev")
-# 如果sakura_env存在且为prod
-Config = ProConfig() if SAKURA_ENV and SAKURA_ENV.lower() == "prod" else DevConfig()
+# 如果sakura_env存在且为pro
+Config = ProConfig() if SAKURA_ENV and SAKURA_ENV.lower() == "pro" else DevConfig()
 
 # 初始化redis
 Config.REDIS_NODES = [
@@ -118,9 +116,13 @@ Config.REDIS_NODES = [
     }
 ]
 
+# 初始化 sqlalchemy（由 apscheduler 使用）
+Config.SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://{}:{}@{}:{}/{}'.format(
+    Config.MYSQL_USER, Config.MYSQL_PWD, Config.MYSQL_HOST, Config.MYSQL_PORT, Config.DBNAME)
+
 # 初始化sqlalchemy
-Config.ASYNC_SQLALCHEMY_URL = f'mysql+aiomysql://{Config.MYSQL_USER}:{Config.MYSQL_PWD}' \
-                              f'@{Config.REDIS_NODES}:{Config.MYSQL_PORT}/{Config.DBNAME}'
+Config.ASYNC_SQLALCHEMY_URI = f'mysql+aiomysql://{Config.MYSQL_USER}:{Config.MYSQL_PWD}' \
+                              f'@{Config.MYSQL_HOST}:{Config.MYSQL_PORT}/{Config.DBNAME}'
 
 BANNER = """
  ______     ______     __  __     __  __     ______     ______    

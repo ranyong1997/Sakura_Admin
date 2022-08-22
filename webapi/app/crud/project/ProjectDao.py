@@ -9,18 +9,17 @@
 from datetime import datetime
 from typing import List
 from sqlalchemy import or_, select, desc
-from webapi.app.crud import Mapper
+from webapi.app.crud import Mapper, ModelWrapper
 from webapi.app.crud.project.ProjectRoleDao import ProjectRoleDao
 from webapi.app.models import async_session
 from webapi.app.models.project import Project
 from webapi.app.models.project_role import ProjectRole
-from webapi.app.utils.decorator import dao
-from webapi.app.utils.logger import Log
 from webapi.config import Config
 
 
-@dao(Project, Log("projectDao"))
+@ModelWrapper(Project)
 class ProjectDao(Mapper):
+
     @classmethod
     async def list_project(cls, user_id: int, role: int, page: int, size: int, name: str = None) -> (
             List[Project], int):
@@ -49,7 +48,7 @@ class ProjectDao(Mapper):
                 data = await session.execute(sql)
                 return data.scalars().all(), total
         except Exception as e:
-            cls.log.error(f"获取用户:{user_id}项目列表失败,{e}")
+            cls.__log__.error(f"获取用户:{user_id}项目列表失败,{e}")
             raise Exception(f"获取用户:{user_id}项目列表失败") from e
 
     @classmethod
@@ -75,7 +74,7 @@ class ProjectDao(Mapper):
             or_(Project.private == False, Project.owner == user), Project.deleted_at == 0))
         for r in roles.all():
             ans.add(r[0])
-        return list(ans) if ans else None
+        return list(ans) if len(ans) > 0 else None
 
     @classmethod
     async def is_project_admin(cls, session, project_id: int, user_id: int):
@@ -88,18 +87,17 @@ class ProjectDao(Mapper):
         try:
             async with async_session() as session:
                 async with session.begin():
-                    data = await session.execute(
-                        select(Project).where(Project.name == name, Project.deleted_at == 0))
+                    data = await session.execute(select(Project).where(Project.name == name, Project.deleted_at == 0))
                     if data.scalars().first() is not None:
                         raise Exception('项目已存在')
                     pr = Project(name, app, owner, user_id, description, private, dingtalk_url)
                     session.add(pr)
         except Exception as e:
-            cls.log.error(f"新增项目:{name}失败,{e}")
+            cls.__log__.error(f"新增项目:{name}失败,{e}")
             raise Exception(f"新增项目:{name}失败,{e}") from e
 
     @classmethod
-    async def update_avater(cls, project_id: int, user_id: int, user_role: int, file_url: str):
+    async def update_avatar(cls, project_id: int, user_id: int, user_role: int, file_url: str):
         try:
             async with async_session() as session:
                 async with session.begin():
@@ -115,7 +113,7 @@ class ProjectDao(Mapper):
                     data.updated_at = datetime.now()
                     data.update_user = user_id
         except Exception as e:
-            cls.log.error(f"修改项目头像失败,项目:{project_id},error:{e}")
+            cls.__log__.error(f"修改项目头像失败,项目:{project_id},error:{e}")
             raise Exception(e) from e
 
     @classmethod
@@ -154,26 +152,25 @@ class ProjectDao(Mapper):
                     data.update_user = user_id
                     data.dingtalk_url = dingtalk_url
         except Exception as e:
-            cls.log.error(f"编辑项目:{name}失败,{e}")
+            cls.__log__.error(f"编辑项目:{name}失败,{e}")
             raise Exception(f"编辑项目:{name}失败,{e}") from e
 
     @classmethod
     async def query_project(cls, project_id: int) -> (List[Project], List[ProjectRole]):
         try:
             async with async_session() as session:
-                query = await session.execute(
-                    select(Project).where(Project.id == project_id, Project.deleted_at == 0))
+                query = await session.execute(select(Project).where(Project.id == project_id, Project.deleted_at == 0))
                 data = query.scalars().first()
                 if data is None:
                     raise Exception("项目不存在")
                 roles = await ProjectRoleDao.list_role(project_id)
                 return data, roles
         except  Exception as e:
-            cls.log.error(f"查询项目:{project_id}失败,{e}")
+            cls.__log__.error(f"查询项目:{project_id}失败,{e}")
             raise Exception(f"查询项目:{project_id}失败,{e}") from e
 
-    @classmethod
-    async def query_user_project(cls) -> int:
+    @staticmethod
+    async def query_user_project(user_id: int) -> int:
         """
         查询用户有多少项目
         :param: 用户id
@@ -189,13 +186,12 @@ class ProjectDao(Mapper):
                 # 将数据放入列表,把owner等于该用户放入列表
                 for r in projects.scalars().all():
                     project_list.append(r.id)
-                    if r.owner == cls:
+                    if r.owner == user_id:
                         ans.add(r.id)
                 # 接着查询项目角色表有该用户的角色,把角色的项目id放入列表
                 # 由于是set,所以不会重复
                 query = await session.execute(
-                    select(Project).where(ProjectRole.deleted_at == 0, ProjectRole.user_id == cls))
-
+                    select(Project).where(ProjectRole.deleted_at == 0, ProjectRole.user_id == user_id))
                 for q in query.scalars().all():
                     ans.add(q.project_id)
         return len(ans)

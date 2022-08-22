@@ -8,6 +8,7 @@
 # @desc    : 测试报告
 from datetime import datetime
 from sqlalchemy import select, desc
+from webapi.app.crud import Mapper
 from webapi.app.crud.test_case.TestResult import TestResultDao
 from webapi.app.models import async_session
 from webapi.app.models.report import SakuraReport

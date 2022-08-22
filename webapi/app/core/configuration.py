@@ -9,7 +9,7 @@
 import json
 import os
 from webapi.app.middleware.RedisManager import RedisHelper
-from webapi.config import Config, SAKURA_ENV, ROOT
+from webapi.config import SAKURA_ENV, ROOT
 
 
 class SystemConfiguration(object):
@@ -33,7 +33,7 @@ class SystemConfiguration(object):
             with open(filepath, mode='r', encoding='utf8') as f:
                 return json.load(f)
         except Exception as e:
-            raise Exception(f"获取系统配置失败,{e}") from e
+            raise Exception(f"获取系统配置失败,{str(e)}") from e
 
     @staticmethod
     @RedisHelper.up_cache("configuration")
@@ -45,4 +45,4 @@ class SystemConfiguration(object):
             with open(filepath, mode='w', encoding='utf8') as f:
                 json.dump(config, f, ensure_ascii=False, indent=4)
         except Exception as e:
-            raise Exception(f"更新系统设置失败,{e}") from e
+            raise Exception(f"更新系统设置失败,{str(e)}") from e

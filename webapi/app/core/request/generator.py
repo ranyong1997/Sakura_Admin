@@ -110,7 +110,7 @@ class CaseGenerator(object):
 
     @staticmethod
     def dfs(body, path: str, ans: dict, headers: bool = False):
-        if isinstance(body, dict):
+        if isinstance(body, list):
             for i in range(len(body)):
                 c_path = f"{path}.{i}"
                 CaseGenerator.dfs(body[i], c_path, ans, headers)
@@ -120,7 +120,7 @@ class CaseGenerator(object):
                 CaseGenerator.dfs(v, c_path, ans, headers)
         else:
             if not headers or not CaseGenerator.ignore(path):
-                # 如果是bool值,需要特殊处理一下,因为python get False/True 会变成 0/1
+                # 如果是bool值，需要特殊处理一下，因为Python get False/True会变成get 0 1
                 if body is not None:
                     if isinstance(body, bool):
                         ans[str(body)].append(path)

@@ -72,7 +72,7 @@ def jsonable_encoder(
     if isinstance(obj, BaseModel):
         encoder = getattr(obj.__config__, "json_encoders", {})
         if custom_encoder:
-            encoder |= custom_encoder
+            encoder.update(custom_encoder)
         obj_dict = obj.dict(
             include=include,
             exclude=exclude,
@@ -87,8 +87,8 @@ def jsonable_encoder(
             obj_dict,
             exclude_none=exclude_none,
             exclude_defaults=exclude_defaults,
-            custom_encoder=custom_encoder,
-            sqlalchemy_safe=sqlalchemy_safe
+            custom_encoder=encoder,
+            sqlalchemy_safe=sqlalchemy_safe,
         )
     if dataclasses.is_dataclass(obj):
         return dataclasses.asdict(obj)

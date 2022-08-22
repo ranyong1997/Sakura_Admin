@@ -7,7 +7,7 @@
 # @Software: PyCharm
 # @desc    : 环境配置(路由)
 from fastapi import APIRouter, Depends
-from webapi.app.crud.config.environment import EnvironmentDao
+from webapi.app.crud.config.Environment import EnvironmentDao
 from webapi.app.handler.fatcory import SakuraResponse
 from webapi.app.routers import Permission, get_session
 from webapi.app.schema.environment import EnvironmentForm

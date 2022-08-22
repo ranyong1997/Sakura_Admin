@@ -9,16 +9,14 @@
 from datetime import timedelta, datetime
 from typing import List
 from sqlalchemy import select, and_, or_, update
-from webapi.app.crud import Mapper
+from webapi.app.crud import Mapper, ModelWrapper
 from webapi.app.enums.MessageEnum import MessageStateEnum, MessageTypeEnum
 from webapi.app.models import async_session
 from webapi.app.models.broadcast_read_user import SakuraBroadcastReadUser
 from webapi.app.models.notification import SakuraNotification
-from webapi.app.utils.decorator import dao
-from webapi.app.utils.logger import Log
 
 
-@dao(SakuraNotification, Log("SakuraNotificationDao"))
+@ModelWrapper(SakuraNotification)
 class SakuraNotificationDao(Mapper):
     @classmethod
     async def list_message(cls, msg_type: int, msg_status: int, receiver: int):
@@ -61,11 +59,14 @@ class SakuraNotificationDao(Mapper):
                     if notify.msg_type == MessageTypeEnum.others:
                         if notify.msg_type == msg_status:
                             ans.append(notify)
-                        elif msg_status == MessageStateEnum.read:
-                            if read is not None or notify.updated_at < last_month:
-                                ans.append(notify)
-                        elif not read:
-                            ans.append(notify)
+                            continue
+                        else:
+                            if msg_status == MessageStateEnum.read:
+                                if read is not None or notify.updated_at < last_month:
+                                    ans.append(notify)
+                            else:
+                                if not read:
+                                    ans.append(notify)
         return ans
 
     @classmethod
@@ -78,15 +79,12 @@ class SakuraNotificationDao(Mapper):
         :return:
         """
         async with session.begin():
-            await seeion.execute(
+            await session.execute(
                 update(SakuraNotification).where(
                     SakuraNotification.id.in_(msg_id),
                     SakuraNotification.receiver == receiver,
-                    SakuraNotification.deleted_at == 0
-                )
-            ) \
+                    SakuraNotification.deleted_at == 0)) \
                 .values(
                 deleted_at=0,
                 updated_at=datetime.now(),
-                update_user=receiver
-            )
+                update_user=receiver)

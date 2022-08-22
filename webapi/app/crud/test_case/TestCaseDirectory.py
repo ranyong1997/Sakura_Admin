@@ -10,13 +10,14 @@ import time
 from collections import defaultdict
 from datetime import datetime
 from sqlalchemy import select, asc, or_
+from webapi.app.crud import Mapper
 from webapi.app.models import async_session
 from webapi.app.schema.testcase_directory import SakuraTestcaseDirectoryForm
 from webapi.app.models.testcase_directory import SakuraTestcaseDirectory
 from webapi.app.utils.logger import Log
 
 
-class SakuraTestcaseDirectoryDao(object):
+class SakuraTestcaseDirectoryDao(Mapper):
     log = Log("SakuraTestcaseDirectoryDao")
 
     @staticmethod
@@ -151,7 +152,7 @@ class SakuraTestcaseDirectoryDao(object):
         return ans, case_map
 
     @staticmethod
-    async def get_directory(ans_map, parent_map, parent, children, case_map, case_node=None, move=False):
+    async def get_directory(ans_map:dict, parent_map, parent, children, case_map, case_node=None, move=False):
         current = parent_map.get(parent)
         if case_node is not None:
             nodes, cs = await case_node(parent)

@@ -27,5 +27,4 @@ class RedisConstructor(ConstructorAbstract):
                 f"当前{ConstructorAbstract.get_name(constructor)}返回变量:{constructor.value}\n返回值:\n{command_result}\n")
         except Exception as e:
             raise Exception(
-                f"当前路径:{path}->{constructor.name}第{index + 1}个{ConstructorAbstract.get_name(constructor)}执行失败:{str(e)}"
-            ) from e
+                f"当前路径:{path}->{constructor.name}第{index + 1}个{ConstructorAbstract.get_name(constructor)}执行失败:{str(e)}") from e

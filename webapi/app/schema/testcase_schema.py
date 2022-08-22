@@ -21,8 +21,8 @@ class TestCaseForm(BaseModel):
     priority: str
     url: str = ""
     name: str = ""
-    cast_type: int = 0
-    base_type: str = None
+    case_type: int = 0
+    base_path: str = None
     tag: str = None
     body: str = None
     body_type: int = 0
@@ -30,7 +30,7 @@ class TestCaseForm(BaseModel):
     request_method: str = None
     status: int
     out_parameters: List[SakuraTestCaseOutParametersForm] = []
-    directory: int
+    directory_id: int
     request_type: int
 
     @validator("priority", "status", "directory_id", "request_type", "url", "name")

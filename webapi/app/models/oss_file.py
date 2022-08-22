@@ -1,3 +1,10 @@
+'''
+Descripttion: 
+version: 
+Author: 冉勇
+Date: 2022-07-28 11:42:12
+LastEditTime: 2022-08-19 10:24:07
+'''
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2022/7/28 11:42
@@ -26,7 +33,7 @@ class SakuraOssFile(SakuraBase):
     __alias__ = dict(file_path="文件路径", view_url="地址", file_size="文件大小")
     __show__ = 1
     __table_args__ = (
-        UniqueConstraint('file_path', 'delete_at'),
+        UniqueConstraint('file_path', 'deleted_at'),
     )
 
     def __init__(self, user, file_path, view_url, file_size, id=None):

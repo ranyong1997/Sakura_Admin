@@ -7,17 +7,16 @@
 # @Software: PyCharm
 # @desc    : 全局配置Dao(逻辑)
 from sqlalchemy import select
-from webapi.app.crud import Mapper
+from webapi.app.crud import Mapper, ModelWrapper
 from webapi.app.middleware.RedisManager import RedisHelper
 from webapi.app.models import async_session
 from webapi.app.models.gconfig import GConfig
 from webapi.app.schema.gconfig import GConfigForm
-from webapi.app.utils.decorator import dao
-from webapi.app.utils.logger import Log
 
 
-@dao(GConfig, Log("GConfigDao"))
+@ModelWrapper(GConfig)
 class GConfigDao(Mapper):
+
     @classmethod
     @RedisHelper.up_cache("dao")
     async def insert_gconfig(cls, form: GConfigForm, user_id: int) -> None:
@@ -33,7 +32,7 @@ class GConfigDao(Mapper):
                     config = GConfig(**form.dict(), user=user_id)
                     session.add(config)
         except Exception as e:
-            cls.log.error(f"新增变量:{data.key}失败,{str(e)}")
+            cls.__log__.error(f"新增变量:{data.key}失败,{str(e)}")
             raise Exception(f"新增变量:{data.key}失败,{str(e)}") from e
 
     @staticmethod

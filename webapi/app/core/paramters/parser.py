@@ -25,13 +25,13 @@ class Parser(object):
         :param match_index:
         :return:
         """
-        if not data:
+        if len(data) == 0:
             return "null"
+        # 如果是数字
+        length = len(data)
         if match_index is not None:
             if match_index.isdigit():
                 idx = int(match_index)
-                # 如果是数字
-                length = len(data)
                 if idx >= length or idx < -length:
                     raise CaseParametersException(f"长度为:{length},索引不在[{-length},{length}]")
                 return json.dumps(data[idx], ensure_ascii=False)

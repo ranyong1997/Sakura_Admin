@@ -11,4 +11,4 @@ import uvicorn
 from webapi.config import Config
 
 if __name__ == '__main__':
-    uvicorn.run("main:sakura", host="0.0.0.0", port=Config.SERVER_ROOT, reload=False, forwarded_allow_ips="*")
+    uvicorn.run("main:sakura", host="0.0.0.0", port=Config.SERVER_PORT, reload=False, forwarded_allow_ips="*")

@@ -20,7 +20,7 @@ from webapi.app.core.constructor.redis_constructor import RedisConstructor
 from webapi.app.core.constructor.sql_constructor import SqlConstructor
 from webapi.app.core.msg.dingtalk import DingTalk
 from webapi.app.core.msg.mail import Email
-from webapi.app.core.paramters import ParameterParser
+from webapi.app.core.paramters import ParametersParser
 from webapi.app.core.ws_connection_manager import ws_manage
 from webapi.app.crud.auth.UserDao import UserDao
 from webapi.app.crud.config.AddressDao import SakuraGatewayDao
@@ -87,7 +87,10 @@ class Executor(object, Exception):
         return None
 
     def append(self, content, end=False):
-        self.logger.append(content, end)
+        if end:
+            self.logger.append(content, end)
+        else:
+            self.logger.append(content, end)
 
     @case_log
     async def parse_gconfig(self, data, type_, env, *fields):
@@ -100,7 +103,7 @@ class Executor(object, Exception):
         :return:
         """
         for f in fields:
-            await self.parse_gconfig(data, f, GConfigType.text(type_), env)
+            await self.parse_field(data, f, GConfigType.text(type_), env)
 
     @case_log
     def get_parser(self, key_type):
@@ -141,10 +144,10 @@ class Executor(object, Exception):
                     setattr(data, field, new_field)
                     self.append("替换全局变量成功, 字段: [{}]:\n\n[{}] -> [{}]\n".format(field, "${%s}" % v, new_value))
                     field_origin = new_field
-            self.append(f"获取{name}字段:[{field}]中的el表达式", True)
+            self.append(f"获取{name}字段: [{field}]中的el表达式", True)
         except Exception as e:
-            Executor.log.error(f"查询全局变量失败:{str(e)}")
-            raise Executor(f"查询全局变量失败:{str(e)}")
+            Executor.log.error(f"查询全局变量失败,error:{str(e)}")
+            raise Executor(f"查询全局变量失败,error:{str(e)}") from e
 
     def replace_params(self, field_name, field_origin, params: dict):
         new_data = {}
@@ -190,7 +193,7 @@ class Executor(object, Exception):
                 for k, v in replace_kv.items():
                     new_field = field_origin.replace(k, v)
                     setattr(data, c.name, new_field)
-                    self.append(f"替换流程变量成功,字段:[{c.name}]:\n\n[{k}] -> [{v}]\n")
+                    self.append("替换流程变量成功，字段: [{}]: \n\n[{}] -> [{}]\n".format(c.name, k, v))
         except Exception as e:
             Executor.log.error(f"替换变量失败:{str(e)}")
             raise Exception(f"替换变量失败:{str(e)}") from e
@@ -218,10 +221,10 @@ class Executor(object, Exception):
         :param suffix:
         :return:
         """
-        if not constructors:
-            self.append("前置条件为空,跳出该环节")
+        if len(constructors) == 0:
+            self.append("前后置条件为空, 跳出该环节")
         current = 0
-        for c in constructors:
+        for i, c in enumerate(constructors):
             if c.suffix == suffix:
                 await self.execute_constructors(env, current, path, params, req_params, c)
                 self.replace_params(params, case_info, constructors, asserts)
@@ -257,7 +260,7 @@ class Executor(object, Exception):
         if case_info.body_type == BodyType.none:
             return
         if case_info.body_type == BodyType.json and "Content-Type" not in headers:
-            headers['Content-Type'] = "application/json; charset=utf-8"
+            headers['Content-Type'] = "application/json; charset=UTF-8"
 
     @case_log
     def extract_out_parameters(self, response_info, data: List[SakuraTestCaseOutParameters]):
@@ -269,7 +272,7 @@ class Executor(object, Exception):
         """
         result = {}
         for d in data:
-            p = ParameterParser(d.source)
+            p = ParametersParser(d.source)
             result[d.name] = p(response_info, d.expression, d.match_index)
         return result
 
@@ -339,7 +342,7 @@ class Executor(object, Exception):
             body = case_info.body if case_info.body != "" else None
 
             # 步骤8:替换请求参数
-            body = self.replace_params(request_params, body, case_info.body_type)
+            body = self.replace_body(request_params, body, case_info.body_type)
 
             # 步骤9:替换base_path
             if case_info.base_path:
@@ -361,11 +364,11 @@ class Executor(object, Exception):
             out_dict = self.extract_out_parameters(response_info, out_parameters)
 
             # 步骤12: 替换主变量
-            req_params |= out_dict
+            req_params.update(out_dict)
 
             # 步骤13: 写入response
             req_params["response"] = res.get("response", "")
-            self.replace_params(req_params, asserts)
+            self.replace_asserts(req_params, asserts)
             self.replace_constructors(req_params, constructors)
 
             # 步骤14: 执行后置条件
@@ -446,7 +449,7 @@ class Executor(object, Exception):
             executor = Executor()
             result, err = await executor.run(env, case_id, params_pool, request_param, path)
             finished_at = datetime.now()
-            cost = f"{(finished_at - start_at).seconds}s"
+            cost = "{}s".format((finished_at - start_at).seconds)
             if err is not None:
                 status = 2
             else:
@@ -465,13 +468,15 @@ class Executor(object, Exception):
             request_headers = result.get("request_headers")
             response = result.get("response")
             case_name = result.get("case_name")
-            response_headers = result.get("request_headers")
+            response_headers = result.get("response_headers")
             cookies = result.get("cookies")
             req = json.dumps(request_param, ensure_ascii=False)
             data[case_id].append(status)
-            await TestResultDao.insert(report_id, case_id, case_name, status, case_logs, start_at, finished_at, url,
-                                       body, request_method, request_headers, cost, asserts, response_headers, response,
-                                       status_code, cookies, times, req, name, data_id)
+            await TestResultDao.insert_report(report_id, case_id, case_name, status,
+                                              case_logs, start_at, finished_at,
+                                              url, body, request_method, request_headers, cost,
+                                              asserts, response_headers, response,
+                                              status_code, cookies, times, req, name, data_id)
             break
 
     @staticmethod
@@ -516,11 +521,10 @@ class Executor(object, Exception):
         return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     @case_log
-    def my_assert(self, asserts: List, json_format: bool) -> [str, bool]:
+    def my_assert(self, asserts: List) -> [str, bool]:
         """
         断言验证
         :param asserts:
-        :param json_format:
         :return:
         """
         result = {}
@@ -628,7 +632,9 @@ class Executor(object, Exception):
         :param string:
         :return:
         """
-        return [] if string is None else re.findall(Executor.pattern, string)
+        if string is None:
+            return []
+        return re.findall(Executor.pattern, string)
 
     @case_log
     def translate(self, data):
@@ -684,7 +690,7 @@ class Executor(object, Exception):
                 else:
                     result = result.get(branch)
         except Exception as e:
-            return Executor(f"获取变量失败:{str(e)}")
+            raise Exception(f"获取变量失败: {str(e)}") from e
         if string == "${response}":
             return result
         return json.dumps(result, ensure_ascii=False)
@@ -706,7 +712,7 @@ class Executor(object, Exception):
                 for m in msg_types:
                     if int(m) == NoticeType.EMAIL:
                         render_html = Email.render_html(plan_name=plan.name, **report_dict[e])
-                        Email.send_msg(
+                        await Email.send_msg(
                             f"【{report_dict[e].get('env')}】测试计划【{plan.name}】执行完毕({report_dict[e].get('plan_result')})",
                             render_html, None, *[r.get("email") for r in users])
                     if int(m) == NoticeType.DINGDING:
@@ -720,7 +726,8 @@ class Executor(object, Exception):
                             Executor.log.debug("项目未配置钉钉通知机器人")
                             continue
                         ding = DingTalk(project.dingtalk_url)
-                        await ding.send_msg("Sakura测试报告", render_markdown, None, users)
+                        await ding.send_msg("Sakura测试报告", render_markdown, None, users,
+                                            link=report_dict[e]['report_url'])
 
     @staticmethod
     @lock("test_plan")
@@ -737,16 +744,16 @@ class Executor(object, Exception):
             return
         try:
             # 设置为running
-            await SakuraTestPlanDao.update_test_plan_state(plan_id, 1)
+            await SakuraTestPlanDao.update_test_plan_state(plan.id, 1)
             project, _ = await ProjectDao.query_project(plan.project_id)
-            env = list(map(int, plan.case_list.split(",")))
+            env = list(map(int, plan.env.split(",")))
             case_list = list(map(int, plan.case_list.split(",")))
             receiver = list(map(int, plan.receiver.split(",") if plan.receiver else []))
             # 聚合报告dict
             report_dict = {}
             await asyncio.gather(
                 *(Executor.run_multiple(executor, int(e), case_list, mode=1, retry_minutes=plan.retry_minutes,
-                                        plan_id=plan.id, order=plan.ordered, report_dict=report_dict) for e in env))
+                                        plan_id=plan.id, ordered=plan.ordered, report_dict=report_dict) for e in env))
             await SakuraTestPlanDao.update_test_plan_state(plan.id, 0)
             users = await UserDao.list_user_touch(*receiver)
             await Executor.notice(env, plan, project, report_dict, users)
@@ -778,7 +785,7 @@ class Executor(object, Exception):
                 user = await UserDao.query_user(executor)
                 name = user.name if user is not None else "未知"
             else:
-                name = 'CPU'
+                name = 'Sakura_Bot'
             st = time.perf_counter()
             # 步骤1: 新增测试报告数据
             report_id = await TestReportDao.start(executor, env, mode, plan_id=plan_id)
@@ -796,7 +803,7 @@ class Executor(object, Exception):
                 for c in case_list:
                     await Executor.run_single(env, result_data, report_id, c, retry_minutes=retry_minutes)
             ok, fail, skip, error = 0, 0, 0, 0
-            for status in result_data.values():
+            for case_id, status in result_data.items():
                 for s in status:
                     if s == 0:
                         ok += 1

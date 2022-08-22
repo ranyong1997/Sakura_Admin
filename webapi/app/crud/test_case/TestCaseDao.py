@@ -8,10 +8,11 @@
 # @desc    :  测试用例(dao)逻辑
 import json
 from datetime import datetime, timedelta
-from typing import List, Dict, Union, Any
+from typing import List, Dict
 from sqlalchemy import desc, func, and_, asc
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from webapi.app.crud import Mapper, ModelWrapper
+from webapi.app.crud import Mapper, ModelWrapper, connect
 from webapi.app.crud.test_case.ConstructorDao import ConstructorDao
 from webapi.app.crud.test_case.TestCaseAssertsDao import TestCaseAssertsDao
 from webapi.app.crud.test_case.TestCaseDirectory import SakuraTestcaseDirectoryDao
@@ -19,7 +20,7 @@ from webapi.app.crud.test_case.TestCaseOutParametersDao import SakuraTestCaseOut
 from webapi.app.crud.test_case.TestcaseDataDao import SakuraTestCaseDataDao
 from webapi.app.enums.ConstructorEnum import ConstructorType
 from webapi.app.middleware.RedisManager import RedisHelper
-from webapi.app.models import DatabaseHelper, async_session
+from webapi.app.models import async_session
 from webapi.app.models.constructor import Constructor
 from webapi.app.models.out_parameters import SakuraTestCaseOutParameters
 from webapi.app.models.project import Project
@@ -28,12 +29,10 @@ from webapi.app.models.testcase_asserts import TestCaseAsserts
 from webapi.app.models.testcase_data import SakuraTestCaseData
 from webapi.app.models.user import User
 from webapi.app.schema.testcase_schema import TestCaseForm, TestCaseInfo
-from webapi.app.utils.logger import Log
 
 
 @ModelWrapper(TestCase)
 class TestCaseDao(Mapper):
-    log = Log("TestCaseDao")
 
     @classmethod
     async def list_test_case(cls, directory_id: int = None, name: str = "", create_user: str = None):
@@ -51,7 +50,7 @@ class TestCaseDao(Mapper):
                 result = await session.execute(sql)
                 return result.scalars().all()
         except Exception as e:
-            cls.log.error(f"获取测试用例失败:{str(e)}")
+            cls.__log__.error(f"获取测试用例失败:{str(e)}")
             raise Exception(f"获取测试用例失败:{str(e)}") from e
 
     @staticmethod
@@ -68,7 +67,7 @@ class TestCaseDao(Mapper):
                     case_map[item.id] = item.name
                 return ans, case_map
         except Exception as e:
-            TestCaseDao.log.error(f"获取测试用例失败:{str(e)}")
+            TestCaseDao.__log__.error(f"获取测试用例失败:{str(e)}")
             raise Exception(f"获取测试用例失败:{str(e)}") from e
 
     @staticmethod
@@ -117,8 +116,7 @@ class TestCaseDao(Mapper):
             session, cs.id, user_id, data, contstructor=(ConstructorDao, Constructor),
             asserts=(TestCaseDao, TestCaseAsserts),
             out_parameters=(SakuraTestCaseOutParametersDao, SakuraTestCaseOutParameters),
-            data=(SakuraTestCaseDataDao, SakuraTestCaseData)
-        )
+            data=(SakuraTestCaseDataDao, SakuraTestCaseData))
         return cs
 
     @classmethod
@@ -137,17 +135,17 @@ class TestCaseDao(Mapper):
                     data = query.scalars().first()
                     if data is None:
                         raise Exception("用例不存在")
-                    DatabaseHelper.updata_model(data, test_case, user_id)
+                    cls.update_model(data, test_case, user_id)
                     await session.flush()
                     # 释放你的sql数据
                     session.expunge(data)
                     return data
         except Exception as e:
-            cls.log.error(f"编辑用例失败:{str(e)}")
+            cls.__log__.error(f"编辑用例失败:{str(e)}")
             raise Exception(f"编辑用例失败:{str(e)}") from e
 
     @staticmethod
-    async def query_test_case(case_id: int) -> Dict[str, Union[List[Constructor], Any]]:
+    async def query_test_case(case_id: int) -> dict:
         """
         查询测试用例
         :param case_id:
@@ -168,11 +166,11 @@ class TestCaseDao(Mapper):
                 test_data = await SakuraTestCaseDataDao.list_testcase_data(case_id=case_id)
                 parameters = await SakuraTestCaseOutParametersDao.list_record(case_id=case_id,
                                                                               _sort=(
-                                                                                  asc(SakuraTestCaseOutParameters.id)))
+                                                                                  asc(SakuraTestCaseOutParameters.id),))
                 return dict(asserts=asserts, constructors=constructors, case=data, constructors_case=constructors_case,
                             test_data=test_data, out_parameters=parameters)
         except Exception as e:
-            TestCaseDao.log.error(f"用例查询失败:{str(e)}")
+            TestCaseDao.__log__.error(f"用例查询失败:{str(e)}")
             raise Exception(f"用例查询失败:{str(e)}") from e
 
     @staticmethod
@@ -186,7 +184,7 @@ class TestCaseDao(Mapper):
                 data = result.scalars().all()
                 return {x.id: x for x in data}
         except Exception as e:
-            TestCaseDao.log.error(f"查询用例失败:{str(e)}")
+            TestCaseDao.__log__.error(f"查询用例失败:{str(e)}")
             raise Exception(f"查询用例失败:{str(e)}") from e
 
     @staticmethod
@@ -197,11 +195,11 @@ class TestCaseDao(Mapper):
                     select(TestCase).where(TestCase.id == case_id, TestCase.deleted_at == 0))
                 data = result.scalars().first()
                 if data is None:
-                    raise Exception("用例不存在")
+                    return None, "用例不存在"
                 return data, None
         except Exception as e:
-            TestCaseDao.log.error(f"查询用例失败:{str(e)}")
-            raise Exception(f"查询用例失败:{str(e)}") from e
+            TestCaseDao.__log__.error(f"查询用例失败:{str(e)}")
+            return None, f"查询用例失败: {str(e)}"
 
     @staticmethod
     async def list_testcase_tree(cls, projects: List[Project]) -> [List, dict]:
@@ -232,7 +230,7 @@ class TestCaseDao(Mapper):
                     })
                 return result
         except Exception as e:
-            cls.log.error(f"获取用例列表失败:{str(e)}")
+            cls.__log__.error(f"获取用例列表失败:{str(e)}")
             raise Exception(f"获取用例列表失败:{str(e)}") from e
 
     @staticmethod
@@ -244,14 +242,13 @@ class TestCaseDao(Mapper):
         """
         try:
             async with async_session() as session:
-                query = await session.execute(
-                    select(Constructor).where(Constructor.case_id == case_id,
-                                              Constructor.deleted_at == 0)) \
-                    .order_by(
-                    desc(Constructor.created_user))
+                query = await session.execute(select(Constructor).where(Constructor.case_id == case_id,
+                                                                        Constructor.deleted_at == 0
+                                                                        )).order_by(
+                    desc(Constructor.created_at))
                 return query.scalars().all()
         except Exception as e:
-            TestCaseDao.log.error(f"查询构造数据失败:{str(e)}")
+            TestCaseDao.__log__.error(f"查询构造数据失败:{str(e)}")
             raise Exception(f"查询构造数据失败:{str(e)}") from e
 
     @staticmethod
@@ -268,13 +265,13 @@ class TestCaseDao(Mapper):
                 data = await session.execute(sql)
                 return data.scalars().all()
         except Exception as e:
-            TestCaseDao.log.error(f"查询构数据失败:{str(e)}")
+            TestCaseDao.__log__.error(f"查询构数据失败:{str(e)}")
             raise Exception(f"查询构数据失败:{str(e)}") from e
 
     @staticmethod
     async def collect_data(case_id: int, data: List):
         """
-        手机以case_id为前置条件的数据
+        收集以case_id为前置条件的数据
         :param case_id:
         :param data:
         :return:
@@ -307,7 +304,7 @@ class TestCaseDao(Mapper):
             elif c.type == ConstructorType.py_script:
                 temp["label"] = "[PyScript]:" + temp["label"]
             elif c.type == ConstructorType.http:
-                temp["label"] = "[HTTP]:" + temp["label"]
+                temp["label"] = "[HTTP Request]:" + temp["label"]
             # 否则正常添加数据
             if c.suffix:
                 suffix.get("children").append(temp)
@@ -343,43 +340,58 @@ class TestCaseDao(Mapper):
         result["children"] = children
         return result
 
+    @classmethod
+    async def generate_sql(cls):
+        return select(TestCase.create_user, func.count(TestCase.id)) \
+            .outerjoin(User, and_(User.deleted_at == 0, TestCase.create_user == User.id)).where(
+            TestCase.deleted_at == 0).group_by(TestCase.create_user).order_by(
+            desc(func.count(TestCase.id)))
+
     @staticmethod
     @RedisHelper.cache("rank")
-    async def query_user_case_list() -> Dict[str, List]:
+    @connect
+    async def query_user_case_list(cls, session: AsyncSession = None) -> Dict[str, List]:
         """
         查询用户case数量和排名
         :return:
         """
         ans = {}
-        async with async_session() as session:
-            sql = select(TestCase.created_user, func.count(TestCase.id)) \
-                .outerjoin(User, and_(User.deleted_at == 0, TestCase.created_user == User.id)).where(
-                TestCase.deleted_at == 0).group_by(TestCase.created_user).order_by(
-                desc(func.count(TestCase.id)))
-            query = await session.execute(sql)
-            for i, q in enumerate(query.all()):
-                user, count = q
-                ans[str(user)] = [count, i + 1]
+        sql = await cls.generate_sql()
+        query = await session.execute(sql)
+        for i, q in enumerate(query.all()):
+            user, count = q
+            ans[str(user)] = [count, i + 1]
         return ans
 
     @staticmethod
-    async def query_weekly_user_case(user_id: int, start_time: datetime, end_time: datetime) -> None:
+    @RedisHelper.cache("rank_detail")
+    @connect
+    async def query_user_case_rank(cls, session: AsyncSession = None) -> List:
         """
         查询每周用户案例
-        :param user_id:
-        :param start_time:
-        :param end_time:
+        :param cls:
+        :param session:
         :return:
         """
-        ans = {}
+        ans = []
+        sql = await cls.generate_sql()
+        query = await session.execute(sql)
+        for i, q in enumerate(query.all()):
+            user, count = q
+            ans.append(dict(id=user, count=count, rank=i + 1))
+        return ans
+
+    @staticmethod
+    async def query_weekly_user_case(user_id: int, start_time: datetime, end_time: datetime) -> List:
+        ans = dict()
         async with async_session() as session:
             async with session.begin():
                 sql = select(TestCase.created_at, func.count(TestCase.id)).where(
-                    TestCase.created_user == user_id,
+                    TestCase.create_user == user_id,
                     TestCase.deleted_at == 0, TestCase.created_at.between(start_time, end_time)).group_by(
                     TestCase.created_at).order_by(asc(TestCase.created_at))
                 query = await session.execute(sql)
-                for q in query.all():
+                for i, q in enumerate(query.all()):
                     date, count = q
                     ans[date.strftime("%Y-%m-%d")] = count
         return await TestCaseDao.fill_data(start_time, end_time, ans)

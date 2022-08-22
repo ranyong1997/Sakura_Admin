@@ -17,7 +17,7 @@ class ConstructorForm(BaseModel):
     type: int
     name: str
     index: int = 0
-    constructor_json = str
+    constructor_json : str
     enable: bool
     case_id: int = None
     public: bool
@@ -27,8 +27,9 @@ class ConstructorForm(BaseModel):
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise ParamsError("不能为空")
-        if not isinstance(v, int) and not v:
-            raise ParamsError("不能为空")
+        if not isinstance(v, int):
+            if not v:
+                raise ParamsError("不能为空")
         return v
 
 

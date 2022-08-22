@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2022/8/2 16:13
 # @Author  : 冉勇
@@ -13,11 +13,11 @@ from sqlalchemy import select, update
 from webapi.app.crud import Mapper, ModelWrapper
 from webapi.app.middleware.RedisManager import RedisHelper
 from webapi.app.models import async_session
-from webapi.app.models.out_parameters import SakuraTestCaseParameters
+from webapi.app.models.out_parameters import SakuraTestCaseOutParameters
 from webapi.app.schema.testcase_out_parameters import SakuraTestCaseOutParametersForm
 
 
-@ModelWrapper(SakuraTestCaseParameters)
+@ModelWrapper(SakuraTestCaseOutParameters)
 class SakuraTestCaseOutParametersDao(Mapper):
 
     @classmethod
@@ -52,23 +52,23 @@ class SakuraTestCaseOutParametersDao(Mapper):
         try:
             async with async_session() as session:
                 async with session.begin():
-                    source = await session.execute(select(SakuraTestCaseParameters).where(
-                        SakuraTestCaseParameters.case_id == case_id,
-                        SakuraTestCaseParameters.deleted_at == 0))
+                    source = await session.execute(select(SakuraTestCaseOutParameters).where(
+                        SakuraTestCaseOutParameters.case_id == case_id,
+                        SakuraTestCaseOutParameters.deleted_at == 0))
                     before = source.scalars().all()
                     should_remove = await cls.should_remove(before, data)
                     for item in data:
                         if item.id is None:
                             # 添加
-                            temp = SakuraTestCaseParameters(**item.dict(), case_id=case_id, user_id=user_id)
+                            temp = SakuraTestCaseOutParameters(**item.dict(), case_id=case_id, user_id=user_id)
                             session.add(temp)
                         else:
-                            query = await session.execute(select(SakuraTestCaseParameters).where(
-                                SakuraTestCaseParameters.id == item.id))
-                            temp = query.scalars().all()
+                            query = await session.execute(select(SakuraTestCaseOutParameters).where(
+                                SakuraTestCaseOutParameters.id == item.id))
+                            temp = query.scalars().first()
                             if temp is None:
                                 # 新逻辑
-                                temp = SakuraTestCaseParameters(**item.dict(), case_id=case_id, user_id=user_id)
+                                temp = SakuraTestCaseOutParameters(**item.dict(), case_id=case_id, user_id=user_id)
                                 session.add(temp)
                             else:
                                 temp.name = item.name
@@ -83,9 +83,8 @@ class SakuraTestCaseOutParametersDao(Mapper):
                         result.append(temp)
                     if should_remove:
                         await session.execute(
-                            update(SakuraTestCaseParameters).where(
-                                SakuraTestCaseParameters.id.in_(should_remove)
-                            ).values(delete_at=int(time.time() * 1000)))
+                            update(SakuraTestCaseOutParameters).where(
+                                SakuraTestCaseOutParameters.id.in_(should_remove)).values(deleted_at=int(time.time() * 1000)))
             return result
         except Exception as e:
             cls.__log__.error(f"批量更新出参数失败:{str(e)}")

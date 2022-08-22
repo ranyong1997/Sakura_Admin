@@ -38,31 +38,30 @@ class ConnectionManager:
         self.log.debug(f"websocket:用户[{client_id}]已安全断开")
 
     @staticmethod
-    async def pushed(sender: WebSocket, message: MsgType) -> None:
+    async def pusher(sender: WebSocket, message: MsgType) -> None:
         """
-        根据不同消息类型,调用不同的方法发送信息
-        :param sender:
-        :param message:
-        :return:
+        根据不同的消息类型，调用不同方法发送消息
         """
         msg_mapping: dict = {
             str: sender.send_text,
             dict: sender.send_json,
             bytes: sender.send_bytes
         }
-        if func_push_msg := msg_mapping.get(type(message)):
+        func_push_msg = msg_mapping.get(type(message))
+        if func_push_msg:
             await func_push_msg(message)
         else:
-            raise TypeError(f"websocket不能发送{type(message)}的内容")
+            raise TypeError(f"websocket不能发送{type(message)}的内容！")
 
-    async def send_personal_message(self, message: MsgType) -> None:
+    async def send_personal_message(self, user_id: int, message: MsgType) -> None:
         """
         发送个人信息
         :param message:
         :return:
         """
-        for connection in self.active_connections.values():
-            await self.pushed(sender=connection, message=message)
+        conn = self.active_connections.get(user_id)
+        if conn:
+            await self.pusher(sender=conn, message=message)
 
     async def broadcast(self, message: MsgType) -> None:
         """
@@ -71,9 +70,13 @@ class ConnectionManager:
         :return:
         """
         for connection in self.active_connections.values():
-            await self.pushed(sender=connection, message=message)
+            await self.pusher(sender=connection, message=message)
 
-    async def notify(self, user_id, title=None, content=None, notice: SakuraNotification = None):
+    async def send_data(self, user_id, msg_type, record_msg):
+        msg = dict(type=msg_type, record_msg=record_msg)
+        await self.send_personal_message(user_id, msg)
+
+    async def notify(self, user_id, title=None, content=None, notice: PityNotification = None):
         """
         根据user_id推送对应信息
         :param user_id:
@@ -90,15 +93,17 @@ class ConnectionManager:
                     await self.broadcast(msg)
                 else:
                     await self.send_personal_message(user_id, msg)
-            elif user_id == ConnectionManager.broadcast:
-                await self.broadcast(WebSocketMessage.msg_count())
             else:
-                await self.send_personal_message(user_id, WebSocketMessage.msg_count())
+                # 说明不是桌面消息，直接给出消息数量即可
+                if user_id == ConnectionManager.broadcast:
+                    await self.broadcast(WebSocketMessage.msg_count())
+                else:
+                    await self.send_personal_message(user_id, WebSocketMessage.msg_count())
             # 判断是否要落入推送表
             if notice is not None:
-                await SakuraNotificationDao.insert_record(notice)
+                await SakuraNotificationDao.insert(model=notice)
         except Exception as e:
-            ConnectionManager.logger.error(f"发送消息失败,{e}")
+            ConnectionManager.logger.error(f"发送消息失败,{str(e)}")
 
 
 ws_manage = ConnectionManager()

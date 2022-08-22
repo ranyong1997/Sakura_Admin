@@ -10,6 +10,7 @@ import smtplib
 from email.header import Header
 from email.mime.text import MIMEText
 from email.utils import make_msgid
+from awaits.awaitable import awaitable
 from jinja2.environment import Template
 from webapi.app.core.configuration import SystemConfiguration
 from webapi.app.core.msg.notification import Notification
@@ -18,6 +19,7 @@ from webapi.config import Config
 
 class Email(Notification):
     @staticmethod
+    @awaitable
     def send_msg(subject, content, attachment=None, *receiver):
         configuration = SystemConfiguration.get_config()
         data = configuration.get("email")

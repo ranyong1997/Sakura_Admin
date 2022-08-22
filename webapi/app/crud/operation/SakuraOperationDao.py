@@ -8,14 +8,12 @@
 # @desc    : 操作记录(dao)逻辑
 from datetime import datetime
 from sqlalchemy import func, select
-from webapi.app.crud import Mapper
+from webapi.app.crud import Mapper, ModelWrapper
 from webapi.app.models import async_session
 from webapi.app.models.operation_log import SakuraOperationLog
-from webapi.app.utils.decorator import dao
-from webapi.app.utils.logger import Log
 
 
-@dao(SakuraOperationLog, Log("SakuraOperationDao"))
+@ModelWrapper(SakuraOperationLog)
 class SakuraOperationDao(Mapper):
     @classmethod
     async def count_user_activities(cls, user_id, start_time: datetime, end_time: datetime):

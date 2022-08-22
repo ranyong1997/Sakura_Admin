@@ -17,6 +17,7 @@ from webapi.app.schema.testcase_data import SakuraTestcaseDataForm
 
 @ModelWrapper(SakuraTestCaseData)
 class SakuraTestCaseDataDao(Mapper):
+
     @classmethod
     async def list_testcase_data(cls, case_id: int):
         """
@@ -45,7 +46,7 @@ class SakuraTestCaseDataDao(Mapper):
                 sql = select(SakuraTestCaseData).where(SakuraTestCaseData.case_id == case_id,
                                                        SakuraTestCaseData.env == env,
                                                        SakuraTestCaseData.deleted_at == 0)
-                result = await session.begin()
+                result = await session.execute(sql)
                 return result.scalars().all()
         except Exception as e:
             cls.__log__.error(f"查询测试数据失败:{str(e)}")
@@ -97,7 +98,7 @@ class SakuraTestCaseDataDao(Mapper):
                     query = result.scalars().first()
                     if query is None:
                         raise Exception("测试数据不存在")
-                    DatabaseHelper.updata_model(query, form, user)
+                    DatabaseHelper.update_model(query, form, user)
                     await session.flush()
                     session.expunge(query)
                     return query

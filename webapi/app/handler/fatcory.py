@@ -37,6 +37,8 @@ class SakuraResponse(object):
         for k, v in obj.items():
             if isinstance(v, dict):
                 SakuraResponse.dict_model_to_dict(v)
+            elif isinstance(v, list):
+                obj[k] = SakuraResponse.model_to_list(v)
             else:
                 obj[k] = SakuraResponse.model_to_dict(v)
         return obj

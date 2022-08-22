@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import List
 from sqlalchemy import asc
 from sqlalchemy.future import select
+from webapi.app.crud import Mapper
 from webapi.app.models import async_session
 from webapi.app.models.result import SakuraTestResult
 from webapi.app.models.test_case import TestCase
@@ -20,10 +21,13 @@ class TestResultDao(object):
     log = Log("TestResultDao")
 
     @staticmethod
-    async def insert(report_id: int, case_id: int, case_name: str, status: int, case_log: str, start_at: datetime,
-                     finished_at: datetime, url: str, body: str, request_method: str, request_headers: str, cost: str,
-                     asserts: str, response_headers: str, response: str, status_code: int, cookies: str,
-                     retry: int = None, request_params: str = "", data_name: str = "", data_id: int = None) -> None:
+    async def insert_report(report_id: int, case_id: int, case_name: str, status: int,
+                            case_log: str, start_at: datetime, finished_at: datetime,
+                            url: str, body: str, request_method: str, request_headers: str, cost: str,
+                            asserts: str, response_headers: str, response: str,
+                            status_code: int, cookies: str, retry: int = None,
+                            request_params: str = '', data_name: str = '', data_id: int = None,
+                            ) -> None:
         try:
             async with async_session() as session:
                 async with session.begin():
@@ -44,7 +48,7 @@ class TestResultDao(object):
             async with async_session() as session:
                 sql = select(SakuraTestResult, TestCase.directory_id).join(TestCase,
                                                                            TestCase.id == SakuraTestResult.case_id). \
-                    where(SakuraTestResult.report_id == report_id, SakuraTestResult.delete_at == 0).order_by(
+                    where(SakuraTestResult.report_id == report_id, SakuraTestResult.deleted_at == 0).order_by(
                     asc(SakuraTestResult.case_id), asc(SakuraTestResult.start_at))
                 data = await session.execute(sql)
                 ans = []

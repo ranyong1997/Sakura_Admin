@@ -13,7 +13,7 @@ from webapi.app.core.paramters.status_code_parser import StatusCodeParser
 from webapi.app.enums.CaseParametersEnum import CaseParametersEnum
 
 
-def ParameterParser(parameter_type: CaseParametersEnum):
+def ParametersParser(parameter_type: CaseParametersEnum):
     if parameter_type == CaseParametersEnum.TEXT:
         return RegexParser.parse
     if parameter_type == CaseParametersEnum.JSON:
@@ -22,5 +22,5 @@ def ParameterParser(parameter_type: CaseParametersEnum):
         return HeaderParser.parse
     if parameter_type == CaseParametersEnum.COOKIE:
         return CookieParser.parse
-    if parameter_type == CaseParametersEnum.STATUS_CODE:
-        return StatusCodeParser.parse
+    return StatusCodeParser.parse
+

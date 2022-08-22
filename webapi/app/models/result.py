@@ -1,3 +1,10 @@
+'''
+Descripttion: 
+version: 
+Author: 冉勇
+Date: 2022-08-05 11:27:36
+LastEditTime: 2022-08-19 10:26:39
+'''
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2022/8/5 11:27
@@ -57,15 +64,15 @@ class SakuraTestResult(Base):
     response = Column(TEXT)
     # cookies
     cookies = Column(TEXT)
-    # delete_at
-    delete_at = Column(BIGINT, nullable=False, default=0)
+    # deleted_at
+    deleted_at = Column(BIGINT, nullable=False, default=0)
 
     def __init__(self, report_id: int, case_id: int, case_name: str, status: int,
-                 start_at: datetime, finished_at: datetime, case_log: str,
+                 case_log: str, start_at: datetime, finished_at: datetime,
                  url: str, body: str, request_method: str, request_headers: str, cost: str,
-                 asserts: str, response_headers: str, response: str, delete_at: int,
+                 asserts: str, response_headers: str, response: str,
                  status_code: int, cookies: str, retry: int = None,
-                 request_params: str = '', data_name: str = '', data_id: int = None, ):
+                 request_params: str = '', data_name: str = '', data_id: int = None):
         self.report_id = report_id
         self.case_id = case_id
         self.case_name = case_name
@@ -87,4 +94,4 @@ class SakuraTestResult(Base):
         self.request_params = request_params
         self.data_name = data_name
         self.data_id = data_id
-        self.delete_at = delete_at
+        self.deleted_at = 0

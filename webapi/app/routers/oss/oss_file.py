@@ -1,3 +1,10 @@
+'''
+Descripttion: 
+version: 
+Author: 冉勇
+Date: 2022-07-28 11:39:30
+LastEditTime: 2022-08-19 10:26:51
+'''
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2022/7/28 11:39
@@ -69,7 +76,7 @@ async def list_oss_file(filepath: str = '', _=Depends(Permission(Config.MEMBER))
 async def delete_oss_file(filepath: str, user_info=Depends(Permission(Config.MEMBER)), session=Depends(get_session)):
     try:
         # 先获取到本地的记录,拿到sha值
-        record = await SakuraOssDao.query_record(filepath=filepath, delete_at=0)
+        record = await SakuraOssDao.query_record(filepath=filepath, deleted_at=0)
         if record is None:
             raise Exception("文件不存在或已被删除")
         await SakuraOssDao.delete_by_id(session, user_info['id'], record, log=True)

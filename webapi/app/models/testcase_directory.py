@@ -35,5 +35,5 @@ class SakuraTestcaseDirectory(SakuraBase):
         self.parent = form.parent
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
-        self.created_user = user
+        self.create_user = user
         self.update_user = user

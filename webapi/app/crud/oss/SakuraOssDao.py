@@ -6,12 +6,10 @@
 # @File    : SakuraOssDao.py
 # @Software: PyCharm
 # @desc    : OSS(dao)逻辑
-from webapi.app.crud import Mapper
+from webapi.app.crud import Mapper, ModelWrapper
 from webapi.app.models.oss_file import SakuraOssFile
-from webapi.app.utils.decorator import dao
-from webapi.app.utils.logger import Log
 
 
-@dao(SakuraOssFile, Log("SakuraOssDao"))
+@ModelWrapper(SakuraOssFile)
 class SakuraOssDao(Mapper):
     pass

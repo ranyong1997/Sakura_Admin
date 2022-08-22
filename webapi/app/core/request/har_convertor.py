@@ -44,10 +44,11 @@ class HarConvertor(Convertor):
                     info = RequestInfo(url=url, response_data=entry.get("response"),
                                        body=HarConvertor.get_body(request_data),
                                        status_code=response_data.get("status"),
-                                       request_method=request_data.gt("method"),
+                                       request_method=request_data.get("method"),
                                        request_headers=HarConvertor.get_kv(request_data),
                                        response_headers=HarConvertor.get_kv(response_data),
-                                       cookies=HarConvertor.get_kv(request_data, "cookies"),
+                                       cookies=HarConvertor.get_kv(response_data, "cookies"),
+                                       request_cookies=HarConvertor.get_kv(request_data, "cookies"),
                                        response_content=response_data.get("content", {}).get("text"))
                     ans.append(info)
             return ans

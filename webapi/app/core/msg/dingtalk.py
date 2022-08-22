@@ -7,6 +7,7 @@
 # @Software: PyCharm
 # @desc    : 钉钉通知
 import os
+from urllib.parse import quote
 from webapi.app.core.msg.notification import Notification
 from webapi.app.middleware.AsyncHttpClient import AsyncRequest
 from webapi.config import Config
@@ -28,15 +29,17 @@ class DingTalk(Notification):
             markdown_text = f.read()
             return markdown_text.format(**testdata)
 
-    async def send_msg(self, subject, content, attachment=None, *receiver):
+    async def send_msg(self, subject, content, attachment=None, *receiver, **kwargs):
         data = {
-            "msgtype": "markdown",
-            "markdown": {
+            "msgtype": "actionCard",
+            "actionCard": {
                 "title": subject,
-                "text": content,
+                "text": "![screenshot](https://static.sakura.fun/picture/走势监测.png)\n%s" % content,
+                "singleTitle": '👉 查看报告',
+                "singleURL": f"""dingtalk://dingtalkclient/page/link?url={quote(kwargs.get("link"))}&pc_slide=false"""
             },
             "at": {
-                "atMobiles": receiver
+                "atMobiles": receiver,
             }
         }
         r = AsyncRequest(self.openapi, headers={'Content-Type': 'application/json'}, timeout=15, json=data)

@@ -20,7 +20,7 @@ class SakuraBase(Base):
     created_at = Column(TIMESTAMP, nullable=False)
     updated_at = Column(TIMESTAMP, nullable=False)
     deleted_at = Column(BIGINT, nullable=False)
-    created_user = Column(INT, nullable=False, default=0)
+    create_user = Column(INT, nullable=False, default=0)
     update_user = Column(INT, nullable=False)
     __abstract__ = True
     __fields__: Tuple[Column] = [id]
@@ -31,7 +31,7 @@ class SakuraBase(Base):
     def __init__(self, user, id=None):
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
-        self.created_user = user
+        self.create_user = user
         self.update_user = user
         self.deleted_at = 0
 

@@ -6,12 +6,11 @@
 # @File    : BroadcastReadDao.py
 # @Software: PyCharm
 # @desc    : 广播(dao)逻辑
-from webapi.app.crud import Mapper
+from webapi.app.crud import Mapper, ModelWrapper
 from webapi.app.models.broadcast_read_user import SakuraBroadcastReadUser
-from webapi.app.utils.decorator import dao
 from webapi.app.utils.logger import Log
 
 
-@dao(SakuraBroadcastReadUser, Log("BroadcastReadDao"))
+@ModelWrapper(SakuraBroadcastReadUser, Log("BroadcastReadDao"))
 class BroadcastReadDao(Mapper):
     pass

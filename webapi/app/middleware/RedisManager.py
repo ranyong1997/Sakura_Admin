@@ -75,6 +75,8 @@ class SakuraRedisManager(object):
         node = SakuraRedisManager._pool.get(redis_id)
         if node is not None:
             return node
+        if ":" not in address:
+            raise Exception("redis连接未包含端口号，请检查配置")
         host, port = address.split(':')
         pool = ConnectionPool(host=host, port=port, db=db, max_connections=100, password=password,
                               decode_responses=True)
@@ -111,16 +113,19 @@ class SakuraRedisManager(object):
         """
         try:
             nodes = address.split(',')
-            startup_nodes = [{"host": n.split(":")[0], "port": n.split(":")[1]} for n in nodes]
+            startup_nodes = [{"host": n.split(":")[0], "port": n.split(":")[1]} for n in nodes if ":" in n]
+            if len(startup_nodes) == 0:
+                raise Exception("找不到集群节点，请检查配置")
             pool = ClusterConnectionPool(startup_nodes=startup_nodes, max_connections=100, decode_responses=True)
-            return RedisCluster(connection_pool=pool, decode_responses=True)
+            client = RedisCluster(connection_pool=pool, decode_responses=True)
+            return client
         except Exception as e:
             raise RedisException(f"获取redis连接失败,{e}") from e
 
 
 class RedisHelper(object):
     """redis助手"""
-    sakura_perfix = 'sakura'
+    sakura_prefix = 'sakura'
     sakura_redis_client = SakuraRedisManager().client
 
     @staticmethod
@@ -249,7 +254,7 @@ class RedisHelper(object):
     def get_key_with_suffix(cls_name: str, key: str, args: Tuple, key_suffix):
         filter_args = [a for a in args if not str(args[0]).startswith('<class')]
         suffix = key_suffix(filter_args)
-        return f"{RedisHelper.sakura_perfix}:{cls_name}:{key}:{suffix}"
+        return f"{RedisHelper.sakura_prefix}:{cls_name}:{key}:{suffix}"
 
     @staticmethod
     def cache(key: str, expired_time=30 * 60, args_key=True):
@@ -268,7 +273,7 @@ class RedisHelper(object):
                 async def wrapper(*args, **kwargs):
                     if not Config.REDIS_ON:
                         return await func(*args, **kwargs)
-                    cls_name = inspect.getframeinfo(inspect.currentframe().f_back)[3][0].split("")[-1]
+                    cls_name = inspect.getframeinfo(inspect.currentframe().f_back)[3][0].split(".")[0].split(" ")[-1]
                     redis_key = RedisHelper.get_key(f"{cls_name}:{key}", args_key, *args, **kwargs)
                     data = RedisHelper.sakura_redis_client.get(redis_key)
                     # 缓存已存在
@@ -277,18 +282,16 @@ class RedisHelper(object):
                     # 获取最新数据
                     new_data = await func(*args, **kwargs)
                     info = pickle.dumps(new_data)
-                    logger.bind(name=None).debug(f"set redis key:{redis_key}")
                     RedisHelper.sakura_redis_client.set(redis_key, info.hex(), ex=expired_time)
                     return new_data
-
                 return wrapper
             else:
                 @functools.wraps(func)
                 def wrapper(*args, **kwargs):
                     if not Config.REDIS_ON:
                         return func(*args, **kwargs)
-                    cls_name = inspect.getframeinfo(inspect.currentframe())
-                    redis_key = RedisHelper.get_key(f"{cls_name}", args_key, *args, **kwargs)
+                    cls_name = inspect.getframeinfo(inspect.currentframe().f_back)[3][0].split(".")[0].split(" ")[-1]
+                    redis_key = RedisHelper.get_key(f"{cls_name}:{key}", args_key, *args, **kwargs)
                     data = RedisHelper.sakura_redis_client.get(redis_key)
                     # 缓存已存在
                     if data is not None:
@@ -296,7 +299,7 @@ class RedisHelper(object):
                     # 获取最新数据
                     new_data = func(*args, **kwargs)
                     info = pickle.dumps(new_data)
-                    logger.bind(name=None).debug(f"set redis key:{redis_key}")
+                    # logger.bind(name=None).debug(f"set redis key:{redis_key}")
                     # 添加随机数防止雪崩
                     RedisHelper.sakura_redis_client.set(redis_key, info.hex(),
                                                         ex=expired_time + Random().randint(10, 59))
@@ -324,7 +327,7 @@ class RedisHelper(object):
                         return new_data
                     cls_name = inspect.getframeinfo(inspect.currentframe().f_back)[3][0].split(".")[0].split(" ")[-1]
                     for k in key:
-                        redis_key = f"{RedisHelper.sakura_perfix}:{cls_name}:{k}"
+                        redis_key = f"{RedisHelper.sakura_prefix}:{cls_name}:{k}"
                         await RedisHelper.async_delete_prefix(redis_key)
                     if key_and_suffix is not None:
                         current_key = RedisHelper.get_key_with_suffix(cls_name, key_and_suffix[0], args,
@@ -332,7 +335,6 @@ class RedisHelper(object):
                         RedisHelper.sakura_redis_client.delete(current_key)
                     # 更新数据，删除缓存
                     return new_data
-
                 return wrapper
             else:
                 @functools.wraps(func)
@@ -342,14 +344,12 @@ class RedisHelper(object):
                         return new_data
                     cls_name = inspect.getframeinfo(inspect.currentframe().f_back)[3][0].split(".")[0].split(" ")[-1]
                     for k in key:
-                        redis_key = f"{RedisHelper.sakura_perfix}:{cls_name}:{k}"
+                        redis_key = f"{RedisHelper.sakura_prefix}:{cls_name}:{k}"
                         RedisHelper.delete_prefix(redis_key)
                     if key_and_suffix is not None:
                         current_key = RedisHelper.get_key_with_suffix(cls_name, key_and_suffix[0], args,
                                                                       key_and_suffix[1])
                         RedisHelper.sakura_redis_client.delete(current_key)
                     return new_data
-
                 return wrapper
-
         return decorator

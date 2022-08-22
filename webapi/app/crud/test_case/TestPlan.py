@@ -10,65 +10,63 @@ import asyncio
 import time
 from copy import deepcopy
 from sqlalchemy import select, and_, or_, null
-from webapi.app.crud import Mapper
+from webapi.app.crud import Mapper, ModelWrapper
 from webapi.app.crud.project.ProjectDao import ProjectDao
 from webapi.app.enums.OperationEnum import OperationType
-from webapi.app.models import async_session, DatabaseHelper
+from webapi.app.models import async_session
 from webapi.app.models.report import SakuraReport
 from webapi.app.models.test_plan import SakuraTestPlan
 from webapi.app.models.testplan_follow_user import SakuraTestPlanFollowUserRel
 from webapi.app.schema.test_plan import SakuraTestPlanForm
-from webapi.app.utils.decorator import dao
-from webapi.app.utils.logger import Log
 
 
-@dao(SakuraTestPlan, Log("SakuraTestPlanDao"))
+@ModelWrapper(SakuraTestPlan)
 class SakuraTestPlanDao(Mapper):
-    @staticmethod
-    async def list_test_plan(page: int, size: int, project_id: int = None, name: str = "", priority: str = "",
+    @classmethod
+    async def list_test_plan(cls, page: int, size: int, project_id: int = None, name: str = '', priority: str = '',
                              role: str = None, create_user: int = None,
                              user_id: int = None, follow: bool = None):
         try:
             async with async_session() as session:
                 conditions = [SakuraTestPlan.deleted_at == 0]
                 if project_id:
-                    DatabaseHelper.where(project_id, SakuraTestPlan.project_id == project_id, conditions)
+                    SakuraTestPlanDao.where(project_id, SakuraTestPlan.project_id == project_id, conditions)
                 else:
                     # 找出用户能看到的项目
                     projects = await ProjectDao.list_project_id_by_user(session, user_id, role)
                     if projects is None:
-                        # 说明用户一个项目都没有,不需要继续查询了
+                        # 说明用户一个项目都没有，不需要继续查询了
                         return [], 0
                     if len(projects) > 0:
-                        DatabaseHelper.where(projects, SakuraTestPlan.project_id.in_(projects), conditions)
-                DatabaseHelper.where(name, SakuraTestPlan.name.like(f"%{name}%"), conditions) \
-                    .where(projects, SakuraTestPlan.priority == priority, conditions) \
-                    .where(create_user, SakuraTestPlan.created_user == create_user, conditions)
+                        cls.where(projects, SakuraTestPlan.project_id.in_(projects), conditions)
+                cls.where(name, SakuraTestPlan.name.like(f"%{name}%"), conditions) \
+                    .where(priority, SakuraTestPlan.priority == priority, conditions) \
+                    .where(create_user, SakuraTestPlan.create_user == create_user, conditions)
                 if follow is None:
                     sql = select(SakuraTestPlan, SakuraTestPlanFollowUserRel.id) \
                         .outerjoin(SakuraTestPlanFollowUserRel,
                                    and_(
                                        SakuraTestPlanFollowUserRel.user_id == user_id,
                                        SakuraTestPlanFollowUserRel.deleted_at == 0,
-                                       SakuraTestPlanFollowUserRel.plan_id == SakuraTestPlan.id
-                                   )) \
+                                       SakuraTestPlanFollowUserRel.plan_id == SakuraTestPlan.id)) \
                         .where(*conditions)
                 elif follow:
                     sql = select(SakuraTestPlan, SakuraTestPlanFollowUserRel.id) \
                         .outerjoin(SakuraTestPlanFollowUserRel,
-                                   SakuraTestPlanFollowUserRel.plan_id == SakuraTestPlan.id) \
-                        .where(*conditions, SakuraTestPlanFollowUserRel.user_id == user_id,
-                               SakuraTestPlanFollowUserRel.deleted_at == 0)
+                                   SakuraTestPlanFollowUserRel.plan_id == SakuraTestPlan.id,
+                                   ).where(*conditions, SakuraTestPlanFollowUserRel.user_id == user_id,
+                                           SakuraTestPlanFollowUserRel.deleted_at == 0)
                 else:
-                    sql = select(SakuraTestPlan, null().label('null_bar')).outerjoin(SakuraTestPlanFollowUserRel,
-                                                                                     SakuraTestPlanFollowUserRel.plan_id == SakuraTestPlan.id) \
-                        .where(*conditions,
-                               or_(SakuraTestPlanFollowUserRel.id is None, SakuraTestPlanFollowUserRel.deleted_at != 0))
-                    result, total = await  DatabaseHelper.pagination(page, size, session, sql, False)
-                    return result, total
+                    sql = select(SakuraTestPlan, null().label('null_bar')) \
+                        .outerjoin(SakuraTestPlanFollowUserRel,
+                                   SakuraTestPlanFollowUserRel.plan_id == SakuraTestPlan.id).where(
+                        *conditions, or_(SakuraTestPlanFollowUserRel.id == None,
+                                         SakuraTestPlanFollowUserRel.deleted_at != 0))
+                result, total = await cls.pagination(page, size, session, sql, False)
+                return result, total
         except Exception as e:
-            SakuraTestPlanDao.log.error(f"获取测试计划失败:{str(e)}")
-            raise Exception(f"获取测试计划失败:{str(e)}") from e
+            cls.__log__.error(f"获取测试计划失败: {str(e)}")
+            raise Exception(f"获取测试计划失败: {str(e)}") from e
 
     @staticmethod
     async def insert_test_plan(plan: SakuraTestPlanForm, user: int) -> SakuraTestPlan:
@@ -88,7 +86,7 @@ class SakuraTestPlanDao(Mapper):
                     session.expunge(test_plan)
                     return test_plan
         except Exception as e:
-            SakuraTestPlanDao.log.error(f"新增测试计划失败:{str(e)}")
+            SakuraTestPlanDao.__log__.error(f"新增测试计划失败:{str(e)}")
             raise Exception(f"新增测试计划失败:{str(e)}") from e
 
     @classmethod
@@ -97,8 +95,7 @@ class SakuraTestPlanDao(Mapper):
             async with async_session() as session:
                 async with session.begin():
                     query = await session.execute(
-                        session(SakuraTestPlan).where(SakuraTestPlan.id == plan.id, SakuraTestPlan.deleted_at == 0)
-                    )
+                        session(SakuraTestPlan).where(SakuraTestPlan.id == plan.id, SakuraTestPlan.deleted_at == 0))
                     data = query.scalars().first()
                     if data is None:
                         raise Exception("测试计划不存在")
@@ -107,7 +104,7 @@ class SakuraTestPlanDao(Mapper):
                     plan.receiver = ",".join(map(str, plan.receiver))
                     plan.case_list = ",".join(map(str, plan.case_list))
                     plan.msg_type = ",".join(map(str, plan.msg_type))
-                    changed = DatabaseHelper.updata_model(map(str, plan.msg_type))
+                    changed = cls.update_model(data, plan, user)
                     await session.flush()
                     session.expunge(data)
                 if log:
@@ -115,8 +112,8 @@ class SakuraTestPlanDao(Mapper):
                         await asyncio.create_task(
                             cls.insert_log(session, user, OperationType.UPDATE, data, old, plan.id, changed))
         except Exception as e:
-            SakuraTestPlanDao.log.exception(f"编辑测试计划失败:{str(e)}")
-            SakuraTestPlanDao.log.error(f"编辑测试计划失败:{str(e)}")
+            SakuraTestPlanDao.__log__.exception(f"编辑测试计划失败:{str(e)}")
+            SakuraTestPlanDao.__log__.error(f"编辑测试计划失败:{str(e)}")
             raise Exception(f"编辑失败:{str(e)}") from e
 
     @staticmethod
@@ -130,9 +127,8 @@ class SakuraTestPlanDao(Mapper):
                     if data is None:
                         raise Exception("测试计划不存在")
                     data.state = state
-
         except Exception as e:
-            SakuraTestPlanDao.log.error(f"编辑测试计划失败:{str(e)}")
+            SakuraTestPlanDao.__log__.error(f"编辑测试计划失败:{str(e)}")
             raise Exception(f"编辑测试计划失败:{str(e)}") from e
 
     @staticmethod
@@ -143,7 +139,7 @@ class SakuraTestPlanDao(Mapper):
                 data = await session.execute(sql)
                 return data.scalars().first()
         except Exception as e:
-            SakuraTestPlanDao.log.error(f"获取测试计划失败:{str(e)}")
+            SakuraTestPlanDao.__log__.error(f"获取测试计划失败:{str(e)}")
             raise Exception(f"获取测试计划:{str(e)}") from e
 
     @staticmethod
@@ -202,9 +198,11 @@ class SakuraTestPlanDao(Mapper):
                 SakuraTestPlan.deleted_at == 0)
             data = await session.execute(sql)
             for d in data.scalars().all():
-                query: await session.execute(select(SakuraReport).where(SakuraReport.plan_id == d.id).order_by(
-                    SakuraReport.start_at.decs()).limit(7))
-                reports = list(query.scalars().all())
+                reports = list()
+                query = await session.execute(select(SakuraReport).where(SakuraReport.plan_id == d.id).order_by(
+                    SakuraReport.start_at.desc()).limit(7))
+                for report in query.scalars().all():
+                    reports.append(report)
                 ans.append({
                     "plan": d,
                     "report": reports

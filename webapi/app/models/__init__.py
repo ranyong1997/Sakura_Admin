@@ -9,13 +9,11 @@
 import time
 from datetime import datetime
 from typing import List
-
 from sqlalchemy import create_engine  # create_engine创建sql连接
 from sqlalchemy.ext.asyncio import AsyncSession  # 异步操作
 from sqlalchemy.ext.asyncio import create_async_engine  # 创建engine
 from sqlalchemy.ext.declarative import declarative_base  # 建立基本映射类
 from sqlalchemy.orm import sessionmaker
-
 from webapi.app.enums.DatabaseEnum import DatabaseEnum
 from webapi.config import Config
 
@@ -25,9 +23,9 @@ def create_database():
         f'mysql+mysqlconnector://{Config.MYSQL_USER}:{Config.MYSQL_PWD}@{Config.MYSQL_HOST}:{Config.MYSQL_PORT}',
         echo=True)
     with engine.connect() as conn:
-        conn.execute(
-            "CREATE DATABASE IF NOT EXISTS  sakura_admin default character set utf8mb4 collate utf8mb4_unicode_ci")
-    # 关闭engine
+        conn.execute("CREATE DATABASE IF NOT EXISTS sakura_admin default character set utf8mb4 collate "
+                     "utf8mb4_unicode_ci")
+        # 关闭引擎
     engine.dispose()
 
 
@@ -37,7 +35,7 @@ create_database()
 # 同步engine
 # engine = create_engine(Config.SQLALCHEMY_DATABASE_URI, pool_recycle=1500)
 # 异步engine
-async_engine = create_async_engine(Config.ASYNC_SQLALCHEMY_URL, pool_recycle=1500)
+async_engine = create_async_engine(Config.ASYNC_SQLALCHEMY_URI, pool_recycle=1500)
 
 async_session = sessionmaker(async_engine, class_=AsyncSession)
 
@@ -88,7 +86,7 @@ class DatabaseHelper(object):
             self.connection.pop(key)
 
     @staticmethod
-    def updata_model(dist, source, update_user=None, not_null=False):
+    def update_model(dist, source, update_user=None, not_null=False):
         """
         更新模型
         :param dist:
@@ -129,7 +127,7 @@ class DatabaseHelper(object):
             dist.deleted_at = datetime.now()
         else:
             dist.deleted_at = int(time.time() * 1000)
-        dist.update_at = datetime.now()
+        dist.updated_at = datetime.now()
         dist.update_user = update_user
 
     @classmethod

@@ -7,16 +7,15 @@
 # @Software: PyCharm
 # @desc    : 环境Dao(逻辑)
 from sqlalchemy import select
-from webapi.app.crud import Mapper
+from webapi.app.crud import Mapper, ModelWrapper
 from webapi.app.models import async_session
 from webapi.app.models.environment import Environment
 from webapi.app.schema.environment import EnvironmentForm
-from webapi.app.utils.decorator import dao
-from webapi.app.utils.logger import Log
 
 
-@dao(Environment, Log("EnvironmentDao"))
+@ModelWrapper(Environment)
 class EnvironmentDao(Mapper):
+
     @staticmethod
     async def query_env(id: int):
         """
@@ -36,14 +35,13 @@ class EnvironmentDao(Mapper):
             async with async_session() as session:
                 async with session.begin():
                     query = await session.execute(
-                        select(Environment).where(Environment.name == data.name, Environment.deleted_at == 0)
-                    )
+                        select(Environment).where(Environment.name == data.name, Environment.deleted_at == 0))
                     if query.scalars().first() is not None:
                         raise Exception("环境已存在")
                     env = Environment(**data.dict(), user=user)
                     session.add(env)
         except Exception as e:
-            EnvironmentDao.log.error(f"新增环境:{data.name}失败,{e}")
+            EnvironmentDao.__log__.error(f"新增环境:{data.name}失败,{e}")
             raise Exception(f"添加失败:{str(e)}")
 
     @classmethod
@@ -52,7 +50,7 @@ class EnvironmentDao(Mapper):
             search = [Environment.deleted_at == 0]
             async with async_session() as session:
                 if name:
-                    search.append(Environment.name.like(f"%{name}%"))
+                    search.append(Environment.name.like("%{}%".format(name)))
                 sql = select(Environment).where(*search)
                 query = await session.execute(sql)
                 if exactly:
@@ -65,5 +63,5 @@ class EnvironmentDao(Mapper):
                 data = await session.execute(sql)
                 return data.scalars().all(), total
         except Exception as e:
-            cls.log.error(f"获取环境列表失败,{str(e)}")
+            cls.__log__.error(f"获取环境列表失败,{str(e)}")
             raise Exception(f"获取环数据失败:{str(e)}")

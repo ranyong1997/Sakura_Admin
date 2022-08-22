@@ -40,9 +40,9 @@ class SakuraReport(Base):
     mode = Column(SMALLINT, default=0, comment="0: 普通 1: 测试集 2: pipeline 3: 其他")
     deleted_at = Column(BIGINT, nullable=False, default=0)
 
-    def __init__(self, executor: int, env: int, success_count: int = 0, failed_count: int = 0, error_count: int = 0,
-                 skipped_count: int = 0,
-                 status: int = 0, mode: int = 0, plan_id: int = None, finished_at: datetime = None, cost=None):
+    def __init__(self, executor: int, env: int, success_count: int = 0, failed_count: int = 0,
+                 error_count: int = 0, skipped_count: int = 0, status: int = 0, mode: int = 0,
+                 plan_id: int = None, finished_at: datetime = None, cost=None):
         self.executor = executor
         self.env = env
         self.start_at = datetime.now()

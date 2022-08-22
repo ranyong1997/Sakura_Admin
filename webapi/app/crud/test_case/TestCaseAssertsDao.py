@@ -9,7 +9,7 @@
 from typing import List
 from sqlalchemy import asc, select
 from webapi.app.crud import Mapper, ModelWrapper
-from webapi.app.models import async_session, DatabaseHelper
+from webapi.app.models import async_session
 from webapi.app.models.testcase_asserts import TestCaseAsserts
 from webapi.app.schema.testcase_schema import TestCaseAssertsForm
 
@@ -25,8 +25,9 @@ class TestCaseAssertsDao(Mapper):
         """
         try:
             async with async_session() as session:
-                query = await session.execute(select(TestCaseAsserts).where(TestCaseAsserts.case_id == case_id,
-                                                                            TestCaseAsserts.deleted_at == 0)).order_by(
+                query = await session.execute(select(TestCaseAsserts)
+                                              .where(TestCaseAsserts.case_id == case_id,
+                                                     TestCaseAsserts.deleted_at == 0)).order_by(
                     asc(TestCaseAsserts.name))
                 return query.scalars().all()
         except Exception as e:
@@ -96,7 +97,7 @@ class TestCaseAssertsDao(Mapper):
                     data = result.scalars().first()
                     if data is None:
                         raise Exception("断言信息不存在,请检查")
-                    DatabaseHelper.updata_model(data, form, user_id)
+                    cls.update_model(data, form, user_id)
                     await session.flush()
                     session.expunge(data)
                     return data
@@ -115,7 +116,7 @@ class TestCaseAssertsDao(Mapper):
                     data = result.scalars().first()
                     if data is None:
                         raise Exception("断言信息不存在,请检查")
-                    DatabaseHelper.delete_model(data, user_id)
+                    cls.delete_model(data, user_id)
         except Exception as e:
             cls.__log__.error(f"删除用例断言失败:{e}")
             raise Exception(f"删除用例断言失败:{e}") from e
