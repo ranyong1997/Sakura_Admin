@@ -10,19 +10,6 @@ from sqlalchemy import INT, Column
 from webapi.app.models.basic import SakuraBase
 
 
-class ProjectRoleEnum:
-    ADMIN = 1
-    MEMBER = 2
-
-    @staticmethod
-    def name(role):
-        if role == 1:
-            return "组长"
-        elif role == 2:
-            return "组员"
-        return None
-
-
 class ProjectRole(SakuraBase):
     __tablename__ = "sakura_project_role"
     user_id = Column(INT, index=True)

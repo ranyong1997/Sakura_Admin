@@ -22,7 +22,7 @@ class User(Base):
     phone = Column(String(12), unique=True)
     created_at = Column(TIMESTAMP, nullable=False, default=datetime.now())
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now())
-    deleted_at = Column(BIGINT, nullable=False, default=datetime.now())
+    deleted_at = Column(BIGINT, nullable=False, default=0)
     update_user = Column(INT, nullable=True)  # 修改人
     last_login_in = Column(TIMESTAMP)
     avatar = Column(String(128), nullable=True, default=None)

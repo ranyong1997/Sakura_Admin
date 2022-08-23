@@ -1,10 +1,3 @@
-'''
-Descripttion: 
-version: 
-Author: 冉勇
-Date: 2022-07-28 11:42:12
-LastEditTime: 2022-08-19 10:24:07
-'''
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2022/7/28 11:42
@@ -24,8 +17,8 @@ units = (
 class SakuraOssFile(SakuraBase):
     # 因为没有目录的概念,所以目录+文件名
     file_path = Column(String(64), nullable=False, index=True, comment="文件路径")
-    view_url = Column(String(64), nullable=False, comment="文件预览url")
-    file_size = Column(String(64), comment="文件大小")
+    view_url = Column(String(256), nullable=False, comment="文件预览url")
+    file_size = Column(String(16), comment="文件大小")
 
     __tablename__ = "sakura_oss_file"
     __filelds__ = (file_path, view_url, file_size)

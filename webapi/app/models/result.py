@@ -1,10 +1,3 @@
-'''
-Descripttion: 
-version: 
-Author: 冉勇
-Date: 2022-08-05 11:27:36
-LastEditTime: 2022-08-19 10:26:39
-'''
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2022/8/5 11:27

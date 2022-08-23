@@ -34,7 +34,7 @@ class SakuraReport(Base):
     skipped_count = Column(INT, nullable=False, default=0)
 
     # 执行状态
-    status = Column(SMALLINT, nullable=False, comment="0: pending 1: running 2: stopped 3: finished", index=True)
+    status = Column(SMALLINT, nullable=False, comment="0: 代办 1: 运行种 2: 已停止 3: 已完成", index=True)
 
     # case执行模式
     mode = Column(SMALLINT, default=0, comment="0: 普通 1: 测试集 2: pipeline 3: 其他")

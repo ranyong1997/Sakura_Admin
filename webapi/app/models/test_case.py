@@ -31,11 +31,13 @@ class TestCase(SakuraBase):
     # 调整联合唯一索引
     __table_args__ = (UniqueConstraint('directory_id', 'name', 'deleted_at'),)
     __tag__ = "测试用例"
-    __fields__ = (
-        name, request_type, url, request_method, request_headers, body, body_type, directory_id, tag, status, body,
-        body_type, directory_id, tag, status, priority, case_type)
-    __alias__ = dict(name="名称", request_type="请求协议", url="地址", request_method="请求方式", request_headers="请求头", body="请求体",
-                     body_type="请求类型", directory_id="用例目录", tag="标签", status="状态", priority="优先级", case_type="用例类型")
+    __fields__ = (name, request_type, url, request_method,
+                  request_headers, body, body_type, directory_id,
+                  tag, status, priority, case_type)
+    __alias__ = dict(name="名称", request_type="请求协议", url="地址", request_method="请求方式",
+                     request_headers="请求头", body="请求体", body_type="请求类型",
+                     directory_id="用例目录", tag="标签", status="状态", priority="优先级",
+                     case_type="用例类型")
 
     def __init__(self, name, request_type, url, directory_id, status, priority, create_user,
                  body_type=1, base_path=None, out_parameters=None, tag=None, request_headers=None, case_type=0,

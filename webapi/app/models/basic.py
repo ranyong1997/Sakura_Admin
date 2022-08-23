@@ -50,6 +50,8 @@ class SakuraBase(Base):
                 data[c.name] = val.strftime("%Y-%m-%d %H:%M:%S")
             elif isinstance(val, Decimal):
                 data[c.name] = str(val)
+            elif isinstance(val, bytes):
+                data[c.name] = val.decode(encoding='utf-8')
             else:
                 data[c.name] = val
         return json.dumps(data, ensure_ascii=False)

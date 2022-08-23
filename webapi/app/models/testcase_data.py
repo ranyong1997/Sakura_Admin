@@ -6,8 +6,6 @@
 # @File    : testcase_data.py
 # @Software: PyCharm
 # @desc    : 测试用例数据,用来存储各个环境下的测试数据,用于数据驱动
-__author__ = "sakura"
-
 from sqlalchemy import Column, INT, String, UniqueConstraint, TEXT
 from webapi.app.models.basic import SakuraBase
 

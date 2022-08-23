@@ -52,4 +52,4 @@ class Constructor(SakuraBase):
         return query.index + 1
 
     def __str__(self):
-        return f"[{'后置条件:' if self.suffix else '前置条件'}:{self.name}]({select.id})"
+        return f"[{'后置条件' if self.suffix else '前置条件'}: {self.name}]({self.id}))"

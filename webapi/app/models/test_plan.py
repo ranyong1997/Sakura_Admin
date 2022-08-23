@@ -52,15 +52,15 @@ class SakuraTestPlan(SakuraBase):
                  user, state=0, retry_minutes=0, id=None):
         super().__init__(user, id)
         self.env = ",".join(map(str, env))
-        self.case_list = case_list
+        self.case_list = ",".join(map(str, case_list))
         self.name = name
         self.project_id = project_id
         self.priority = priority
         self.ordered = ordered
         self.cron = cron
         self.pass_rate = pass_rate
-        self.receiver = receiver
-        self.msg_type = msg_type
+        self.receiver = ",".join(map(str, receiver))
+        self.msg_type = ",".join(map(str, msg_type))
         self.retry_minutes = retry_minutes
         self.state = state
 
