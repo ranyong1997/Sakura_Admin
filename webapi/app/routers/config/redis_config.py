@@ -11,7 +11,6 @@ from starlette.background import BackgroundTasks
 from webapi.app.crud.config.RedisConfigDao import SakuraRedisConfigDao
 from webapi.app.handler.fatcory import SakuraResponse
 from webapi.app.middleware.RedisManager import SakuraRedisManager
-from webapi.app.models import DatabaseHelper
 from webapi.app.models.redis_config import SakuraRedis
 from webapi.app.routers import Permission, get_session
 from webapi.app.routers.config.environment import router
@@ -21,11 +20,11 @@ from webapi.config import Config
 
 
 @router.get("/redis/list")
-async def list_redis_config(name: str = '', addr: str = '', env: int = None, cluster: bool = None,
-                            user_info=Depends(Permission(Config.ADMIN))):
+async def list_redis_config(name: str = '', addr: str = '', env: int = None,
+                            cluster: bool = None, _=Depends(Permission(Config.MEMBER))):
     try:
         data = await SakuraRedisConfigDao.list_record(
-            name=DatabaseHelper.like(name), addr=DatabaseHelper.like(addr),
+            name=SakuraRedisConfigDao.like(name), addr=SakuraRedisConfigDao.like(addr),
             env=env, cluster=cluster
         )
         return SakuraResponse.success(data=data)
@@ -40,7 +39,7 @@ async def insert_redis_config(form: RedisConfigForm, user_info=Depends(Permissio
         if query is not None:
             raise Exception("数据已存在,请勿重复添加")
         data = SakuraRedis(**form.dict(), user=user_info['id'])
-        result = await SakuraRedisConfigDao.insert_record(data, log=True)
+        result = await SakuraRedisConfigDao.insert(model=data, log=True)
         return SakuraResponse.success(data=result)
     except Exception as e:
         return SakuraResponse.failed(e)

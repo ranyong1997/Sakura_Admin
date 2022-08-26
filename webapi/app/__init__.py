@@ -113,26 +113,20 @@ async def unexpected_exception_error(request: Request, exc: PermissionException)
     """
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        cotent=jsonable_encoder({
+        content=jsonable_encoder({
             "code": 403,
-            "msg": exc.detail
+            "msg": exc.detail,
         })
     )
 
 
 @sakura.exception_handler(AuthException)
 async def unexpected_exception_error(request: Request, exc: AuthException):
-    """
-    意外异常错误
-    :param request:
-    :param exc:
-    :return:
-    """
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({
             "code": 401,
-            "msg": str(exc.detail)
+            "msg": str(exc.detail),
         })
     )
 

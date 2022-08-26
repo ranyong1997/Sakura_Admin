@@ -38,6 +38,7 @@ class ProjectEditForm(BaseModel):
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise ParamsError("不能为空")
+        return v
 
 
 class ProjectRoleForm(BaseModel):

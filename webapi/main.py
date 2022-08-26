@@ -36,7 +36,7 @@ from webapi.config import Config, SAKURA_ENV, BANNER
 from webapi.app.utils.scheduler import Scheduler
 
 logger = init_logging()
-logger.bind(name=None).opt(ansi=True).success(f"sakura is running at <red>{SAKURA_ENV}</red>")
+logger.bind(name=None).opt(ansi=True).success(f"sakura 正在运行环境: <red>{SAKURA_ENV}</red>")
 logger.bind(name=None).success(BANNER)
 
 
@@ -67,7 +67,6 @@ sakura.include_router(oss_router, dependencies=[Depends(request_info)])
 sakura.include_router(operation_router, dependencies=[Depends(request_info)])
 sakura.include_router(msg_router, dependencies=[Depends(request_info)])
 sakura.include_router(workspace_router, dependencies=[Depends(request_info)])
-
 sakura.mount("/statics", StaticFiles(directory="statics"), name="statics")
 templates = Jinja2Templates(directory="statics")
 

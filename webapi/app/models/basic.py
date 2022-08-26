@@ -19,8 +19,8 @@ class SakuraBase(Base):
     id = Column(INT, primary_key=True)
     created_at = Column(TIMESTAMP, nullable=False)
     updated_at = Column(TIMESTAMP, nullable=False)
-    deleted_at = Column(BIGINT, nullable=False)
-    create_user = Column(INT, nullable=False, default=0)
+    deleted_at = Column(BIGINT, nullable=False, default=0)
+    create_user = Column(INT, nullable=False)
     update_user = Column(INT, nullable=False)
     __abstract__ = True
     __fields__: Tuple[Column] = [id]

@@ -38,8 +38,8 @@ async def list_project(page: int = 1, size: int = 8, name: str = "", user_info=D
 
 
 @router.post("/insert")
-async def insert_project(data: ProjectForm, user_info: Depends(Permission(Config.MEMBER))):
-    await ProjectDao.add_project(user_id=user_info['id'], **data.dict())
+async def insert_project(data: ProjectForm, user_info=Depends(Permission(Config.MANAGER))):
+    await ProjectDao.add_project(user_id=user_info["id"], **data.dict())
     return SakuraResponse.success()
 
 
@@ -58,19 +58,20 @@ async def update_project_avatar(project_id: int, file: UploadFile = File(...), u
 
 
 @router.post("/update")
-async def update_project(data: ProjectEditForm, user_info: Depends(Permission())):
-    user_id, role = user_info['id'], user_info['role']
+async def update_project(data: ProjectEditForm, user_info=Depends(Permission())):
+    user_id, role = user_info["id"], user_info["role"]
     await ProjectDao.update_project(user_id=user_id, role=role, **data.dict())
     return SakuraResponse.success()
 
 
 @router.get("/query")
-async def query_project(projectId: int, user_info: Depends(Permission())):
+async def query_project(projectId: int, user_info=Depends(Permission())):
     try:
+        result = dict()
         data, roles = await ProjectDao.query_project(projectId)
-        await ProjectDao.access(user_info['id'], user_info['role'], roles, data)
-        result = {} | {"project": data, "roles": roles}
-        SakuraResponse.success(result)
+        await ProjectRoleDao.access(user_info["id"], user_info["role"], roles, data)
+        result.update({"project": data, "roles": roles})
+        return SakuraResponse.success(result)
     except AuthException:
         return SakuraResponse.forbidden()
     except Exception as e:
@@ -78,16 +79,17 @@ async def query_project(projectId: int, user_info: Depends(Permission())):
 
 
 @router.delete("/delete", description="删除项目")
-async def query_project(projectId: int, user_info: Depends(Permission(Config.MEMBER)), session=Depends(get_session)):
+async def query_project(projectId: int, user_info=Depends(Permission(Config.MEMBER)), session=Depends(get_session)):
     try:
         async with session.begin():
             # 事务开始
-            owner = await ProjectDao.is_project_admin(session, projectId, user_info['id'])
+            owner = await ProjectDao.is_project_admin(session, projectId, user_info["id"])
             if not owner and user_info["role"] != Config.ADMIN:
                 return SakuraResponse.forbidden()
             await ProjectDao.delete_record_by_id(session, user_info['id'], projectId, session_begin=True)
+            # 有可能项目没有测试计划 2022-03-14 fixed bug
             await SakuraTestPlanDao.delete_record_by_id(session, user_info['id'], projectId, key="project_id",
-                                                        exists=False, session_bagin=True)
+                                                      exists=False, session_begin=True)
         return SakuraResponse.success()
     except Exception as e:
         return SakuraResponse.failed(e)
@@ -101,19 +103,19 @@ async def insert_project_role(role: ProjectRoleForm, user_info=Depends(Permissio
             raise Exception("该用户已存在")
         await ProjectRoleDao.has_permission(role.project_id, role.project_role, user_info['id'], user_info['role'])
         model = ProjectRole(**role.dict(), create_user=user_info['id'])
-        await ProjectRoleDao.insert_record(model, True)
+        await ProjectRoleDao.insert_record(model=model, log=True)
     except Exception as e:
         return SakuraResponse.failed(e)
     return SakuraResponse.success()
 
 
 @router.post("/role/update")
-async def update_project_role(role: ProjectRoleEditForm, user_info: Depends(Permission())):
+async def update_project_role(role: ProjectRoleEditForm, user_info=Depends(Permission())):
     await ProjectRoleDao.update_project_role(role, user_info['id'], user_info['role'])
     return SakuraResponse.success()
 
 
 @router.post("/role/delete")
-async def delete_project_role(role: ProjectDelForm, user_info: Depends(Permission())):
+async def delete_project_role(role: ProjectDelForm, user_info=Depends(Permission())):
     await ProjectRoleDao.delete_project_role(role.id, user_info['id'], user_info['role'])
     return SakuraResponse.success()

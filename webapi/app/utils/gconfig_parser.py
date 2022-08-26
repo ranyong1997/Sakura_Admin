@@ -6,7 +6,6 @@
 # @File    : gconfig_parser.py
 # @Software: PyCharm
 # @desc    : 全局配置解析器
-__author__ = "woody"
 
 import json
 import yaml

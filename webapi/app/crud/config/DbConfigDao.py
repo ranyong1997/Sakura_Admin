@@ -17,6 +17,7 @@ from webapi.app.handler.fatcory import SakuraResponse
 from webapi.app.middleware.RedisManager import RedisHelper
 from webapi.app.models import async_session, DatabaseHelper, db_helper
 from webapi.app.models.database import SakuraDatabase
+from webapi.app.models.sql_log import SakuraSQLHistory
 from webapi.app.schema.database import DatabaseForm
 from webapi.app.utils.logger import Log
 
@@ -239,8 +240,7 @@ class DbConfigDao(Mapper):
             if query is None:
                 raise Exception("未找到对应的数据库配置")
             data = await db_helper.get_connection(query.sql_type, query.host, query.port, query.username,
-                                                  query.password,
-                                                  query.database)
+                                                  query.password, query.database)
             result = await DbConfigDao.execute(data, sql)
             _, result = SakuraResponse.parse_sql_result(result)
             return json.dumps(result, cls=JsonEncoder, ensure_ascii=False)
@@ -249,6 +249,6 @@ class DbConfigDao(Mapper):
             raise Exception(f"查询数据库配置失败:{e}") from e
 
 
-@ModelWrapper(PitySQLHistory)
-class PitySQLHistoryDao(Mapper):
+@ModelWrapper(SakuraSQLHistory)
+class SakuraSQLHistoryDao(Mapper):
     pass

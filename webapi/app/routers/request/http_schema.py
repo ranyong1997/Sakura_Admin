@@ -7,14 +7,15 @@
 # @Software: PyCharm
 # @desc    : HTTP 模式
 from pydantic import BaseModel, validator
+from webapi.app.enums.RequestBodyEnum import BodyType
 from webapi.app.excpetions.ParamsException import ParamsError
 
 
 class HttpRequestForm(BaseModel):
-    method = str
-    url = str
+    method: str
+    url: str
     body: str = None
-    body_type: int = 0
+    body_type: BodyType = BodyType.none
     headers: dict = {}
 
     @validator('method', 'url')

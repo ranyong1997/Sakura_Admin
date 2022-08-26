@@ -38,34 +38,40 @@ Author = TypeVar("Author", int, str)
 
 
 @router.get("/list")
+async def insert_testcase(directory_id: int = None, name: str = "", create_user: str = ''):
+    data = await TestCaseDao.list_test_case(directory_id, name, create_user)
+    return SakuraResponse.success(data)
+
+
+@router.post("/insert")
 async def insert_testcase(data: TestCaseForm, user_info=Depends(Permission())):
     try:
         record = await TestCaseDao.query_record(name=data.name, directory_id=data.directory_id)
         if record is not None:
             return SakuraResponse.failed("用例已存在")
         model = TestCase(**data.dict(), create_user=user_info['id'])
-        model = await TestCaseDao.insert_record(model, True)
+        model = await TestCaseDao.insert(model=model, log=True)
         return SakuraResponse.success(model.id)
     except Exception as e:
-        return SakuraResponse.failed(str(e))
+        return SakuraResponse.failed(e)
 
 
 # V2版本船舰用例接口
 @router.post("/create", summary="创建接口测试用例")
-async def create_testcase(data: TestCaseInfo, user_info: Depends(Permission()), session=Depends(get_session)):
+async def create_testcase(data: TestCaseInfo, user_info=Depends(Permission()), session=Depends(get_session)):
     async with session.begin():
-        await TestCaseDao.insert_test_case(session, user_info['id'])
+        await TestCaseDao.insert_test_case(session, data, user_info['id'])
     return SakuraResponse.success()
 
 
 @router.post("/update")
-async def update_testcase(form: TestCaseForm, user_info: Depends(Permission())):
+async def update_testcase(form: TestCaseForm, user_info=Depends(Permission())):
     try:
         data = await TestCaseDao.update_test_case(form, user_info['id'])
         result = await SakuraTestCaseOutParametersDao.update_many(form.id, form.out_parameters, user_info['id'])
         return SakuraResponse.success(dict(case_info=data, out_parameters=result))
     except Exception as e:
-        return SakuraResponse.failed(str(e))
+        return SakuraResponse.failed(e)
 
 
 @router.delete("/delete", description="删除测试用例")
@@ -146,6 +152,13 @@ async def get_constructor_tree(suffix: bool, name: str = "", user_info=Depends(P
     return SakuraResponse.success(result)
 
 
+# 获取数据构造器树
+@router.get("/constructor")
+async def get_constructor_tree(id: int, user_info=Depends(Permission())):
+    result = await ConstructorDao.get_constructor_data(id)
+    return SakuraResponse.success(result)
+
+
 # 获取所有数据构造器
 @router.get("/constructor/list")
 async def list_case_and_constructor(constructor_type: int, suffix: bool):
@@ -206,6 +219,15 @@ async def query_testcase_directory(directory_id: int, user_info=Depends(Permissi
         return SakuraResponse.forbidden()
     except Exception as e:
         return SakuraResponse.failed(str(e))
+
+
+@router.post("/directory/insert")
+async def insert_testcase_directory(form: SakuraTestcaseDirectoryForm, user_info=Depends(Permission())):
+    try:
+        await SakuraTestcaseDirectoryDao.insert_directory(form, user_info['id'])
+        return SakuraResponse.success()
+    except Exception as e:
+        return SakuraResponse.failed(e)
 
 
 @router.post("/directory/update")

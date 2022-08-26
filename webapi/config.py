@@ -16,6 +16,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 class BaseConfig(BaseSettings):
     LOG_DIR = os.path.join(ROOT, 'logs')
     LOG_NAME = os.path.join(LOG_DIR, 'sakura.log')
+    SERVER_HOST: str = "0.0.0.0"
     SERVER_PORT: int
     HEARTBEAT: int = 48
     # mock_server
@@ -61,6 +62,9 @@ class BaseConfig(BaseSettings):
 
     # 测试报告路径
     REPORT_PATH = os.path.join(ROOT, "templates", "report.html")
+
+    # 重置密码路径
+    PASSWORD_HTML_PATH = os.path.join(ROOT, "templates", "reset_password.html")
 
     # APP路径
     APP_PATH = os.path.join(ROOT, "app")

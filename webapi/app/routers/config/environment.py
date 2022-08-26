@@ -7,20 +7,20 @@
 # @Software: PyCharm
 # @desc    : 环境配置(路由)
 from fastapi import APIRouter, Depends
-from webapi.app.crud.config.Environment import EnvironmentDao
+from webapi.app.crud.config.EnvironmentDao import EnvironmentDao
 from webapi.app.handler.fatcory import SakuraResponse
 from webapi.app.routers import Permission, get_session
 from webapi.app.schema.environment import EnvironmentForm
 from webapi.config import Config
 
-router = APIRouter(perfix="/config")
+router = APIRouter(prefix="/config")
 
 
 @router.get("/environment/list")
 async def list_environment(page: int = 1, size: int = 8, name: str = "", exactly=False,
                            user_info=Depends(Permission())):
-    data, totl = await EnvironmentDao.list_env(page, size, name, exactly)
-    return SakuraResponse.success_with_size(data=data, total=totl)
+    data, total = await EnvironmentDao.list_env(page, size, name, exactly)
+    return SakuraResponse.success_with_size(data=data, total=total)
 
 
 @router.post("/environment/insert")

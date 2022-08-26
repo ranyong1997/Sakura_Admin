@@ -24,6 +24,9 @@ class ConnectionManager:
         self.active_connections: dict[int, WebSocket] = {}
         self.log = Log("websocket")
 
+    def get_clients(self):
+        return {key: True for key in self.active_connections.keys()}
+
     async def connect(self, websocket: WebSocket, client_id: int) -> None:
         await websocket.accept()
         exist: WebSocket = self.active_connections.get(client_id)
@@ -76,7 +79,7 @@ class ConnectionManager:
         msg = dict(type=msg_type, record_msg=record_msg)
         await self.send_personal_message(user_id, msg)
 
-    async def notify(self, user_id, title=None, content=None, notice: PityNotification = None):
+    async def notify(self, user_id, title=None, content=None, notice: SakuraNotification = None):
         """
         根据user_id推送对应信息
         :param user_id:

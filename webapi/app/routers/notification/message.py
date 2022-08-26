@@ -42,7 +42,7 @@ async def read_msg(form: NotificationForm, user_info=Depends(Permission())):
             user_id = user_info['id']
             for f in form.broadcast:
                 model = SakuraBroadcastReadUser(f, user_id)
-                await BroadcastReadDao.insert_record(model)
+                await BroadcastReadDao.insert_record(model=model)
         return SakuraResponse.success()
     except Exception as e:
         return SakuraResponse.failed(str(e))

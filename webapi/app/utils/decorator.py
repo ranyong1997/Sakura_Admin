@@ -9,6 +9,7 @@
 import asyncio
 import functools
 import os
+import typing
 from datetime import datetime
 from functools import wraps
 from typing import Coroutine
@@ -51,8 +52,12 @@ def case_log(func):
                                                            doc.strip() if doc else func.__name__, get_str(args, kw)))
             returns = func(*args, **kw)
             if not isinstance(returns, Coroutine):
-                self.logger.o_append("[{}]:步骤结束 -> {}{}".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                                                                doc.strip() if doc else func.__name__))
+                self.logger.o_append(
+                    f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]: 步骤结束 -> {doc.strip() if doc else func.__name__} {get_returns(returns)}")
+
+            else:
+                self.logger.o_append(
+                    f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]: 步骤结束 -> {doc.strip() if doc else func.__name__}")
             return returns
     return wrapper
 
@@ -83,15 +88,6 @@ def get_returns(obj):
     return f"返回值:{obj}"
 
 
-def dao(model, log):
-    def wrapper(cls):
-        setattr(cls, "model", model)
-        setattr(cls, "log", log)
-        return cls
-
-    return wrapper
-
-
 def lock(key):
     """
     redis分布式锁，基于redlock
@@ -105,10 +101,9 @@ def lock(key):
             async def wrapper(*args, **kwargs):
                 try:
                     with RedLock(f"分布式锁:{func.__name__}:{key}:{str(args)}", connection_details=Config.REDIS_NODES,
-                                 ttl=30000  # 释放时间为30s
-                                 ):
-                        return func(*args, **kwargs)
-                except Exception:
+                                 ttl=30000):  # 释放时间为30s
+                        return await func(*args, **kwargs)
+                except RedLockError:
                     print(f"进程:{os.getpid()}获取任务失败,不用担心,还有其他为你执行")
         else:
             @functools.wraps(func)
@@ -116,8 +111,8 @@ def lock(key):
                 try:
                     with RedLock(f"distributed_lock:{func.__name__}:{key}:{str(args)}",
                                  connection_details=Config.REDIS_NODES,
-                                 ttl=30000,  # 锁释放时间为30s
-                                 ):
+                                 ttl=30000):  # 锁释放时间为30s
+
                         return func(*args, **kwargs)
                 except RedLockError:
                     print(f"进程: {os.getpid()}获取任务失败,不用担心,还有其他为你执行")

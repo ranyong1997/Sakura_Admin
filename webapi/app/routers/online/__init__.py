@@ -7,3 +7,4 @@
 # @Software: PyCharm
 # @desc    :
 from webapi.app.routers.online.sql import router
+from webapi.app.routers.online.script import router

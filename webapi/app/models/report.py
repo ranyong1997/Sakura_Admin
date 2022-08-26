@@ -29,13 +29,11 @@ class SakuraReport(Base):
     finished_at = Column(TIMESTAMP)
     # 成功数量
     success_count = Column(INT, nullable=False, default=0)
-    error_count = Column(INT, nullable=False, decimal=0)
+    error_count = Column(INT, nullable=False, default=0)
     failed_count = Column(INT, nullable=False, default=0)
     skipped_count = Column(INT, nullable=False, default=0)
-
     # 执行状态
     status = Column(SMALLINT, nullable=False, comment="0: 代办 1: 运行种 2: 已停止 3: 已完成", index=True)
-
     # case执行模式
     mode = Column(SMALLINT, default=0, comment="0: 普通 1: 测试集 2: pipeline 3: 其他")
     deleted_at = Column(BIGINT, nullable=False, default=0)

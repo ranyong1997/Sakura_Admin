@@ -7,14 +7,12 @@
 # @Software: PyCharm
 # @desc    : 网关Dao(逻辑)
 from sqlalchemy import select
-from webapi.app.crud import Mapper
+from webapi.app.crud import Mapper, ModelWrapper
 from webapi.app.models import async_session
 from webapi.app.models.address import SakuraGateway
-from webapi.app.utils.decorator import dao
-from webapi.app.utils.logger import Log
 
 
-@dao(SakuraGateway, Log("SakuraRedisConfigDao"))
+@ModelWrapper(SakuraGateway)
 class SakuraGatewayDao(Mapper):
     @staticmethod
     async def query_gateway(env, name):
@@ -25,5 +23,5 @@ class SakuraGatewayDao(Mapper):
             )
             data = query.scalars().first()
             if data is None:
-                raise Exception(f"此环境没有网关配置:{name}")
+                raise Exception(f"此环境没有网关配置: {name}")
             return data.gateway

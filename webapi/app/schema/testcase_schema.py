@@ -43,7 +43,7 @@ class TestCaseForm(BaseModel):
 class TestCaseAssertsForm(BaseModel):
     id: int = None
     name: str
-    case_id: str
+    case_id: int = None
     assert_type: str
     expected: str
     actually: str

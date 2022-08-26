@@ -14,7 +14,7 @@ from webapi.app.handler.fatcory import SakuraResponse
 from webapi.app.models.operation_log import SakuraOperationLog
 from webapi.app.routers import Permission
 
-router = APIRouter(perfix="/operation")
+router = APIRouter(prefix="/operation")
 
 
 # 获取用户操作记录

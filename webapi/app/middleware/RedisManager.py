@@ -22,22 +22,22 @@ from webapi.config import Config
 
 
 class SakuraRedisManager(object):
+    """非线程安全，可能存在问题
     """
-    非线程安全，可能存在问题
-    """
-    _cluster_pool = {}
-    _pool = {}
+    _cluster_pool = dict()
+    _pool = dict()
 
     @property
     def client(self):
         pool = ConnectionPool(host=Config.REDIS_HOST, port=Config.REDIS_PORT, db=Config.REDIS_DB, max_connections=100,
-                              password=Config.REDIS_PASSWORD, decode_response=True)
+                              password=Config.REDIS_PASSWORD,
+                              decode_responses=True)
         return StrictRedis(connection_pool=pool, decode_responses=True)
 
     @staticmethod
     def delete_client(redis_id: int, cluster: bool):
         """
-        根据redis_id和cluster是否是集群删除客户端
+        根据redis_id和是否是集群删除客户端
         :param redis_id:
         :param cluster:
         :return:
@@ -48,7 +48,7 @@ class SakuraRedisManager(object):
             SakuraRedisManager._pool.pop(redis_id)
 
     @staticmethod
-    def get_cluster_client(redis_id, address: str):
+    def get_cluster_client(redis_id: int, address: str):
         """
         获取redis集群客户端
         :param redis_id:
@@ -59,11 +59,11 @@ class SakuraRedisManager(object):
         if cluster is not None:
             return cluster
         client = SakuraRedisManager.get_cluster(address)
-        SakuraRedisManager._pool[redis_id] = client
+        SakuraRedisManager._cluster_pool[redis_id] = client
         return client
 
     @staticmethod
-    def get_single_client(redis_id: int, address: str, password: str, db: int):
+    def get_single_node_client(redis_id: int, address: str, password: str, db: int):
         """
         获取redis单实例客户端
         :param redis_id:
@@ -77,7 +77,7 @@ class SakuraRedisManager(object):
             return node
         if ":" not in address:
             raise Exception("redis连接未包含端口号，请检查配置")
-        host, port = address.split(':')
+        host, port = address.split(":")
         pool = ConnectionPool(host=host, port=port, db=db, max_connections=100, password=password,
                               decode_responses=True)
         client = StrictRedis(connection_pool=pool)
@@ -120,12 +120,11 @@ class SakuraRedisManager(object):
             client = RedisCluster(connection_pool=pool, decode_responses=True)
             return client
         except Exception as e:
-            raise RedisException(f"获取redis连接失败,{e}") from e
+            raise RedisException(f"获取Redis连接失败, {e}")
 
 
 class RedisHelper(object):
-    """redis助手"""
-    sakura_prefix = 'sakura'
+    sakura_prefix = "sakura"
     sakura_redis_client = SakuraRedisManager().client
 
     @staticmethod
@@ -137,7 +136,7 @@ class RedisHelper(object):
     @awaitable
     def ping():
         """
-        测试redis是否连接
+        test redis client
         :return:
         """
         return RedisHelper.sakura_redis_client.ping()
@@ -146,7 +145,7 @@ class RedisHelper(object):
     @awaitable
     def get_address_record(address: str):
         """
-        获取ip是否开启录制
+        获取ip是否已经开启录制
         :param address:
         :return:
         """
@@ -154,23 +153,14 @@ class RedisHelper(object):
         return RedisHelper.sakura_redis_client.get(key)
 
     @staticmethod
-    def get_key(_redis_key: str, args_key: bool = True, *args, **kwargs):
-        if not args_key:
-            return f"{RedisHelper.sakura_perfix}:{_redis_key}"
-        filter_args = [a for a in args if not str(a).startswith('<class')]
-        filter_args.extend(str(v) for v in kwargs.values())
-        return f"{RedisHelper.sakura_perfix}:{_redis_key}{':' + ':'.join(str(a) for a in filter_args) if filter_args else ''} "
-
-    @staticmethod
     @awaitable
     def cache_record(address: str, request):
         """
-        存记录
         :param address:
         :param request:
         :return:
         """
-        key = RedisHelper.get_key(f"record:{address}:request")
+        key = RedisHelper.get_key(f"record:{address}:requests")
         RedisHelper.sakura_redis_client.rpush(key, request)
         ttl = RedisHelper.sakura_redis_client.ttl(key)
         if ttl < 0:
@@ -183,14 +173,14 @@ class RedisHelper(object):
         设置录制状态
         :param user_id:
         :param address:
-        :param regex:
+        :param regex: 录制的url正则
         :return:
         """
         # 默认录制1小时
         value = json.dumps({"user_id": user_id, "regex": regex}, ensure_ascii=False)
-        RedisHelper.sakura_redis_client.set(RedisHelper.get_key(f"recode:ip:{address}"), value, ex=36000)
+        RedisHelper.sakura_redis_client.set(RedisHelper.get_key(f"record:ip:{address}"), value, ex=3600)
         # 清除上次录制数据
-        RedisHelper.sakura_redis_client.delete(RedisHelper.get_key(f"recode:{address}:requests"))
+        RedisHelper.sakura_redis_client.delete(RedisHelper.get_key(f"record:{address}:requests"))
 
     @staticmethod
     @awaitable
@@ -231,13 +221,13 @@ class RedisHelper(object):
     @awaitable
     def async_delete_prefix(key: str):
         """
-        【异步】根据前缀删除数据
+        根据前缀删除数据
         :param key:
         :return:
         """
         for k in RedisHelper.sakura_redis_client.scan_iter(f"{key}*"):
             RedisHelper.sakura_redis_client.delete(k)
-            logger.bind(name=None).debug(f"delete redis key:{k}")
+            logger.bind(name=None).debug(f"delete redis key: {k}")
 
     @staticmethod
     def delete_prefix(key: str):
@@ -246,12 +236,23 @@ class RedisHelper(object):
         :param key:
         :return:
         """
-        for k in RedisHelper.sakura_redis_client.scan_iter(f"{key}:*"):
+        for k in RedisHelper.sakura_redis_client.scan_iter(f"{key}*"):
             RedisHelper.sakura_redis_client.delete(k)
-            logger.bind(name=None).debug(f"delete redis key:{k}")
+            logger.bind(name=None).debug(f"delete redis key: {k}")
 
     @staticmethod
-    def get_key_with_suffix(cls_name: str, key: str, args: Tuple, key_suffix):
+    def get_key(_redis_key: str, args_key: bool = True, *args, **kwargs):
+        if not args_key:
+            return f"{RedisHelper.sakura_prefix}:{_redis_key}"
+        filter_args = [a for a in args if not str(a).startswith(('<class', '<sqlalchemy', '(<sqlalchemy'))]
+        for v in kwargs.values():
+            if v and not str(v).startswith(('<class', '<sqlalchemy', '(<sqlalchemy')):
+                filter_args.append(str(v))
+        return f"{RedisHelper.sakura_prefix}:{_redis_key}" \
+               f"{':' + ':'.join(str(a) for a in filter_args) if len(filter_args) > 0 else ''}"
+
+    @staticmethod
+    def get_key_with_suffix(cls_name: str, key: str, args: tuple, key_suffix):
         filter_args = [a for a in args if not str(args[0]).startswith('<class')]
         suffix = key_suffix(filter_args)
         return f"{RedisHelper.sakura_prefix}:{cls_name}:{key}:{suffix}"
@@ -259,10 +260,10 @@ class RedisHelper(object):
     @staticmethod
     def cache(key: str, expired_time=30 * 60, args_key=True):
         """
-        自动缓存装置
-        :param key:
-        :param expired_time:
+        自动缓存装饰器
         :param args_key:
+        :param key: 被缓存的key
+        :param expired_time: 默认key过期时间
         :return:
         """
 
@@ -282,8 +283,10 @@ class RedisHelper(object):
                     # 获取最新数据
                     new_data = await func(*args, **kwargs)
                     info = pickle.dumps(new_data)
+                    # logger.bind(name=None).debug(f"set redis key: {redis_key}")
                     RedisHelper.sakura_redis_client.set(redis_key, info.hex(), ex=expired_time)
                     return new_data
+
                 return wrapper
             else:
                 @functools.wraps(func)
@@ -299,10 +302,9 @@ class RedisHelper(object):
                     # 获取最新数据
                     new_data = func(*args, **kwargs)
                     info = pickle.dumps(new_data)
-                    # logger.bind(name=None).debug(f"set redis key:{redis_key}")
-                    # 添加随机数防止雪崩
-                    RedisHelper.sakura_redis_client.set(redis_key, info.hex(),
-                                                        ex=expired_time + Random().randint(10, 59))
+                    # logger.bind(name=None).debug(f"set redis key: {redis_key}")
+                    # 添加随机数防止缓存雪崩
+                    RedisHelper.sakura_redis_client.set(redis_key, info.hex(), ex=expired_time + Random().randint(10, 59))
                     return new_data
 
                 return wrapper
@@ -312,12 +314,11 @@ class RedisHelper(object):
     @staticmethod
     def up_cache(*key: str, key_and_suffix: Tuple = None):
         """
-        redis缓存key,套用了此方法，会自动执行更新数据操作后删除缓存
+        redis缓存key，套了此方法，会自动执行更新数据操作后删除缓存
         :param key:
-        :param key_and_suffix:
+        :param key_and_suffix: 要删除的key和key组成规则
         :return:
         """
-
         def decorator(func):
             if asyncio.iscoroutinefunction(func):
                 @functools.wraps(func)
@@ -335,6 +336,7 @@ class RedisHelper(object):
                         RedisHelper.sakura_redis_client.delete(current_key)
                     # 更新数据，删除缓存
                     return new_data
+
                 return wrapper
             else:
                 @functools.wraps(func)
@@ -351,5 +353,8 @@ class RedisHelper(object):
                                                                       key_and_suffix[1])
                         RedisHelper.sakura_redis_client.delete(current_key)
                     return new_data
+
                 return wrapper
+
         return decorator
+

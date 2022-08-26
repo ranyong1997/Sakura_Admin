@@ -71,5 +71,4 @@ class Log(object):
         """
         file_name, line, func, _, _ = inspect.getframeinfo(inspect.currentframe().f_back)
         logger.bind(name=Config.SAKURA_ERROR, func=func, line=line, business=self.business,
-                    filename=file_name).exception(
-            message)
+                    filename=file_name).exception(message)

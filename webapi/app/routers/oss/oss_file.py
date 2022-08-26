@@ -1,10 +1,3 @@
-'''
-Descripttion: 
-version: 
-Author: 冉勇
-Date: 2022-07-28 11:39:30
-LastEditTime: 2022-08-19 10:26:51
-'''
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2022/7/28 11:39
@@ -43,7 +36,7 @@ async def create_oss_file(filepath: str, file: UploadFile = File(...),
             record.file_size = file_size
             await SakuraOssDao.update_record_by_id(user_info['id'], record)
         else:
-            await SakuraOssDao.insert_record(model, True)
+            await SakuraOssDao.insert(model=model, log=True)
         return SakuraResponse.success()
     except Exception as e:
         return SakuraResponse.failed(f"上传失败:{e}")
@@ -66,7 +59,7 @@ async def upload_avatar(file: UploadFile = File(...), user_info=Depends(Permissi
 @router.get('/list')
 async def list_oss_file(filepath: str = '', _=Depends(Permission(Config.MEMBER))):
     try:
-        records = await SakuraOssDao.list_record(condition=[SakuraOssFile.file_path.like(f"%{filepath}%")])
+        records = await SakuraOssDao.select_list(condition=[SakuraOssFile.file_path.like(f"%{filepath}%")])
         return SakuraResponse.records(records)
     except Exception as e:
         return SakuraResponse.failed(f"获取失败:{e}")
@@ -79,7 +72,7 @@ async def delete_oss_file(filepath: str, user_info=Depends(Permission(Config.MEM
         record = await SakuraOssDao.query_record(filepath=filepath, deleted_at=0)
         if record is None:
             raise Exception("文件不存在或已被删除")
-        await SakuraOssDao.delete_by_id(session, user_info['id'], record, log=True)
+        await SakuraOssDao.delete_record_by_id(session, user_info["id"], record.id, log=True)
         client = OssClient.get_oss_client()
         await client.delete_file(filepath)
         return SakuraResponse.success()

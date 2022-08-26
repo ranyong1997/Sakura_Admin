@@ -53,7 +53,7 @@ from webapi.app.utils.logger import Log
 from webapi.config import Config
 
 
-class Executor(object, Exception):
+class Executor(object):
     log = Log("Executor")
     el_exp = r"\$\{(.+?)\}"
     pattern = re.compile(el_exp)

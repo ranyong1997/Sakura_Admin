@@ -44,7 +44,7 @@ async def http_request(cert: CertType):
         suffix = cert.get_suffix()
         client = AsyncRequest(CERT_URL + suffix)
         content = await client.download()
-        shuffle = list(range(9))
+        shuffle = list(range(0, 9))
         random.shuffle(shuffle)
         filename = f"{''.join(map(lambda x: str(x), shuffle))}mitmproxy.{suffix}"
         with open(filename, 'wb') as f:
@@ -68,7 +68,7 @@ async def execute_case(env: int, case_id: int, _=Depends(Permission)):
                 params = json.loads(data.json_data)
                 result, _ = await executor.run(env, case_id, request_params=params)
                 ans[data.name] = result
-            return SakuraResponse.success(ans)
+        return SakuraResponse.success(ans)
     except JSONDecodeError:
         return SakuraResponse.failed("测试数据不为合法的JSON")
     except Exception as e:

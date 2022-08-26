@@ -17,7 +17,7 @@ class ConstructorForm(BaseModel):
     type: int
     name: str
     index: int = 0
-    constructor_json : str
+    constructor_json: str
     enable: bool
     case_id: int = None
     public: bool

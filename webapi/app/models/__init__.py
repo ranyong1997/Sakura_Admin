@@ -53,7 +53,7 @@ class DatabaseHelper(object):
         # 获取sqlalchemy需要jdbc url
         jdbc_url = DatabaseHelper.get_jdbc_url(sql_type, host, port, username, password, database)
         # 创建异步引擎
-        eg = create_engine(jdbc_url, pool_recycle=1500)
+        eg = create_async_engine(jdbc_url, pool_recycle=1500)
         ss = sessionmaker(bind=eg, class_=AsyncSession)
         # 将数据缓存起来
         data = dict(engine=eg, session=ss)

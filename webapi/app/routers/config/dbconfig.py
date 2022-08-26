@@ -12,7 +12,7 @@ from webapi.app.handler.fatcory import SakuraResponse
 from webapi.app.models import DatabaseHelper, db_helper
 from webapi.app.routers import Permission
 from webapi.app.routers.config.environment import router
-from webapi.app.schema.database import DataBaseForm
+from webapi.app.schema.database import DatabaseForm
 from webapi.config import Config
 
 
@@ -27,7 +27,7 @@ async def list_dbconfig(name: str = "", database: str = "", env: int = None,
 
 
 @router.post("/dbconfig/insert")
-async def insert_dbconfig(form: DataBaseForm, user_info=Depends(Permission(Config.ADMIN))):
+async def insert_dbconfig(form: DatabaseForm, user_info=Depends(Permission(Config.ADMIN))):
     try:
         await DbConfigDao.insert_database(form, user_info['id'])
         return SakuraResponse.success()
@@ -36,7 +36,7 @@ async def insert_dbconfig(form: DataBaseForm, user_info=Depends(Permission(Confi
 
 
 @router.post("/dbconfig/update")
-async def insert_dbconfig(form: DataBaseForm, user_info=Depends(Permission(Config.ADMIN))):
+async def insert_dbconfig(form: DatabaseForm, user_info=Depends(Permission(Config.ADMIN))):
     try:
         await DbConfigDao.insert_database(form, user_info['id'])
         return SakuraResponse.success()

@@ -6,8 +6,6 @@
 # @File    : request.py
 # @Software: PyCharm
 # @desc    : 发送请求
-__author__ = "woody"
-
 import json
 from typing import TypeVar
 import pydantic

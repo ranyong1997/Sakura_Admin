@@ -25,6 +25,6 @@ class SakuraTestPlanForm(BaseModel):
     msg_type: List[int] = []
     retry_minutes: int = 0
 
-    @validator("cast_list", "project_id", "env", "cron", "ordered", "priority", "name", "pass_rate")
+    @validator("case_list", "project_id", "env", "cron", "ordered", "priority", "name", "pass_rate")
     def name_not_empty(cls, v):
         return SakuraModel.not_empty(v)

@@ -77,25 +77,25 @@ class CaseGenerator(object):
                             case_type=0, status=CaseStatus.debugging.value, priority="P3")
 
     @staticmethod
-    def extract_field(request: List[RequestInfo]) -> list[str]:
+    def extract_field(requests: List[RequestInfo]) -> List[str]:
         """
         遍历接口,并提取其中的变量
         :param request:
         :return:
         """
         var_pool = defaultdict(list)
-        replace = []
-        for i in range(len(request)):
+        replaced = []
+        for i in range(len(requests)):
             # 删除headers里面的Content-Length字段
-            if "Content-Length" in request[i].request_headers:
-                request[i].request_headers.pop("Content-Length")
-            if "Content-Length" in request[i].request_headers:
-                request[i].response_headers.pop("Content-Length")
+            if "Content-Length" in requests[i].request_headers:
+                requests[i].request_headers.pop("Content-Length")
+            if "Content-Length" in requests[i].response_headers:
+                requests[i].response_headers.pop("Content-Length")
             # 记录变量
-            CaseGenerator.record_vars(request[i], var_pool, f"http_res_{i + 1}")
+            CaseGenerator.record_vars(requests[i], var_pool, f"http_res_{i + 1}")
             if i > 0:
-                CaseGenerator.replace_vars(request[i], var_pool, replace)
-        return replace
+                CaseGenerator.replace_vars(requests[i], var_pool, replaced)
+        return replaced
 
     @staticmethod
     def replace_vars(request: RequestInfo, ans: dict, replaced: list):
