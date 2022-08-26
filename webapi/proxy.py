@@ -10,7 +10,6 @@ import asyncio
 import uvicorn
 from fastapi import FastAPI
 from loguru import logger
-
 from webapi.config import Config
 from webapi.sakura_proxy import start_proxy
 

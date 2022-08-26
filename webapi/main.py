@@ -7,6 +7,7 @@
 # @Software: PyCharm
 # @desc    : 主入口
 import asyncio
+import contextlib
 from mimetypes import guess_type
 from os.path import isfile
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
@@ -45,15 +46,12 @@ async def request_info(request: Request):
     try:
         body = await request.json()
         logger.bind(payload=body, name=None).debug("request_json:")
-    except:
-        try:
+    except Exception:
+        with contextlib.suppress(Exception):
             body = await request.body()
             if len(body) != 0:
                 # 有请求体,记录日志
                 logger.bind(payload=body, name=None).debug(body)
-        except:
-            # 忽略文件上传类型的数据
-            pass
 
 
 # 注册路由
@@ -78,21 +76,18 @@ async def serve_spa(request: Request):
 
 @sakura.get("/{filename}")
 async def get_site(filename):
-    filename = "./statics/" + filename
-
+    filename = f"./statics/{filename}"
     if not isfile(filename):
         return Response(status_code=404)
-
     with open(filename, mode='rb') as f:
         content = f.read()
-
     content_type = guess_type(filename)
     return Response(content, media_type=content_type)
 
 
 @sakura.get("/static/{filename}")
 async def get_site_static(filename):
-    filename = "./statics/static/" + filename
+    filename = f"./statics/static/{filename}"
     if not isfile(filename):
         return Response(status_code=404)
     with open(filename, mode='rb') as f:
