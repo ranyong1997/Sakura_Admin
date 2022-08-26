@@ -24,7 +24,7 @@ router = APIRouter(prefix="/auth")
 
 
 # router注册的函数都会自带 /auth,所以url是/auth/register
-@router.post("/register")
+@router.post("/register", summary="注册", tags=['User'])
 async def register(user: UserDto):
     try:
         await UserDao.register_user(**user.dict())
@@ -33,7 +33,7 @@ async def register(user: UserDto):
         return SakuraResponse.failed(e)
 
 
-@router.post("/login")
+@router.post("/login", summary="登录", tags=['User'])
 async def login(data: UserForm):
     try:
         user = await UserDao.login(data.username, data.password)
@@ -44,7 +44,7 @@ async def login(data: UserForm):
         return SakuraResponse.failed(e)
 
 
-@router.get("/listUser")
+@router.get("/listUser", summary="列出用户", tags=['User'])
 async def list_users(user_info=Depends(Permission())):
     try:
         user = await UserDao.list_users()
@@ -53,7 +53,7 @@ async def list_users(user_info=Depends(Permission())):
         return SakuraResponse.failed(str(e))
 
 
-@router.get("/github/login")
+@router.get("/github/login", summary="github 第三方登录", tags=['User'])
 async def login_with_github(code: str):
     try:
         code = code.rstrip("#/")
@@ -73,7 +73,7 @@ async def login_with_github(code: str):
         return SakuraResponse.failed(code=110, msg="登录超时,请稍后再试")
 
 
-@router.post("/update")
+@router.post("/update", summary="更新密码,手机,邮箱", tags=['User'])
 async def update_user_info(user_info: UserUpdateForm, user=Depends(Permission(Config.MEMBER))):
     try:
         if user['role'] != Config.ADMIN:
@@ -89,7 +89,7 @@ async def update_user_info(user_info: UserUpdateForm, user=Depends(Permission(Co
         return SakuraResponse.failed(e)
 
 
-@router.get("/query")
+@router.get("/query", summary="查询账号", tags=['User'])
 async def query_user_info(token: str):
     try:
         if not token:
@@ -103,7 +103,7 @@ async def query_user_info(token: str):
         return SakuraResponse.failed(e)
 
 
-@router.delete("/delete")
+@router.delete("/delete", summary="删除账号", tags=['User'])
 async def delete_user(id: int, user=Depends(Permission(Config.ADMIN))):
     try:
         user = await UserDao.delete_user(id, user['id'])
@@ -112,14 +112,14 @@ async def delete_user(id: int, user=Depends(Permission(Config.ADMIN))):
         return SakuraResponse.failed(e)
 
 
-@router.post("/reset", summary="重置用户密码")
+@router.post("/reset", summary="重置用户密码", tags=['User'])
 async def reset_user(form: ResetPwdForm):
     email = Des.des_decrypt(form.token)
     await UserDao.reset_password(email, form.password)
     return SakuraResponse.success()
 
 
-@router.get("/reset/generate/{email}", summary="生成重置密码链接")
+@router.get("/reset/generate/{email}", summary="生成重置密码链接", tags=['User'])
 async def generate_reset_url(email: str):
     try:
         user = await UserDao.query_user_by_email(email)
@@ -134,7 +134,7 @@ async def generate_reset_url(email: str):
         return SakuraResponse.failed(str(e))
 
 
-@router.get("/reset/check/{token}", summary="检测生成的链接是否正确")
+@router.get("/reset/check/{token}", summary="检测生成的链接是否正确", tags=['User'])
 async def check_reset_url(token: str):
     try:
         email = Des.des_decrypt(token)

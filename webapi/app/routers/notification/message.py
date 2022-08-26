@@ -20,7 +20,7 @@ from webapi.app.routers import Permission, get_session
 router = APIRouter(prefix="/notification")
 
 
-@router.get("/list", description="获取用户消息列表")
+@router.get("/list", summary="获取用户消息列表", tags=['Notification'])
 async def list_msg(msg_status: int, msg_type: int, user_info=Depends(Permission())):
     try:
         data = await SakuraNotificationDao.list_message(msg_type=msg_type, msg_status=msg_status,
@@ -30,7 +30,7 @@ async def list_msg(msg_status: int, msg_type: int, user_info=Depends(Permission(
         return SakuraResponse.failed(str(e))
 
 
-@router.post('/read', description="用户读取消息")
+@router.post('/read', summary="用户读取消息", tags=['Notification'])
 async def read_msg(form: NotificationForm, user_info=Depends(Permission())):
     try:
         if form.personal:
@@ -48,7 +48,7 @@ async def read_msg(form: NotificationForm, user_info=Depends(Permission())):
         return SakuraResponse.failed(str(e))
 
 
-@router.post("/delete", description="用户删除信息")
+@router.delete("/delete", summary="用户删除信息", tags=['Notification'])
 async def read_msg(msg_id: List[int], user_info=Depends(Permission()), session=Depends(get_session)):
     try:
         await SakuraNotificationDao.delete_message(session, msg_id, user_info['id'])

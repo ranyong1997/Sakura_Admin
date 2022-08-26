@@ -69,12 +69,12 @@ sakura.mount("/statics", StaticFiles(directory="statics"), name="statics")
 templates = Jinja2Templates(directory="statics")
 
 
-@sakura.get("/")
+@sakura.get("/", tags=['Other'])
 async def serve_spa(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@sakura.get("/{filename}")
+@sakura.get("/{filename}", tags=['Other'])
 async def get_site(filename):
     filename = f"./statics/{filename}"
     if not isfile(filename):
@@ -85,7 +85,7 @@ async def get_site(filename):
     return Response(content, media_type=content_type)
 
 
-@sakura.get("/static/{filename}")
+@sakura.get("/static/{filename}", tags=['Other'])
 async def get_site_static(filename):
     filename = f"./statics/static/{filename}"
     if not isfile(filename):

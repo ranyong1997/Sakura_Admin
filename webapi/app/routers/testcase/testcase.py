@@ -37,13 +37,13 @@ router = APIRouter(prefix="/testcase")
 Author = TypeVar("Author", int, str)
 
 
-@router.get("/list")
+@router.get("/list", summary="列出测试用例", tags=['Testcase'])
 async def insert_testcase(directory_id: int = None, name: str = "", create_user: str = ''):
     data = await TestCaseDao.list_test_case(directory_id, name, create_user)
     return SakuraResponse.success(data)
 
 
-@router.post("/insert")
+@router.post("/insert", summary="插入测试用例", tags=['Testcase'])
 async def insert_testcase(data: TestCaseForm, user_info=Depends(Permission())):
     try:
         record = await TestCaseDao.query_record(name=data.name, directory_id=data.directory_id)
@@ -57,14 +57,14 @@ async def insert_testcase(data: TestCaseForm, user_info=Depends(Permission())):
 
 
 # V2版本船舰用例接口
-@router.post("/create", summary="创建接口测试用例")
+@router.post("/create", summary="创建接口测试用例", tags=['Testcase'])
 async def create_testcase(data: TestCaseInfo, user_info=Depends(Permission()), session=Depends(get_session)):
     async with session.begin():
         await TestCaseDao.insert_test_case(session, data, user_info['id'])
     return SakuraResponse.success()
 
 
-@router.post("/update")
+@router.post("/update", summary="创建接口测试用例", tags=['Testcase'])
 async def update_testcase(form: TestCaseForm, user_info=Depends(Permission())):
     try:
         data = await TestCaseDao.update_test_case(form, user_info['id'])
@@ -74,7 +74,7 @@ async def update_testcase(form: TestCaseForm, user_info=Depends(Permission())):
         return SakuraResponse.failed(e)
 
 
-@router.delete("/delete", description="删除测试用例")
+@router.delete("/delete", summary="删除测试用例", tags=['Testcase'])
 async def delete_testcase(id_list: List[int], user_info=Depends(Permission()), session=Depends(get_session)):
     try:
         # 删除case
@@ -89,7 +89,7 @@ async def delete_testcase(id_list: List[int], user_info=Depends(Permission()), s
         return SakuraResponse.failed(str(e))
 
 
-@router.get("/query")
+@router.get("/query", summary="查询测试用例", tags=['Testcase'])
 async def query_testcase(caseId: int, _=Depends(Permission())):
     try:
         data = await TestCaseDao.query_test_case(caseId)
@@ -98,7 +98,7 @@ async def query_testcase(caseId: int, _=Depends(Permission())):
         return SakuraResponse.failed(str(e))
 
 
-@router.post("/asserts/insert")
+@router.post("/asserts/insert", summary="新增断言", tags=['Asserts'])
 async def insert_testcase_asserts(data: TestCaseAssertsForm, user_info=Depends(Permission())):
     try:
         new_assert = await TestCaseAssertsDao.insert_test_case_asserts(data, user_id=user_info['id'])
@@ -107,7 +107,7 @@ async def insert_testcase_asserts(data: TestCaseAssertsForm, user_info=Depends(P
         return SakuraResponse.failed(str(e))
 
 
-@router.post("/asserts/update")
+@router.post("/asserts/update", summary="更新断言", tags=['Asserts'])
 async def insert_testcase_asserts(data: TestCaseAssertsForm, user_info=Depends(Permission())):
     try:
         update = await TestCaseAssertsDao.update_test_case_asserts(data, user_id=user_info['id'])
@@ -116,65 +116,59 @@ async def insert_testcase_asserts(data: TestCaseAssertsForm, user_info=Depends(P
         return SakuraResponse.failed(str(e))
 
 
-@router.get("/asserts/delete")
-async def insert_testcase_asserts(id: int, user_info=Depends(Permission())):
+@router.delete("/asserts/delete", summary="删除断言", tags=['Asserts'])
+async def delete_testcase_asserts(id: int, user_info=Depends(Permission())):
     await TestCaseAssertsDao.delete_test_case_asserts(id, user_id=user_info["id"])
     return SakuraResponse.success()
 
 
-@router.post("/constructor/insert")
-async def insert_constructor(data: ConstructorForm, user_info=Depends(Permission())):
-    await ConstructorDao.insert_constructor(data, user_id=user_info["id"])
-    return SakuraResponse.success()
-
-
-@router.post("/constructor/update")
-async def update_constructor(data: ConstructorForm, user_info=Depends(Permission())):
-    await ConstructorDao.update_constructor(data, user_id=user_info["id"])
-    return SakuraResponse.success()
-
-
-@router.get("/constructor/delete")
-async def update_constructor(id: int, user_info=Depends(Permission())):
-    await ConstructorDao.delete_constructor(id, user_id=user_info["id"])
-    return SakuraResponse.success()
-
-
-@router.post("/constructor/order")
-async def update_constructor(data: List[ConstructorIndex], user_info=Depends(Permission())):
-    await ConstructorDao.update_constructor_index(data)
-    return SakuraResponse.success()
-
-
-@router.get("/constructor/tree")
-async def get_constructor_tree(suffix: bool, name: str = "", user_info=Depends(Permission())):
-    result = await ConstructorDao.get_constructor_tree(name, suffix)
-    return SakuraResponse.success(result)
-
-
 # 获取数据构造器树
-@router.get("/constructor")
+@router.get("/constructor", summary="数据构造树", tags=['Testcase'])
 async def get_constructor_tree(id: int, user_info=Depends(Permission())):
     result = await ConstructorDao.get_constructor_data(id)
     return SakuraResponse.success(result)
 
 
 # 获取所有数据构造器
-@router.get("/constructor/list")
+@router.get("/constructor/list", summary="获取数据构造树", tags=['Testcase'])
 async def list_case_and_constructor(constructor_type: int, suffix: bool):
     ans = await ConstructorDao.get_case_and_constructor(constructor_type, suffix)
     return SakuraResponse.success(ans)
 
 
+@router.post("/constructor/insert", summary="新增数据构造树", tags=['Constructor'])
+async def insert_constructor(data: ConstructorForm, user_info=Depends(Permission())):
+    await ConstructorDao.insert_constructor(data, user_id=user_info["id"])
+    return SakuraResponse.success()
+
+
+@router.post("/constructor/update", summary="更新数据构造树", tags=['Constructor'])
+async def update_constructor(data: ConstructorForm, user_info=Depends(Permission())):
+    await ConstructorDao.update_constructor(data, user_id=user_info["id"])
+    return SakuraResponse.success()
+
+
+@router.delete("/constructor/delete", summary="删除数据构造树", tags=['Constructor'])
+async def update_constructor(id: int, user_info=Depends(Permission())):
+    await ConstructorDao.delete_constructor(id, user_id=user_info["id"])
+    return SakuraResponse.success()
+
+
+@router.post("/constructor/order", summary="更新数据构造树", tags=['Constructor'])
+async def update_constructor(data: List[ConstructorIndex], user_info=Depends(Permission())):
+    await ConstructorDao.update_constructor_index(data)
+    return SakuraResponse.success()
+
+
 # 根据id查询具体报告内容
-@router.get("/report")
+@router.get("/report", summary="测试报告", tags=['Report'])
 async def query_report(id: int, user_info=Depends(Permission())):
     report, case_list, plan_name = await TestCaseDao.query(id)
     return SakuraResponse.success(dict(report=report, plan_name=plan_name, case_list=case_list))
 
 
 # 获取构建历史列表
-@router.get("/report/list")
+@router.get("/report/list", summary="列出测试报告", tags=['Report'])
 async def list_report(page: int, size: int, start_time: str, end_time: str, executor: Author = None,
                       _=Depends(Permission())):
     start = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
@@ -184,14 +178,14 @@ async def list_report(page: int, size: int, start_time: str, end_time: str, exec
 
 
 # 获取脑图数据
-@router.get("/xmind")
+@router.get("/xmind", summary="获取脑图数据", tags=['Xmind'])
 async def get_xmind_data(case_id: int, user_info=Depends(Permission())):
     tree_data = await TestCaseDao.get_xmind_data(case_id)
     return SakuraResponse.success(tree_data)
 
 
 # 获取case目录
-@router.get("/directory")
+@router.get("/directory", summary="获取用例目录", tags=['Testcase-目录'])
 async def get_testcase_directory(project_id: int, move: bool = False, user_info=Depends(Permission())):
     # 如果是move,则不需要禁用树
     tree_data, _ = await SakuraTestcaseDirectoryDao.get_directory_tree(project_id, move=move)
@@ -199,7 +193,7 @@ async def get_testcase_directory(project_id: int, move: bool = False, user_info=
 
 
 # 获取case目录+case
-@router.get("/tree")
+@router.get("/tree", summary="获取用例目录+用例", tags=['Testcase-目录'])
 async def get_directory_and_case(project_id: int, user_info=Depends(Permission())):
     try:
         tree_data, cs_map = await SakuraTestcaseDirectoryDao.get_directory_tree(project_id,
@@ -209,7 +203,7 @@ async def get_directory_and_case(project_id: int, user_info=Depends(Permission()
         return SakuraResponse.failed(str(e))
 
 
-@router.get("/directory/query")
+@router.get("/directory/query", summary="获取测试用例目录", tags=['Testcase-目录'])
 async def query_testcase_directory(directory_id: int, user_info=Depends(Permission())):
     try:
         data = await SakuraTestcaseDirectoryDao.query_directory(directory_id)
@@ -221,7 +215,7 @@ async def query_testcase_directory(directory_id: int, user_info=Depends(Permissi
         return SakuraResponse.failed(str(e))
 
 
-@router.post("/directory/insert")
+@router.post("/directory/insert", summary="新增测试用例目录", tags=['Testcase-目录'])
 async def insert_testcase_directory(form: SakuraTestcaseDirectoryForm, user_info=Depends(Permission())):
     try:
         await SakuraTestcaseDirectoryDao.insert_directory(form, user_info['id'])
@@ -230,7 +224,7 @@ async def insert_testcase_directory(form: SakuraTestcaseDirectoryForm, user_info
         return SakuraResponse.failed(e)
 
 
-@router.post("/directory/update")
+@router.post("/directory/update", summary="更新测试用例目录", tags=['Testcase-目录'])
 async def insert_testcase_directory(form: SakuraTestcaseDirectoryForm, user_info=Depends(Permission())):
     try:
         await SakuraTestcaseDirectoryDao.update_directory(form, user_info["id"])
@@ -239,7 +233,7 @@ async def insert_testcase_directory(form: SakuraTestcaseDirectoryForm, user_info
         return SakuraResponse.failed(str(e))
 
 
-@router.get("/directory/delete")
+@router.delete("/directory/delete", summary="删除测试用例目录", tags=['Testcase-目录'])
 async def insert_testcase_directory(id: int, user_info=Depends(Permission())):
     try:
         await SakuraTestcaseDirectoryDao.delete_directory(id, user_info['id'])
@@ -248,7 +242,7 @@ async def insert_testcase_directory(id: int, user_info=Depends(Permission())):
         return SakuraResponse.failed(str(e))
 
 
-@router.post("/data/insert")
+@router.post("/data/insert", summary="新增测试用例数据", tags=['Testcase-数据'])
 async def insert_testcase_data(form: SakuraTestcaseDataForm, user_info=Depends(Permission())):
     try:
         data = await SakuraTestCaseDataDao.insert_testcase_data(form, user_info['id'])
@@ -257,7 +251,7 @@ async def insert_testcase_data(form: SakuraTestcaseDataForm, user_info=Depends(P
         return SakuraResponse.failed(str(e))
 
 
-@router.post("/data/update")
+@router.post("/data/update", summary="更新测试用例数据", tags=['Testcase-数据'])
 async def update_testcase_data(form: SakuraTestcaseDataForm, user_info=Depends(Permission())):
     try:
         data = await SakuraTestCaseDataDao.update_testcase_data(form, user_info['id'])
@@ -266,7 +260,7 @@ async def update_testcase_data(form: SakuraTestcaseDataForm, user_info=Depends(P
         return SakuraResponse.failed(str(e))
 
 
-@router.get("/data/delete")
+@router.delete("/data/delete", summary="删除测试用例数据", tags=['Testcase-数据'])
 async def delete_testcase_data(id: int, user_info=Depends(Permission())):
     try:
         await SakuraTestCaseDataDao.delete_testcase_data(id, user_info['id'])
@@ -275,7 +269,7 @@ async def delete_testcase_data(id: int, user_info=Depends(Permission())):
         return SakuraResponse.failed(str(e))
 
 
-@router.post("/move", description="移动case到其他目录")
+@router.post("/move", summary="移动case到其他目录", tags=['Testcase'])
 async def move_testcase(form: SakuraTestCaseDto, user_info=Depends(Permission())):
     try:
         # 判断是否有移动case的权限
@@ -288,7 +282,7 @@ async def move_testcase(form: SakuraTestCaseDto, user_info=Depends(Permission())
         return SakuraResponse.failed(str(e))
 
 
-@router.post("/parameters/insert", summary="参数新增")
+@router.post("/parameters/insert", summary="参数新增", tags=['Parameters'])
 async def insert_testcase_out_parameters(form: SakuraTestCaseOutParametersForm, user_info=Depends(Permission())):
     query = await SakuraTestCaseOutParametersDao.query_record(name=form.name, case_id=form.case_id)
     if query is not None:
@@ -298,38 +292,38 @@ async def insert_testcase_out_parameters(form: SakuraTestCaseOutParametersForm, 
     return SakuraResponse.success(data)
 
 
-@router.post("/parameters/update/batch", summary="批量更新出数据")
+@router.post("/parameters/update/batch", summary="批量更新出数据", tags=['Parameters'])
 async def update_batch_testcast_out_parameters(case_id: int, form: List[SakuraTestCaseOutParametersForm],
                                                user_info=Depends(Permission())):
     result = await SakuraTestCaseOutParametersDao.update_many(case_id, form, user_info["id"])
     return SakuraResponse.success(result)
 
 
-@router.post("/parameters/update", summary="参数更新")
+@router.post("/parameters/update", summary="参数更新", tags=['Parameters'])
 async def update_testcase_out_parameters(form: SakuraTestCaseOutParametersForm, user_info=Depends(Permission())):
     data = await SakuraTestCaseOutParametersDao.update_record_by_id(user_info["id"], form)
     return SakuraResponse.success(data)
 
 
-@router.get("/parameters/delete", summary="参数删除")
+@router.get("/parameters/delete", summary="参数删除", tags=['Parameters'])
 async def delete_testcase_out_parameters(id: int, user_info=Depends(Permission()), session=Depends(get_session)):
     await SakuraTestCaseOutParametersDao.delete_record_by_id(session, id, user_info['id'], log=False)
     return SakuraResponse.success()
 
 
-@router.get("/record/start", summary="开始录制接口请求")
+@router.get("/record/start", summary="开始录制接口请求", tags=['录制接口'])
 async def record_request(request: Request, regex: str, user_info=Depends(Permission())):
     await RedisHelper.set_address_record(user_info["id"], request.client.host, regex)
     return SakuraResponse.success(msg="开始录制,可以在浏览器/app上操作了")
 
 
-@router.get("/record/stop", summary="停止录制接口请求")
+@router.get("/record/stop", summary="停止录制接口请求", tags=['录制接口'])
 async def record_requests(request: Request, _=Depends(Permission())):
     await RedisHelper.remove_address_record(request.client.host)
     return SakuraResponse.success(msg="停止成功,快去生成用例吧~")
 
 
-@router.get("record/status", summary="获取录制接口请求状态")
+@router.get("record/status", summary="获取录制接口请求状态", tags=['录制接口'])
 async def record_requests(request: Request, _=Depends(Permission())):
     record = await RedisHelper.get_address_record(request.client.host)
     status = False
@@ -342,13 +336,13 @@ async def record_requests(request: Request, _=Depends(Permission())):
     return SakuraResponse.success(dict(data=data, regex=regex, status=status))
 
 
-@router.get("/record/remove", summary="删除录制接口")
+@router.get("/record/remove", summary="删除录制接口", tags=['录制接口'])
 async def remove_record(index: int, request: Request, _=Depends(Permission())):
     await RedisHelper.remove_record_data(request.client.host, index)
     return SakuraResponse.success()
 
 
-@router.post("/generate", summary="生成用例")
+@router.post("/generate", summary="生成用例", tags=['录制接口'])
 async def generate_case(form: TestCaseGeneratorForm, user=Depends(Permission()), session=Depends(get_session)):
     if len(form.requests) == 0:
         return SakuraResponse.failed("无http请求,请检查参数")
@@ -361,7 +355,7 @@ async def generate_case(form: TestCaseGeneratorForm, user=Depends(Permission()),
         return SakuraResponse.success(ans)
 
 
-@router.post("/import", summary="导入har或其他用例数据文件")
+@router.post("/import", summary="导入har或其他用例数据文件", tags=['录制接口'])
 async def convert_case(import_type: CaseConvertorType, file: UploadFile = File(...), _=Depends(Permission())):
     convert, file_ext = get_convertor(import_type)
     if convert is None:

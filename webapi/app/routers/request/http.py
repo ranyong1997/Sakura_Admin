@@ -26,7 +26,7 @@ router = APIRouter(prefix="/request")
 CERT_URL = "http://mitm.it/cert"
 
 
-@router.post("/http")
+@router.post("/http", summary="发起请求", tags=['Http'])
 async def http_request(data: HttpRequestForm, _=Depends(Permission())):
     try:
         r = await AsyncRequest.client(data.url, data.body_type, headers=data.headers, body=data.body)
@@ -38,7 +38,7 @@ async def http_request(data: HttpRequestForm, _=Depends(Permission())):
         return SakuraResponse.failed(e)
 
 
-@router.get("/cert")
+@router.get("/cert", summary="证书", tags=['Http'])
 async def http_request(cert: CertType):
     try:
         suffix = cert.get_suffix()
@@ -54,7 +54,7 @@ async def http_request(cert: CertType):
         return SakuraResponse.failed(e)
 
 
-@router.get("/run")
+@router.get("/run", summary="发起请求", tags=['Http'])
 async def execute_case(env: int, case_id: int, _=Depends(Permission)):
     try:
         executor = Executor()
@@ -75,7 +75,7 @@ async def execute_case(env: int, case_id: int, _=Depends(Permission)):
         return SakuraResponse.failed(e)
 
 
-@router.get("/retry", summary="根据测试数据重新运行测试用例")
+@router.get("/retry", summary="根据测试数据重新运行测试用例", tags=['Http'])
 async def re_run_case(env: int, case_id: int, data_id: int = 0, _=Depends(Permission())):
     try:
         executor = Executor()
@@ -89,14 +89,14 @@ async def re_run_case(env: int, case_id: int, data_id: int = 0, _=Depends(Permis
         return SakuraResponse.failed("测试数据不为合法的JSON")
 
 
-@router.post("/run/async")
+@router.post("/run/async", summary="异步发起请求", tags=['Http'])
 async def execute_case(env: int, case_id: List[int]):
     data = {}
     await asyncio.gather(*(run_single(env, c, data) for c in case_id))
     return SakuraResponse.success()
 
 
-@router.post("/run/sync")
+@router.post("/run/sync", summary="同步发起请求", tags=['Http'])
 async def execute_case(env: int, case_id: List[int]):
     data = {}
     task_id = uuid.uuid5(uuid.NAMESPACE_URL, "task")
@@ -106,7 +106,7 @@ async def execute_case(env: int, case_id: List[int]):
     return SakuraResponse.success(data)
 
 
-@router.post("/run/multiple")
+@router.post("/run/multiple", summary="同、异发起请求", tags=['Http'])
 async def execute_as_report(env: int, case_id: List[int], user_info=Depends(Permission())):
     report_id = await Executor.run_multiple(user_info['id'], env, case_id)
     return SakuraResponse.success(report_id)

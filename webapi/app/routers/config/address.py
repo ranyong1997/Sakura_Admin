@@ -16,26 +16,26 @@ from webapi.app.schema.address import SakuraAddressForm
 from webapi.config import Config
 
 
-@router.get("/gateway/list", summary="查询网关地址")
+@router.get("/gateway/list", summary="列出网关地址", tags=['Gateway'])
 async def list_gateway(name: str = '', gateway: str = '', env: int = None, _=Depends(Permission(Config.MEMBER))):
     data = await SakuraGatewayDao.select_list(env=env, gateway=f"%{gateway}%", name=f"%{name}%")
     return SakuraResponse.success(data)
 
 
-@router.post("/gateway/insert", summary="添加网关地址", description="添加网关地址,只有组长可以操作")
+@router.post("/gateway/insert", summary="添加网关地址", description="添加网关地址,只有组长可以操作", tags=['Gateway'])
 async def insert_gateway(form: SakuraAddressForm, user_info=Depends(Permission(Config.MEMBER))):
     model = SakuraGateway(**form.dict(), user_id=user_info['id'])
     model = await SakuraGatewayDao.insert(model=model, log=True)
     return SakuraResponse.success(model)
 
 
-@router.post("/gateway/update", summary="编辑网关地址", description="编辑网关地址，只有组长可以操作")
+@router.post("/gateway/update", summary="编辑网关地址", description="编辑网关地址，只有组长可以操作", tags=['Gateway'])
 async def insert_gateway(form: SakuraAddressForm, user_info=Depends(Permission(Config.MANAGER))):
     model = await SakuraGatewayDao.update_record_by_id(user_info['id'], form, True, log=True)
     return SakuraResponse.success(model)
 
 
-@router.get("/gateway/delete", summary="删除网关地址", description="根据id删除网关地址，只有组长可以操作")
+@router.get("/gateway/delete", summary="删除网关地址", description="根据id删除网关地址，只有组长可以操作", tags=['Gateway'])
 async def delete_gateway(id: int, user_info=Depends(Permission(Config.MANAGER)), session=Depends(get_session)):
     await SakuraGatewayDao.delete_record_by_id(session, user_info['id'], id)
     return SakuraResponse.success()

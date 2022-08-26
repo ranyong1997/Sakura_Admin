@@ -22,7 +22,7 @@ from webapi.config import Config
 router = APIRouter(prefix="/project")
 
 
-@router.get("/list")
+@router.get("/list", summary="列出项目", tags=['Project'])
 async def list_project(page: int = 1, size: int = 8, name: str = "", user_info=Depends(Permission())):
     """
     获取项目列表
@@ -37,13 +37,13 @@ async def list_project(page: int = 1, size: int = 8, name: str = "", user_info=D
     return SakuraResponse.success_with_size(data=result, total=total)
 
 
-@router.post("/insert")
+@router.post("/insert", summary="新增项目", tags=['Project'])
 async def insert_project(data: ProjectForm, user_info=Depends(Permission(Config.MANAGER))):
     await ProjectDao.add_project(user_id=user_info["id"], **data.dict())
     return SakuraResponse.success()
 
 
-@router.post("/avatar/{project_id}", summary="上传项目头像")
+@router.post("/avatar/{project_id}", summary="上传项目头像", tags=['Project'])
 async def update_project_avatar(project_id: int, file: UploadFile = File(...), user_info=Depends(Permission())):
     try:
         file_content = await file.read()
@@ -57,14 +57,14 @@ async def update_project_avatar(project_id: int, file: UploadFile = File(...), u
         return SakuraResponse.failed(e)
 
 
-@router.post("/update")
+@router.post("/update", summary="更新项目", tags=['Project'])
 async def update_project(data: ProjectEditForm, user_info=Depends(Permission())):
     user_id, role = user_info["id"], user_info["role"]
     await ProjectDao.update_project(user_id=user_id, role=role, **data.dict())
     return SakuraResponse.success()
 
 
-@router.get("/query")
+@router.get("/query", summary="查询项目", tags=['Project'])
 async def query_project(projectId: int, user_info=Depends(Permission())):
     try:
         result = dict()
@@ -78,7 +78,7 @@ async def query_project(projectId: int, user_info=Depends(Permission())):
         return SakuraResponse.failed(e)
 
 
-@router.delete("/delete", description="删除项目")
+@router.delete("/delete", description="删除项目", summary="删除项目", tags=['Project'])
 async def query_project(projectId: int, user_info=Depends(Permission(Config.MEMBER)), session=Depends(get_session)):
     try:
         async with session.begin():
@@ -89,13 +89,13 @@ async def query_project(projectId: int, user_info=Depends(Permission(Config.MEMB
             await ProjectDao.delete_record_by_id(session, user_info['id'], projectId, session_begin=True)
             # 有可能项目没有测试计划 2022-03-14 fixed bug
             await SakuraTestPlanDao.delete_record_by_id(session, user_info['id'], projectId, key="project_id",
-                                                      exists=False, session_begin=True)
+                                                        exists=False, session_begin=True)
         return SakuraResponse.success()
     except Exception as e:
         return SakuraResponse.failed(e)
 
 
-@router.post("/role/insert")
+@router.post("/role/insert", summary="新增角色", tags=['Role'])
 async def insert_project_role(role: ProjectRoleForm, user_info=Depends(Permission())):
     try:
         query = await ProjectRoleDao.query_record(user_id=role.user_id, project_id=role.project_id, deleted_at=0)
@@ -109,13 +109,13 @@ async def insert_project_role(role: ProjectRoleForm, user_info=Depends(Permissio
     return SakuraResponse.success()
 
 
-@router.post("/role/update")
+@router.post("/role/update", summary="更新角色", tags=['Role'])
 async def update_project_role(role: ProjectRoleEditForm, user_info=Depends(Permission())):
     await ProjectRoleDao.update_project_role(role, user_info['id'], user_info['role'])
     return SakuraResponse.success()
 
 
-@router.post("/role/delete")
+@router.delete("/role/delete", summary="删除角色", tags=['Role'])
 async def delete_project_role(role: ProjectDelForm, user_info=Depends(Permission())):
     await ProjectRoleDao.delete_project_role(role.id, user_info['id'], user_info['role'])
     return SakuraResponse.success()

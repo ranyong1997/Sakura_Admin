@@ -19,7 +19,7 @@ from webapi.app.schema.redis_config import RedisConfigForm
 from webapi.config import Config
 
 
-@router.get("/redis/list")
+@router.get("/redis/list", summary="列出redis配置", tags=['Redis'])
 async def list_redis_config(name: str = '', addr: str = '', env: int = None,
                             cluster: bool = None, _=Depends(Permission(Config.MEMBER))):
     try:
@@ -32,7 +32,7 @@ async def list_redis_config(name: str = '', addr: str = '', env: int = None,
         return SakuraResponse.failed(e)
 
 
-@router.post("/redis/insert")
+@router.post("/redis/insert", summary="新增redis配置", tags=['Redis'])
 async def insert_redis_config(form: RedisConfigForm, user_info=Depends(Permission(Config.ADMIN))):
     try:
         query = await SakuraRedisConfigDao.query_record(name=form.name, env=form.env)
@@ -45,7 +45,7 @@ async def insert_redis_config(form: RedisConfigForm, user_info=Depends(Permissio
         return SakuraResponse.failed(e)
 
 
-@router.post("/redis/update")
+@router.post("/redis/update", summary="更新redis配置", tags=['Redis'])
 async def update_redis_config(form: RedisConfigForm, background_tasks: BackgroundTasks,
                               user_info=Depends(Permission(Config.ADMIN))):
     try:
@@ -60,7 +60,7 @@ async def update_redis_config(form: RedisConfigForm, background_tasks: Backgroun
         return SakuraResponse.failed(e)
 
 
-@router.get("/redis/delete")
+@router.delete("/redis/delete", summary="删除redis配置", tags=['Redis'])
 async def delete_redis_config(id: int, background_tasks: BackgroundTasks, user_info=Depends(Permission(Config.ADMIN)),
                               session=Depends(get_session)):
     try:
@@ -72,7 +72,7 @@ async def delete_redis_config(id: int, background_tasks: BackgroundTasks, user_i
         return SakuraResponse.failed(e)
 
 
-@router.post("/redis/command")
+@router.post("/redis/command", summary="测试redis命令", tags=['Redis'])
 async def test_redis_command(form: OnlineRedisForm):
     try:
         res = await SakuraRedisConfigDao.execute_command(form.command, id=form.id)

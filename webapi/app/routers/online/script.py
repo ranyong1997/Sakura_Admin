@@ -15,7 +15,7 @@ from webapi.app.routers.online.sql import router
 tag = "Python脚本"
 
 
-@router.post("/script")
+@router.post("/script", summary="执行py脚本", tags=[tag])
 def execute_py_script(data: PyScriptForm, user_info=Depends(Permission())):
     try:
         loc = {}

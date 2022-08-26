@@ -14,13 +14,13 @@ from webapi.app.routers import Permission
 from webapi.config import Config
 
 
-@router.get("/system", description="获取系统配置")
+@router.get("/system", summary="获取系统配置", tags=['System'])
 def get_system_config(_=Depends(Permission(Config.ADMIN))):
     configuration = SystemConfiguration.get_config()
     return SakuraResponse.success(configuration)
 
 
-@router.post("/system/update", description="更新系统配置")
+@router.post("/system/update", summary="更新系统配置", tags=['System'])
 def get_system_config(data: dict, _=Depends(Permission(Config.ADMIN))):
     SystemConfiguration.update_config(data)
     return SakuraResponse.success()

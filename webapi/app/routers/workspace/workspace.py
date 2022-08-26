@@ -17,7 +17,7 @@ from webapi.app.routers import Permission
 router = APIRouter(prefix="/workspace")
 
 
-@router.get("/", description="获取工作台用户统计数据")
+@router.get("/", summary="获取工作台用户统计数据", tags=['Notification'])
 async def query_user_statistics(user_info=Depends(Permission())):
     user_id = user_info['id']
     count = await ProjectDao.query_user_project(user_id)
@@ -29,7 +29,7 @@ async def query_user_statistics(user_info=Depends(Permission())):
                                        weekly_case=weekly_case, user_rank=user_rank, total_user=len(rank)))
 
 
-@router.get("/testplan", description="获取用户关注的测试计划执行数据")
+@router.get("/testplan", summary="获取用户关注的测试计划执行数据", tags=['Notification'])
 async def query_follow_testplan(user_info=Depends(Permission())):
     user_id = user_info['id']
     ans = await SakuraTestPlanDao.query_user_follow_test_plan(user_id)

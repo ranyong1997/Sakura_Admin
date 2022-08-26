@@ -16,7 +16,7 @@ from webapi.app.routers import Permission
 from webapi.app.routers.workspace.workspace import router
 
 
-@router.get("/statistics", description="获取统计数据", summary="获取平台统计数据")
+@router.get("/statistics", summary="获取平台统计数据", tags=['Notification'])
 async def query_follow_testplan(_=Depends(Permission())):
     end = datetime.now()
     start = datetime.now() - timedelta(days=6)

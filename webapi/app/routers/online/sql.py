@@ -19,7 +19,7 @@ from webapi.app.schema.online_sql import OnlineSQLForm
 router = APIRouter(prefix="/online")
 
 
-@router.post('/sql')
+@router.post('/sql', summary="sql执行", tags=['Sql'])
 async def execute_sql(data: OnlineSQLForm, user=Depends(Permission())):
     try:
         result, elapsed = await DbConfigDao.online_sql(data.id, data.sql)
@@ -30,7 +30,7 @@ async def execute_sql(data: OnlineSQLForm, user=Depends(Permission())):
         return SakuraResponse.failed(e)
 
 
-@router.get("/history/query", summary="获取sql执行历史记录")
+@router.get("/history/query", summary="获取sql执行历史记录", tags=['Sql'])
 async def query_sql_history(page: int = 1, size: int = 4, _=Depends(Permission())):
     data, total = await SakuraSQLHistory.list_with_pagination(page, size,
                                                               _sort=[SakuraSQLHistory.created_at.desc()],
@@ -47,7 +47,7 @@ async def query_sql_history(page: int = 1, size: int = 4, _=Depends(Permission()
     return SakuraResponse.success(dict(data=ans, total=total))
 
 
-@router.get('/tables')
+@router.get('/tables', summary="sql表", tags=['Sql'])
 async def list_tables(_=Depends(Permission())):
     try:
         result, table_map = await DbConfigDao.query_database_and_tables()
@@ -56,7 +56,7 @@ async def list_tables(_=Depends(Permission())):
         return SakuraResponse.failed(e)
 
 
-@router.get("/database/list")
+@router.get("/database/list", summary="列出数据库", tags=['Sql'])
 async def list_database(_=Depends(Permission())):
     try:
         result = await DbConfigDao.query_database_tree()
@@ -65,7 +65,7 @@ async def list_database(_=Depends(Permission())):
         return SakuraResponse.failed(e)
 
 
-@router.post("/tables/list", summary="获取数据库表和字段")
+@router.post("/tables/list", summary="获取数据库表和字段", tags=['Sql'])
 async def list_tables(form: DatabaseForm, _=Depends(Permission())):
     try:
         children, tables = await DbConfigDao.get_tables(form)

@@ -19,7 +19,7 @@ from webapi.app.utils.scheduler import Scheduler
 from webapi.config import Config
 
 
-@router.get("/plan/list")
+@router.get("/plan/list", summary="列出测试计划", tags=['TestPlan'])
 async def list_test_plan(page: int, size: int, project_id: int = None, name: str = "", priority: str = "",
                          create_user: int = None, follow: bool = None, user_info=Depends(Permission())):
     try:
@@ -32,7 +32,7 @@ async def list_test_plan(page: int, size: int, project_id: int = None, name: str
         return SakuraResponse.failed(str(e))
 
 
-@router.post("/plan/insert")
+@router.post("/plan/insert", summary="新增测试计划", tags=['TestPlan'])
 async def insert_test_plan(form: SakuraTestPlanForm, user_info=Depends(Permission(Config.MEMBER))):
     try:
         plan = await SakuraTestPlanDao.insert_test_plan(form, user_info['id'])
@@ -43,7 +43,7 @@ async def insert_test_plan(form: SakuraTestPlanForm, user_info=Depends(Permissio
         return SakuraResponse.failed(str(e))
 
 
-@router.post("/plan/update")
+@router.post("/plan/update", summary="更新测试计划", tags=['TestPlan'])
 async def update_test_plan(form: SakuraTestPlanForm, user_info=Depends(Permission(Config.MANAGER))):
     try:
         await SakuraTestPlanDao.update_test_plan(form, user_info['id'], True)
@@ -53,7 +53,7 @@ async def update_test_plan(form: SakuraTestPlanForm, user_info=Depends(Permissio
         return SakuraResponse.failed(str(e))
 
 
-@router.get("/plan/delete")
+@router.delete("/plan/delete", summary="删除测试计划", tags=['TestPlan'])
 async def delete_test_plan(id: int, user_info=Depends(Permission(Config.MANAGER)), session=Depends(get_session)):
     try:
         await SakuraTestPlanDao.delete_record_by_id(session, user_info['id'], id)
@@ -66,7 +66,7 @@ async def delete_test_plan(id: int, user_info=Depends(Permission(Config.MANAGER)
     return SakuraResponse.success()
 
 
-@router.get("/plan/switch")
+@router.get("/plan/switch", summary="扭转测试计划", tags=['TestPlan'])
 async def switch_test_plan(id: int, status: bool, user_info=Depends(Permission(Config.MANAGER))):
     try:
         Scheduler.pause_resume_test_plan(id, status)
@@ -75,7 +75,7 @@ async def switch_test_plan(id: int, status: bool, user_info=Depends(Permission(C
         return SakuraResponse.failed(str(e))
 
 
-@router.get("/plan/execute")
+@router.get("/plan/execute", summary="执行测试计划", tags=['TestPlan'])
 async def run_test_plan(id: int, user_info=Depends(Permission(Config.MEMBER))):
     try:
         asyncio.create_task(Executor.run_test_plan(id, user_info['id']))
@@ -84,7 +84,7 @@ async def run_test_plan(id: int, user_info=Depends(Permission(Config.MEMBER))):
         return SakuraResponse.failed(str(e))
 
 
-@router.get("/plan/follow", description="关注测试计划")
+@router.get("/plan/follow", summary="关注测试计划", tags=['TestPlan'])
 async def follow_test_plan(id: int, user_info=Depends(Permission(Config.MEMBER))):
     try:
         await SakuraTestPlanDao.follow_test_plan(id, user_info['id'])
@@ -93,7 +93,7 @@ async def follow_test_plan(id: int, user_info=Depends(Permission(Config.MEMBER))
         return SakuraResponse.failed(str(e))
 
 
-@router.get("/plan/unfollow", description="取消关注测试计划")
+@router.get("/plan/unfollow", summary="取关测试计划", tags=['TestPlan'])
 async def unfollow_test_plan(id: int, user_info=Depends(Permission(Config.MEMBER))):
     try:
         await SakuraTestPlanDao.unfollow_test_plan(id, user_info['id'])

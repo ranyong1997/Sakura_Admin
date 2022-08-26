@@ -18,9 +18,8 @@ from webapi.config import Config
 router = APIRouter(prefix="/oss")
 
 
-@router.post('/upload')
+@router.post('/upload', summary="获取数据库表和字段", tags=['Oss'])
 async def create_oss_file(filepath: str, file: UploadFile = File(...),
-                          session=Depends(get_session),
                           user_info=Depends(Permission(Config.MEMBER))):
     try:
         file_content = await file.read()
@@ -42,7 +41,7 @@ async def create_oss_file(filepath: str, file: UploadFile = File(...),
         return SakuraResponse.failed(f"上传失败:{e}")
 
 
-@router.post("/avatar", summary="上传用户头像")
+@router.post("/avatar", summary="上传用户头像", tags=['Oss'])
 async def upload_avatar(file: UploadFile = File(...), user_info=Depends(Permission(Config.MEMBER))):
     try:
         file_content = await file.read()
@@ -56,7 +55,7 @@ async def upload_avatar(file: UploadFile = File(...), user_info=Depends(Permissi
         return SakuraResponse.failed(f"上传用户头像失败:{e}")
 
 
-@router.get('/list')
+@router.get('/list', summary="列出oss文件", tags=['Oss'])
 async def list_oss_file(filepath: str = '', _=Depends(Permission(Config.MEMBER))):
     try:
         records = await SakuraOssDao.select_list(condition=[SakuraOssFile.file_path.like(f"%{filepath}%")])
@@ -65,7 +64,7 @@ async def list_oss_file(filepath: str = '', _=Depends(Permission(Config.MEMBER))
         return SakuraResponse.failed(f"获取失败:{e}")
 
 
-@router.get('/delete')
+@router.get('/delete', summary="删除oss文件", tags=['Oss'])
 async def delete_oss_file(filepath: str, user_info=Depends(Permission(Config.MEMBER)), session=Depends(get_session)):
     try:
         # 先获取到本地的记录,拿到sha值
@@ -80,7 +79,7 @@ async def delete_oss_file(filepath: str, user_info=Depends(Permission(Config.MEM
         return SakuraResponse.failed(f"删除失败:{e}")
 
 
-@router.get("/download")
+@router.get("/download", summary="下载oss文件", tags=['Oss'])
 async def download_oss_file(filepath: str):
     """
     更新oss文件,路径不能变化

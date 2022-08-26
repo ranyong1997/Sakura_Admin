@@ -16,7 +16,7 @@ from webapi.app.schema.database import DatabaseForm
 from webapi.config import Config
 
 
-@router.get("/dbconfig/list")
+@router.get("/dbconfig/list", summary="列出数据库配置", tags=['Dbconfig'])
 async def list_dbconfig(name: str = "", database: str = "", env: int = None,
                         user_info=Depends(Permission(Config.MEMBER))):
     try:
@@ -26,7 +26,7 @@ async def list_dbconfig(name: str = "", database: str = "", env: int = None,
         return SakuraResponse.failed(e)
 
 
-@router.post("/dbconfig/insert")
+@router.post("/dbconfig/insert", summary="插入数据库配置", tags=['Dbconfig'])
 async def insert_dbconfig(form: DatabaseForm, user_info=Depends(Permission(Config.ADMIN))):
     try:
         await DbConfigDao.insert_database(form, user_info['id'])
@@ -35,7 +35,7 @@ async def insert_dbconfig(form: DatabaseForm, user_info=Depends(Permission(Confi
         return SakuraResponse.failed(e)
 
 
-@router.post("/dbconfig/update")
+@router.post("/dbconfig/update", summary="更新数据库配置", tags=['Dbconfig'])
 async def insert_dbconfig(form: DatabaseForm, user_info=Depends(Permission(Config.ADMIN))):
     try:
         await DbConfigDao.insert_database(form, user_info['id'])
@@ -44,7 +44,7 @@ async def insert_dbconfig(form: DatabaseForm, user_info=Depends(Permission(Confi
         return SakuraResponse.failed(e)
 
 
-@router.get("dbconfig/delete", summary="删除数据库配置")
+@router.get("dbconfig/delete", summary="删除数据库配置", tags=['Dbconfig'])
 async def delete_dbconfig(id: int, user_info=Depends(Permission(Config.ADMIN))):
     try:
         await DbConfigDao.delete_database(id, user_info['id'])
@@ -53,7 +53,7 @@ async def delete_dbconfig(id: int, user_info=Depends(Permission(Config.ADMIN))):
         return SakuraResponse.failed(e)
 
 
-@router.get("dbconfig/connect", summary="测试数据库连接")
+@router.get("dbconfig/connect", summary="测试数据库连接", tags=['Dbconfig'])
 async def connect_test(sql_type: int, host: str, port: int, username: str, password: str, database: str,
                        _=Depends(Permission(Config.ADMIN))):
     try:

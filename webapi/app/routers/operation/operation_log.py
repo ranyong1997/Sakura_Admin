@@ -18,7 +18,7 @@ router = APIRouter(prefix="/operation")
 
 
 # 获取用户操作记录
-@router.get("/list")
+@router.get("/list", summary="获取用户操作记录", tags=['用户操作'])
 async def list_user_operation(start_time: str, end_time: str, user_id: int, tag: str = None, _=Depends(Permission())):
     try:
         start = datetime.strptime(start_time, "%Y-%m-%d")
@@ -31,7 +31,7 @@ async def list_user_operation(start_time: str, end_time: str, user_id: int, tag:
 
 
 # 获取用户操作记录热力图以及参与的项目数量
-@router.get("/count")
+@router.get("/count", summary="获取用户操作记录热力图以及参与的项目数量", tags=['用户操作'])
 async def list_user_activities(user_id: int, start_time: str, end_time: str, _=Depends(Permission())):
     try:
         start = datetime.strptime(start_time, "%Y-%,-%d")
