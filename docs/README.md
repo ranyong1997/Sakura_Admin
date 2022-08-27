@@ -124,4 +124,7 @@ docker-compose stop <服务名称>
 
 # 4.关闭服务并移除容器
 docker-compose down
+
+# 5.Mac系统激活虚拟华南
+source venv/bin/activate
 ```
