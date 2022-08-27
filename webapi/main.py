@@ -37,7 +37,7 @@ from webapi.config import Config, SAKURA_ENV, BANNER
 from webapi.app.utils.scheduler import Scheduler
 
 logger = init_logging()
-logger.bind(name=None).opt(ansi=True).success(f"sakura 正在运行环境: <red>{SAKURA_ENV}</red>")
+logger.bind(name=None).opt(ansi=True).success(f"sakura 正在运行环境: <red>{SAKURA_ENV} 网址: http://localhost:7777/docs</red>")
 logger.bind(name=None).success(BANNER)
 
 
@@ -76,7 +76,7 @@ async def serve_spa(request: Request):
 
 @sakura.get("/{filename}", tags=['Other'])
 async def get_site(filename):
-    filename = f"./statics/{filename}"
+    filename = f"app/statics/{filename}"
     if not isfile(filename):
         return Response(status_code=404)
     with open(filename, mode='rb') as f:
@@ -87,7 +87,7 @@ async def get_site(filename):
 
 @sakura.get("/static/{filename}", tags=['Other'])
 async def get_site_static(filename):
-    filename = f"./statics/static/{filename}"
+    filename = f"app/statics/static/{filename}"
     if not isfile(filename):
         return Response(status_code=404)
     with open(filename, mode='rb') as f:
