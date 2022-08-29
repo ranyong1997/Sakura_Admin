@@ -30,7 +30,7 @@ class UserDao(Mapper):
         try:
             async with async_session() as session:
                 async with session.begin():
-                    sql = update(User).where(User.id == user_id).value(avatar=avatar_url)
+                    sql = update(User).where(User.id == user_id).values(avatar=avatar_url)
                     await session.execute(sql)
         except Exception as e:
             UserDao.log.error(f"修改用户头像失败:{str(e)}")
