@@ -24,7 +24,7 @@ class User(Base):
     updated_at = Column(TIMESTAMP, nullable=False, default=datetime.now())
     deleted_at = Column(BIGINT, nullable=False, default=0)
     update_user = Column(INT, nullable=True)  # 修改人
-    last_login_in = Column(TIMESTAMP)
+    last_login_at = Column(TIMESTAMP)
     avatar = Column(String(128), nullable=True, default=None)
     # 管理员可以禁用某个用户
     is_valid = Column(Boolean, nullable=False, default=True, comment="是否合法")

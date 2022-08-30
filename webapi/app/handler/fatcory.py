@@ -22,8 +22,8 @@ class SakuraResponse(object):
             return obj
         data = {}
         for c in obj.__table__.columns:
-            # 如果字段忽略,则不进行转换
             if c.name in ignore:
+                # 如果字段忽略, 则不进行转换
                 continue
             val = getattr(obj, c.name)
             if isinstance(val, datetime):

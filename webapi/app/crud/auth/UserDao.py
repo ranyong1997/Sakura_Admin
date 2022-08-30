@@ -33,7 +33,7 @@ class UserDao(Mapper):
                     sql = update(User).where(User.id == user_id).values(avatar=avatar_url)
                     await session.execute(sql)
         except Exception as e:
-            UserDao.log.error(f"修改用户头像失败:{str(e)}")
+            UserDao.log.error(f"修改用户头像失败: {str(e)}")
             raise Exception(e) from e
 
     @staticmethod
@@ -153,23 +153,24 @@ class UserDao(Mapper):
         try:
             pwd = UserToken.add_salt(password)
             async with async_session() as session:
-                # 查询用户名/密码匹配且没有被删除的用户
-                query = await session.execute(
-                    select(User).where(or_(User.username == username, User.email == username), User.password == pwd,
-                                       User.deleted_at == 0))
-                user = query.scalars().first()
-                if user is None:
-                    raise Exception("用户名或密码错误！")
-                if not user.is_valid:
-                    # 说明用户被禁用
-                    raise Exception("您的账号被禁用,请联系管理员!")
-                user.last_login_at = datetime.now()
-                await session.flush()
-                session.expunge(user)
-                return user
+                async with session.begin():
+                    # 查询用户名/密码匹配且没有被删除的用户
+                    query = await session.execute(
+                        select(User).where(or_(User.username == username, User.email == username), User.password == pwd,
+                                           User.deleted_at == 0))
+                    user = query.scalars().first()
+                    if user is None:
+                        raise Exception("用户名或密码错误")
+                    if not user.is_valid:
+                        # 说明用户被禁用
+                        raise Exception("您的账号已被封禁, 请联系管理员")
+                    user.last_login_at = datetime.now()
+                    await session.flush()
+                    session.expunge(user)
+                    return user
         except Exception as e:
-            UserDao.log.error(f"用户{username}登录失败:{str(e)}")
-            raise Exception("登录失败") from e
+            UserDao.log.error(f"用户{username}登录失败: {str(e)}")
+            raise e
 
     @staticmethod
     @RedisHelper.cache("user_list", 3 * 3600)
