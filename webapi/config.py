@@ -106,6 +106,7 @@ class ProConfig(BaseConfig):
         env_file = os.path.join(ROOT, "conf", "pro.env")
 
     SERVER_REPORT = "http://localhost:8000/#/record/report/"
+    SERVER_HOST = "127.0.0.1"
 
 
 # 获取sakura环境变量

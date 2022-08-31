@@ -288,7 +288,7 @@ class Mapper(object):
     @classmethod
     @RedisHelper.up_cache("dao")
     @connect(True)
-    async def insert(cls, *, model: SakuraBase, session: AsyncSession = None, log=False, not_begin=False):
+    async def insert(cls, *, model: SakuraBase, session: AsyncSession = None, log=False):
         session.add(model)
         await session.flush()
         session.expunge(model)

@@ -45,7 +45,7 @@ async def login(data: UserForm):
 
 
 @router.get("/listUser", summary="列出用户", tags=['User'])
-async def list_users():
+async def list_users(user=Depends(Permission())):
     try:
         user = await UserDao.list_users()
         return SakuraResponse.success(user, exclude=("password",))

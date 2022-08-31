@@ -6,7 +6,6 @@
 # @File    : ProjectRoleDao.py
 # @Software: PyCharm
 # @desc    : 项目角色(dao)逻辑
-import asyncio
 from copy import deepcopy
 from typing import List
 from sqlalchemy import select
@@ -14,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from webapi.app.crud import Mapper, ModelWrapper
 from webapi.app.enums.OperationEnum import OperationType
 from webapi.app.excpetions.AuthException import AuthException
-from webapi.app.models import async_session, DatabaseHelper
+from webapi.app.models import async_session
 from webapi.app.models.project import Project
 from webapi.app.models.project_role import ProjectRole
 from webapi.app.routers.project.project_schema import ProjectRoleEditForm

@@ -43,7 +43,7 @@ export default defineComponent({
     const registerRef = ref(null) //注册ref
     const router = useRouter() //路由
     const param = ref({
-      username: 'admin',
+      username: 'root',
       password: '123456'
     })
     const state = reactive({

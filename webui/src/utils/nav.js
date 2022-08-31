@@ -10,7 +10,7 @@ import request from './axios'
 export function login(data) {
     data = `username=${data.username}&password=${data.password}`
     return request({
-        url: "/api/admin/login/access_token",
+        url: "/auth/login",
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
         method: "post",
         data

@@ -3,7 +3,7 @@
  * @version: 
  * @Author: 冉勇
  * @Date: 2022-07-09 08:33:10
- * @LastEditTime: 2022-07-12 16:52:16
+ * @LastEditTime: 2022-08-31 09:57:00
  */
 import axios from 'axios'
 
@@ -11,7 +11,7 @@ import axios from 'axios'
 axios.defaults.timeout = 7 * 24 * 60 // 超时时间
 axios.defaults.withCredentials = false // 跨域凭证
 // axios.defaults.baseURL = 'http://192.168.1.196:9527'  //自动加在url前面
-axios.defaults.baseURL = 'http://127.0.0.1:8001'  //自动加在url前面 本地服务
+axios.defaults.baseURL = 'http://localhost:7777/'  //自动加在url前面 本地服务
 // 注意,实例中无法使用全局拦截器
 
 // request拦截器
