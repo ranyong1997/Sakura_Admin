@@ -105,12 +105,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @sakura.exception_handler(PermissionException)
 async def unexpected_exception_error(request: Request, exc: PermissionException):
-    """
-    意外异常错误
-    :param request:
-    :param exc:
-    :return:
-    """
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({

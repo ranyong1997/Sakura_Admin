@@ -9,7 +9,6 @@
 import asyncio
 import functools
 import os
-import typing
 from datetime import datetime
 from functools import wraps
 from typing import Coroutine
@@ -41,7 +40,6 @@ def case_log(func):
             self.logger.o_append("[{}]:步骤结束 -> {} {}".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                                                              doc.strip() if doc else func.__name__,
                                                              get_returns(returns)))
-
             return returns
     else:
         @wraps(func)
@@ -54,7 +52,6 @@ def case_log(func):
             if not isinstance(returns, Coroutine):
                 self.logger.o_append(
                     f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]: 步骤结束 -> {doc.strip() if doc else func.__name__} {get_returns(returns)}")
-
             else:
                 self.logger.o_append(
                     f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]: 步骤结束 -> {doc.strip() if doc else func.__name__}")
@@ -94,7 +91,6 @@ def lock(key):
     :param key: 唯一key,确保所有任务一致,但不与其他任务冲突
     :return:
     """
-
     def decorator(func):
         if asyncio.iscoroutinefunction(func):
             @functools.wraps(func)
@@ -117,5 +113,4 @@ def lock(key):
                 except RedLockError:
                     print(f"进程: {os.getpid()}获取任务失败,不用担心,还有其他为你执行")
         return wrapper
-
     return decorator

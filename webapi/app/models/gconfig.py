@@ -15,7 +15,7 @@ class GConfig(SakuraBase):
     env = Column(INT)
     key = Column(String(16))
     value = Column(TEXT)
-    key_type = Column(INT, nullable=False, comment="0:string 1:json 2:yaml")
+    key_type = Column(INT, nullable=False, comment="0: string 1: json 2: yaml")
     # 是否可用
     enable = Column(Boolean, default=True)
     __table_args__ = (

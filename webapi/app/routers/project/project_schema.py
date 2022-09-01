@@ -15,7 +15,7 @@ class ProjectForm(BaseModel):
     app: str
     owner: int
     private: bool = False
-    description: str
+    description: str = ''
     dingtalk_url: str = None
 
     @validator('name', 'app', 'owner')

@@ -5,7 +5,7 @@
 # @Site    : 
 # @File    : user.py
 # @Software: PyCharm
-# @desc    : 用户管理【github登录】路由
+# @desc    : 用户管理路由
 import asyncio
 import requests
 from fastapi import APIRouter, Depends
