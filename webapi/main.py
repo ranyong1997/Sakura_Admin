@@ -7,7 +7,6 @@
 # @Software: PyCharm
 # @desc    : 主入口
 import asyncio
-import contextlib
 from mimetypes import guess_type
 from os.path import isfile
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
@@ -42,16 +41,19 @@ logger.bind(name=None).success(BANNER)
 
 
 async def request_info(request: Request):
-    logger.bind(name=None).debug(f"{request.method}{request.url}")
+    logger.bind(name=None).debug(f"{request.method} {request.url}")
     try:
         body = await request.json()
-        logger.bind(payload=body, name=None).debug("request_json:")
-    except Exception:
-        with contextlib.suppress(Exception):
+        logger.bind(payload=body, name=None).debug("request_json: ")
+    except:
+        try:
             body = await request.body()
             if len(body) != 0:
-                # 有请求体,记录日志
+                # 有请求体，记录日志
                 logger.bind(payload=body, name=None).debug(body)
+        except:
+            # 忽略文件上传类型的数据
+            pass
 
 
 # 注册路由
@@ -76,18 +78,18 @@ async def serve_spa(request: Request):
 
 @sakura.get("/{filename}", tags=['Other'])
 async def get_site(filename):
-    filename = f"app/statics/{filename}"
+    filename = f"./statics/{filename}"
     if not isfile(filename):
         return Response(status_code=404)
     with open(filename, mode='rb') as f:
         content = f.read()
-    content_type = guess_type(filename)
+    content_type, _ = guess_type(filename)
     return Response(content, media_type=content_type)
 
 
 @sakura.get("/static/{filename}", tags=['Other'])
 async def get_site_static(filename):
-    filename = f"app/statics/static/{filename}"
+    filename = f'./statics/static/{filename}'
     if not isfile(filename):
         return Response(status_code=404)
     with open(filename, mode='rb') as f:
@@ -105,12 +107,12 @@ async def init_redis():
     """
     try:
         await RedisHelper.ping()
-        logger.bind(name=None).success("Redis 连接成功.✔")
+        logger.bind(name=None).success("Redis 连接成功.          ✔")
     except Exception as e:
         if not Config.REDIS_ON:
-            logger.bind(name=None).warning("没有选择redis，所以我们不能保证任务不重复执行.🚫")
+            logger.bind(name=None).warning("没有选择redis，所以我们不能保证任务不重复执行.          🚫")
             return
-        logger.bind(name=None).error("Redis 连接失败，请检查 config.py 中的 redis 配置.❌")
+        logger.bind(name=None).error("Redis 连接失败，请检查 config.py 中的 redis 配置.          ❌")
         raise e
 
 
@@ -129,7 +131,7 @@ def init_scheduler():
     Scheduler.init(scheduler)
     Scheduler.configure(jobstore=job_store)
     Scheduler.start()
-    logger.bind(name=None).success("ApScheduler 启动成功.✔")
+    logger.bind(name=None).success("ApScheduler 启动成功.          ✔")
 
 
 @sakura.on_event("startup")
@@ -140,9 +142,9 @@ async def init_database():
     """
     try:
         asyncio.create_task(create_table())
-        logger.bind(name=None).success("数据库和表创建成功.✔")
+        logger.bind(name=None).success("数据库和表创建成功.          ✔")
     except Exception as e:
-        logger.bind(name=None).error(f"数据库和表创建失败.❌ \n Error:{str(e)}")
+        logger.bind(name=None).error(f"数据库和表创建失败.          ❌ \n Error:{str(e)}")
         raise
 
 
@@ -169,8 +171,8 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
             "HEARTBEAT": f"{user_id}"
         }
         # 存储连接后获取信息
-        msg_records = await SakuraNotificationDao.list_message(msg_type=MessageTypeEnum.all.value, receiver=user_id,
-                                                               msg_status=MessageStateEnum.unread.value)
+        msg_records = await SakuraNotificationDao.list_messages(msg_type=MessageTypeEnum.all.value, receiver=user_id,
+                                                                msg_status=MessageStateEnum.unread.value)
         # 如果有未读消息,则推送给前端对应的count
         if len(msg_records) > 0:
             await websocket.send_json(WebSocketMessage.msg_count(len(msg_records), True))

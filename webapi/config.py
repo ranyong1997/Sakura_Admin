@@ -67,7 +67,7 @@ class BaseConfig(BaseSettings):
     PASSWORD_HTML_PATH = os.path.join(ROOT, "templates", "reset_password.html")
 
     # APP路径
-    APP_PATH = os.path.join(ROOT, "app")
+    APP_PATH = os.path.join(ROOT, "../webapi/app")
 
     # dao路径
     DAO_PATH = os.path.join(APP_PATH, "crud")

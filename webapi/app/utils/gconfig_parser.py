@@ -6,7 +6,6 @@
 # @File    : gconfig_parser.py
 # @Software: PyCharm
 # @desc    : 全局配置解析器
-
 import json
 import yaml
 from webapi.app.utils.logger import Log

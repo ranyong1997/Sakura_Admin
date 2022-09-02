@@ -41,7 +41,7 @@ class UserForm(BaseModel):
     username: str
     password: str
 
-    @validator("password", "username")
+    @validator('password', 'username')
     def name_not_empty(cls, v):
         if isinstance(v, str) and len(v.strip()) == 0:
             raise ParamsError("不能为空")

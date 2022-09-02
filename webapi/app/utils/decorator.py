@@ -78,11 +78,11 @@ def get_str(args, kwargs):
 def get_returns(obj):
     if not obj:
         return ""
-    if type(obj).__name__ == "function":
-        return obj.__obj__ if obj.__doc__ else obj.__name__
+    if callable(obj):
+        return obj.__doc__ if obj.__doc__ else obj.__name__
     if isinstance(obj, object):
         return str(obj)
-    return f"返回值:{obj}"
+    return f"返回值: {obj}"
 
 
 def lock(key):
@@ -91,6 +91,7 @@ def lock(key):
     :param key: 唯一key,确保所有任务一致,但不与其他任务冲突
     :return:
     """
+
     def decorator(func):
         if asyncio.iscoroutinefunction(func):
             @functools.wraps(func)
@@ -108,9 +109,9 @@ def lock(key):
                     with RedLock(f"distributed_lock:{func.__name__}:{key}:{str(args)}",
                                  connection_details=Config.REDIS_NODES,
                                  ttl=30000):  # 锁释放时间为30s
-
                         return func(*args, **kwargs)
                 except RedLockError:
                     print(f"进程: {os.getpid()}获取任务失败,不用担心,还有其他为你执行")
         return wrapper
+
     return decorator

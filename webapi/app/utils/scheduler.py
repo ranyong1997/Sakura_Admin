@@ -30,8 +30,9 @@ class Scheduler(object):
 
     @staticmethod
     def add_test_plan(plan_id, plan_name, cron):
-        return Scheduler.scheduler.add_job(func=Executor.run_test_plan, args=plan_id,
-                                           name=plan_name, id=str(plan_id), trigger=CronTrigger.from_crontab(cron))
+        return Scheduler.scheduler.add_job(func=Executor.run_test_plan, args=(plan_id,),
+                                           name=plan_name, id=str(plan_id),
+                                           trigger=CronTrigger.from_crontab(cron))
 
     @staticmethod
     def edit_test_plan(plan_id, plan_name, cron):

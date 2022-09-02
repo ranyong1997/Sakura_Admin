@@ -20,19 +20,18 @@ from loguru._defaults import LOGURU_FORMAT
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.errors import ServerErrorMiddleware
 from starlette.types import Message
-from starlette_context import middleware, plugins
 from webapi.app.excpetions.RequestException import AuthException
 from webapi.app.excpetions.RequestException import PermissionException
 from webapi.config import Config
-
+# from starlette_context import middleware, plugins
 sakura = FastAPI()
 
-sakura.add_middleware(
-    middleware.ContextMiddleware,
-    plugins={
-        plugins.ForwardedForPlugin()
-    }
-)
+# sakura.add_middleware(
+#     middleware.ContextMiddleware,
+#     plugins={
+#         plugins.ForwardedForPlugin()
+#     }
+# )
 
 # 配置日志格式
 INFO_FORMAT = "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> " \
@@ -109,7 +108,7 @@ async def unexpected_exception_error(request: Request, exc: PermissionException)
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({
             "code": 403,
-            "msg": exc.detail,
+            "msg": exc.detail
         })
     )
 
@@ -228,8 +227,8 @@ def init_logging():
     sakura_info = os.path.join(Config.LOG_DIR, f"{Config.SAKURA_INFO}.log")
     # 为sakura添加一个error log的文件,主要记录warning和error级别的日志
     sakura_error = os.path.join(Config.LOG_DIR, f"{Config.SAKURA_ERROR}.log")
-    logger.add(sakura_info, enqueue=True, rotation="10 MB", level="DEBUG", filter=make_filter(Config.SAKURA_INFO))
-    logger.add(sakura_error, enqueue=True, rotation="10 MB", level="WARNING", filter=make_filter(Config.SAKURA_ERROR))
+    logger.add(sakura_info, enqueue=True, rotation="20 MB", level="DEBUG", filter=make_filter(Config.SAKURA_INFO))
+    logger.add(sakura_error, enqueue=True, rotation="20 MB", level="WARNING", filter=make_filter(Config.SAKURA_ERROR))
 
     # 配置loguru的日志句柄,sink代表输出目标
     logger.configure(

@@ -21,8 +21,8 @@ class SakuraTestPlanForm(BaseModel):
     ordered: bool
     case_list: List[int]
     pass_rate: int
-    receiver: List[int] = []
-    msg_type: List[int] = []
+    receiver: List[int] = list()
+    msg_type: List[int] = list()
     retry_minutes: int = 0
 
     @validator("case_list", "project_id", "env", "cron", "ordered", "priority", "name", "pass_rate")

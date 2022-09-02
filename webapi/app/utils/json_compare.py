@@ -54,9 +54,9 @@ class JsonCompare(object):
                 j += 1
         elif a != b:
             ans.append(
-                f"{path} 数据不一致:{a} 【❌】"
+                f"{path} 数据不一致: {a} 【❌】"
                 f"!= {b}" if path != "" else
-                f"数据不一致:{a} !={b}【❌】")
+                f"数据不一致: {a} != {b}【❌】")
 
     def _to_json(self, string):
         try:

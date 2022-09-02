@@ -288,7 +288,7 @@ class Mapper(object):
     @classmethod
     @RedisHelper.up_cache("dao")
     @connect(True)
-    async def insert(cls, *, model: SakuraBase, session: AsyncSession = None, log=False):
+    async def insert(cls, *, model: SakuraBase, session: AsyncSession = None, log=False, not_begin=False):
         session.add(model)
         await session.flush()
         session.expunge(model)
@@ -455,23 +455,29 @@ class Mapper(object):
         :param new_id:
         :return:
         """
-        cls_ = id_field.parent.clss_
+        cls_ = id_field.parent.class_
         if old_id is None:
             id_list = await cls.get_id_list(new_id)
-            data = await session.execute(select(cls_).where(getattr(cls, id_field.name).in_(id_list)))
+            data = await session.execute(select(cls_).where(getattr(cls_, id_field.name).in_(id_list)))
             result = data.scalars().all()
             if result is None:
                 return new_id, None
-            ans = [getattr(r, name_field, new_id) for r in result]
+            ans = []
+            for r in result:
+                ans.append(getattr(r, name_field.name, new_id))
             return ",".join(map(str, ans)), None
         new_list = await cls.get_id_list(new_id)
         old_list = await cls.get_id_list(old_id)
         id_list = old_list + new_list
         data = await session.execute(select(cls_).where(getattr(cls_, id_field.name).in_(id_list)))
         old_ans, new_ans = [], []
-        mp = {getattr(d, id_field, None): getattr(d, name_field, None) for d in data.scalars()}
-        old_ans.extend(mp.get(t, t) for t in old_list)
-        new_ans.extend(mp.get(i, i) for i in new_list)
+        mp = dict()
+        for d in data.scalars():
+            mp[getattr(d, id_field.name, None)] = getattr(d, name_field.name, None)
+        for t in old_list:
+            old_ans.append(mp.get(t, t))
+        for i in new_list:
+            new_ans.append(mp.get(i, i))
         return ",".join(map(str, new_ans)), ",".join(map(str, old_ans))
 
     @classmethod
@@ -528,8 +534,10 @@ class Mapper(object):
         ans = []
         fields = getattr(model, Config.FIELD, None)
         fields = [x.name for x in fields] if fields else list()
-        ans.extend(c.name for c in model.__table__.columns if
-                   c.name not in Config.IGNORE_FIELDS and (not fields or c.name in fields))
+        for c in model.__table__.columns:
+            if c.name in Config.IGNORE_FIELDS or (fields and c.name not in fields):
+                continue
+            ans.append(c.name)
         return ans
 
     @classmethod

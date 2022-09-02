@@ -28,17 +28,16 @@ class RequestInfo(pydantic.BaseModel):
     def __init__(self, flow=None, **kwargs):
         if flow:
             kwargs.update(
-                dict(
-                    status_code=flow.response.status_code,
-                    url=flow.request.url,
-                    request_method=flow.request.method,
-                    request_headers=dict(flow.request.headers),
-                    response_content=self.get_response(flow.response),
-                    body=self.get_body(flow.request),
-                    cookies=dict(flow.response.cookies),
-                    request_cookies=dict(flow.request.cookies)
-                )
-            )
+                dict(status_code=flow.response.status_code,
+                     url=flow.request.url,
+                     request_method=flow.request.method,
+                     request_headers=dict(flow.request.headers),
+                     response_headers=dict(flow.response.headers),
+                     response_content=self.get_response(flow.response),
+                     body=self.get_body(flow.request),
+                     cookies=dict(flow.response.cookies),
+                     request_cookies=dict(flow.request.cookies),
+                     ))
         super().__init__(**kwargs)
 
     def from_dict(self, **kwargs):

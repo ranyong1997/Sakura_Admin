@@ -26,7 +26,7 @@ async def list_dbconfig(name: str = "", database: str = "", env: int = None,
         return SakuraResponse.failed(e)
 
 
-@router.post("/dbconfig/insert", summary="插入数据库配置", tags=['Dbconfig'])
+@router.post("/dbconfig/insert", summary="新增数据库配置", tags=['Dbconfig'])
 async def insert_dbconfig(form: DatabaseForm, user_info=Depends(Permission(Config.ADMIN))):
     try:
         await DbConfigDao.insert_database(form, user_info['id'])
@@ -36,9 +36,9 @@ async def insert_dbconfig(form: DatabaseForm, user_info=Depends(Permission(Confi
 
 
 @router.post("/dbconfig/update", summary="更新数据库配置", tags=['Dbconfig'])
-async def insert_dbconfig(form: DatabaseForm, user_info=Depends(Permission(Config.ADMIN))):
+async def update_dbconfig(form: DatabaseForm, user_info=Depends(Permission(Config.ADMIN))):
     try:
-        await DbConfigDao.insert_database(form, user_info['id'])
+        await DbConfigDao.update_database(form, user_info['id'])
         return SakuraResponse.success()
     except Exception as e:
         return SakuraResponse.failed(e)

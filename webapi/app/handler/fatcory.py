@@ -16,11 +16,12 @@ from webapi.app.handler.encoder import jsonable_encoder
 
 
 class SakuraResponse(object):
+
     @staticmethod
     def model_to_dict(obj, *ignore: str):
         if getattr(obj, '__table__', None) is None:
             return obj
-        data = {}
+        data = dict()
         for c in obj.__table__.columns:
             if c.name in ignore:
                 # 如果字段忽略, 则不进行转换
@@ -45,7 +46,7 @@ class SakuraResponse(object):
 
     @staticmethod
     def json_serialize(obj):
-        ans = {}
+        ans = dict()
         for k, o in dict(obj).items():
             if isinstance(o, set):
                 ans[k] = list(o)
@@ -72,8 +73,9 @@ class SakuraResponse(object):
 
     @staticmethod
     def encode_json(data: Any, *exclude: str):
-        return jsonable_encoder(data, exclude=exclude,
-                                custom_encoder={datetime: lambda x: x.strftime("%Y-%m-%d %H:%M:%S")})
+        return jsonable_encoder(data, exclude=exclude, custom_encoder={
+            datetime: lambda x: x.strftime("%Y-%m-%d %H:%M:%S")
+        })
 
     @staticmethod
     def success(data=None, code=0, msg="操作成功", exclude=()):
@@ -84,9 +86,9 @@ class SakuraResponse(object):
         return dict(code=code, msg=msg, data=SakuraResponse.model_to_list(data))
 
     @staticmethod
-    def success_with_size(data: list, code=0, msg="操作成功", total=0):
+    def success_with_size(data=None, code=0, msg="操作成功", total=0):
         if data is None:
-            return SakuraResponse.encode_json(dict(code=code, msg=msg, data=list, total=0))
+            return SakuraResponse.encode_json(dict(code=code, msg=msg, data=list(), total=0))
         return SakuraResponse.encode_json(dict(code=code, msg=msg, data=data, total=total))
 
     @staticmethod
@@ -95,7 +97,7 @@ class SakuraResponse(object):
 
     @staticmethod
     def forbidden():
-        return dict(code=403, msg="对不起,您没有权限！")
+        return dict(code=403, msg="对不起, 你没有权限")
 
     @staticmethod
     def file(filepath, filename):
