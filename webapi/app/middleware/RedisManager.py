@@ -23,7 +23,7 @@ from webapi.config import Config
 
 class SakuraRedisManager(object):
     """非线程安全，可能存在问题
-    """
+        """
     _cluster_pool = dict()
     _pool = dict()
 
@@ -304,7 +304,8 @@ class RedisHelper(object):
                     info = pickle.dumps(new_data)
                     # logger.bind(name=None).debug(f"set redis key: {redis_key}")
                     # 添加随机数防止缓存雪崩
-                    RedisHelper.sakura_redis_client.set(redis_key, info.hex(), ex=expired_time + Random().randint(10, 59))
+                    RedisHelper.sakura_redis_client.set(redis_key, info.hex(),
+                                                        ex=expired_time + Random().randint(10, 59))
                     return new_data
 
                 return wrapper
@@ -319,6 +320,7 @@ class RedisHelper(object):
         :param key_and_suffix: 要删除的key和key组成规则
         :return:
         """
+
         def decorator(func):
             if asyncio.iscoroutinefunction(func):
                 @functools.wraps(func)
@@ -357,4 +359,3 @@ class RedisHelper(object):
                 return wrapper
 
         return decorator
-
