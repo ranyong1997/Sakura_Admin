@@ -39,7 +39,6 @@ async def login(data: UserForm):
         user = await UserDao.login(data.username, data.password)
         user = SakuraResponse.model_to_dict(user, "password")  # 排除显示密码
         expire, token = UserToken.get_token(user)
-        print("expire-->", expire, "token-->", token)
         return SakuraResponse.success(dict(token=token, user=user, expire=expire), msg="🎊🎊登录成功")
     except Exception as e:
         return SakuraResponse.failed(e)
