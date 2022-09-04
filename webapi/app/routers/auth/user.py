@@ -6,6 +6,7 @@
 # @File    : user.py
 # @Software: PyCharm
 # @desc    : 用户管理路由
+import traceback
 import asyncio
 import requests
 from fastapi import APIRouter, Depends
@@ -30,6 +31,7 @@ async def register(user: UserDto):
         await UserDao.register_user(**user.dict())
         return SakuraResponse.success(msg="🎉🎉注册成功,请登录")
     except Exception as e:
+        traceback.print_exc(e)
         return SakuraResponse.failed(e)
 
 
@@ -41,6 +43,7 @@ async def login(data: UserForm):
         expire, token = UserToken.get_token(user)
         return SakuraResponse.success(dict(token=token, user=user, expire=expire), msg="🎊🎊登录成功")
     except Exception as e:
+        traceback.print_exc(e)
         return SakuraResponse.failed(e)
 
 
