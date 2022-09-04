@@ -128,3 +128,10 @@ docker-compose down
 # 5.Mac系统激活虚拟华南
 source venv/bin/activate
 ```
+#### 下一步进展
+```
+1、引入测试报告
+https://github.com/yongchin0821/pywebreport
+2、引入Httprunner3
+https://github.com/httprunner/httprunner
+```
