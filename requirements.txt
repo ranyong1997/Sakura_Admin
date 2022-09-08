@@ -34,3 +34,4 @@ py-mock
 starlette_context
 gunicorn
 supervisor
+httprunner~=3.1.6
