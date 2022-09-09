@@ -1,0 +1,41 @@
+2022-08-29 09:23:28.658 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: register_user | 行数: 142 | - 用户注册失败:用户名或邮箱已存在！
+2022-08-29 09:23:35.264 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: register_user | 行数: 142 | - 用户注册失败:用户名或邮箱已存在！
+2022-08-30 14:15:00.715 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: register_for_github | 行数: 111 | - Github用户登录失败: (pymysql.err.IntegrityError) (1048, "Column 'email' cannot be null")
+[SQL: INSERT INTO sakura_user (username, name, password, email, `role`, phone, created_at, updated_at, deleted_at, update_user, last_login_in, avatar, is_valid) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)]
+[parameters: (None, None, '542b9eb1771a4f78089ebd14d0d710ec', None, 0, None, datetime.datetime(2022, 8, 30, 14, 15, 0, 697852), datetime.datetime(2022, 8, 30, 14, 15, 0, 697852), 0, None, None, None, 1)]
+(Background on this error at: http://sqlalche.me/e/14/gkpj)
+2022-08-30 17:32:45.723 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 171 | - 用户root登录失败:用户名或密码错误！
+2022-08-30 17:33:01.073 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 171 | - 用户root1登录失败:用户名或密码错误！
+2022-08-30 17:33:13.229 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 171 | - 用户root登录失败:用户名或密码错误！
+2022-08-30 17:33:21.677 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 171 | - 用户root登录失败:用户名或密码错误！
+2022-08-31 11:37:49.270 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户fewfa登录失败: 用户名或密码错误
+2022-08-31 11:38:21.283 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户fefe登录失败: 用户名或密码错误
+2022-08-31 11:38:41.209 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户fewfa登录失败: 用户名或密码错误
+2022-08-31 11:38:49.747 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-08-31 11:39:18.217 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-08-31 11:39:52.612 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-08-31 11:40:14.086 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-08-31 11:46:24.881 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-08-31 15:58:26.111 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: register_user | 行数: 142 | - 用户注册失败:用户名或邮箱已存在！
+2022-08-31 16:19:51.011 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户1234登录失败: 用户名或密码错误
+2022-09-01 09:33:18.282 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:33:26.575 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:34:16.962 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:35:16.291 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:35:28.594 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:36:02.265 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:36:40.030 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:37:11.414 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:38:23.275 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:38:35.145 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:39:59.227 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:40:51.662 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-01 09:45:53.273 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 用户名或密码错误
+2022-09-02 17:45:59.710 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 'AsyncSession' object has no attribute 'first'
+2022-09-02 17:46:13.959 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 'AsyncSession' object has no attribute 'all'
+2022-09-02 17:46:36.589 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 'list' object has no attribute 'is_valid'
+2022-09-02 17:46:38.118 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 'list' object has no attribute 'is_valid'
+2022-09-02 17:46:38.930 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 172 | - 用户root登录失败: 'list' object has no attribute 'is_valid'
+2022-09-02 17:49:03.949 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 173 | - 用户root登录失败: 'ScalarResult' object has no attribute 'is_valid'
+2022-09-02 17:49:38.597 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 173 | - 用户root登录失败: Instance <User at 0x1af26330e50> is not present in this Session
+2022-09-02 17:49:42.591 | ERROR    | 文件: E:\gitpush\Sakura_Admin\webapi\app\crud\auth\UserDao.py | 模块: UserDao | 方法: login | 行数: 173 | - 用户root登录失败: Instance <User at 0x1af26357ee0> is not present in this Session
