@@ -35,3 +35,4 @@ starlette_context
 gunicorn
 supervisor
 pyDes~=2.0.1
+allure-pytest

@@ -1,0 +1,29 @@
+# 模板
+config: # 全局配置，每个测试用例都必须有config部分
+    name: 安全组业务流接口测试  # 用例描述，name是必须要有的，其它配置项为可选项，根据实际项目增删
+    base_url: ${ENV(HOST)}  # 项目路径，亦可配置在环境配置env文件中
+    variables:  # 参数变量
+        Opertype: ADD
+        poolId: e3cc3d8b90b4465998ddfec569a66612
+        resType: SECURITYGROUP
+        name: dyd${random_num()}  # 此处调用了在debugtalk.py中定义的生成随机数的函数
+        secGType: SECURITY_VM
+        adapterType: SINGLE
+        approvalType: SECURITYGROUP-ADD
+    verify: False  # 指定是否验证服务器的 TLS 证书。如果我们想记录测试用例执行的 HTTP 流量，这尤其有用，因为如果 verify 未设置或设置为 True，则会发生 SSLError。
+
+teststeps:  # 每个测试用例都有1个或多个测试步骤，name，request是必须有的，其它根据实际项目配置
+-   name: 登录平台  # 步骤一，登录平台
+    request:  # 配置请求信息，（请求方法、url、头信息、传参等）
+        method: POST
+        url: ${ENV(HOST)}/auth/login  # 因全局配置中已存在base_url,故在测试步骤不必填写，其会自动拼接
+        headers:
+            accept: application/json
+            Content-Type: application/json
+        data: # 入参参数
+            username: ${ENV(USERNAME)}  # 引用env环境配置中的账号和密码
+            password: ${ENV(PASSWORD)}
+    extract:  # 提取响应数据中的access_token值
+        access_token: body.data.token # # body是响应体json的根节点
+    validate: # 判断是否成功，可使用多个断言
+      - eq: ["status_code", 200]
