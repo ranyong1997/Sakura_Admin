@@ -10,7 +10,7 @@
 - 使用Allure，让测试报告更加美观，可读性更强
 - 通过与locust的结合，可以很方便利用httprunner进行接口性能测试
 - 支持CLI命令，更可与持续集成工具(CI/CD)完美结合，如Jenkins
-
+ 是
 HttpRunner官方网址：[HttpRunner 3.x文档](https://httprunner.com/httprunner/)
 
 ## HttpRunner安装
