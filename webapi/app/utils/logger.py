@@ -30,7 +30,7 @@ class Log(object):
         :return:
         """
         file_name, line, func, _, _ = inspect.getframeinfo(inspect.currentframe().f_back)
-        logger.bind(name=Config.SAKURA_INFO, func=func, line=line, business=self.business, filename=file_name).debug(
+        logger.bind(name=Config.SAKURA_INFO, func=func, line=line, business=self.business, filename=file_name).info(
             message)
 
     def error(self, message: str):
